@@ -1,0 +1,351 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.page { font-family: var(--font-sans); max-width: 860px; }
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 0 0 2rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 3.5rem; }
+.nav-logo { display: flex; align-items: center; gap: 9px; }
+.nav-mark { width: 28px; height: 28px; border-radius: 6px; background: #1B2B4B; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nav-name { font-size: 14px; font-weight: 500; color: #1B2B4B; }
+.nav-links { display: flex; gap: 20px; }
+.nav-links span { font-size: 13px; color: var(--color-text-secondary); }
+.nav-cta { background: #1B2B4B; color: #fff; font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 8px; }
+.section { margin-bottom: 4rem; }
+.eyebrow { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 1rem; }
+.display { font-size: 36px; font-weight: 500; line-height: 1.2; color: var(--color-text-primary); margin-bottom: 1.25rem; max-width: 640px; }
+.body-lg { font-size: 17px; line-height: 1.8; color: var(--color-text-secondary); max-width: 600px; margin-bottom: 1.25rem; }
+.body { font-size: 15px; line-height: 1.75; color: var(--color-text-secondary); max-width: 600px; margin-bottom: 1rem; }
+.pull { border-left: 3px solid #1D9E75; padding: 1rem 1.5rem; border-radius: 0 8px 8px 0; background: #E1F5EE; margin: 2rem 0; }
+.pull-text { font-size: 18px; font-weight: 500; line-height: 1.5; color: #085041; font-style: italic; font-family: var(--font-serif); }
+.pull-attr { font-size: 13px; color: #0F6E56; margin-top: 8px; }
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 3rem 0; }
+.h2 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.75rem; line-height: 1.3; }
+.h3 { font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 0.5rem; }
+.def-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1px; background: var(--color-border-tertiary); border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; overflow: hidden; margin: 2rem 0; }
+.def-cell { padding: 1.25rem; background: var(--color-background-primary); }
+.def-cell-teal { background: #E1F5EE; }
+.def-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 6px; }
+.def-label-teal { color: #0F6E56; }
+.def-val { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.def-val-teal { color: #085041; }
+.def-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+.def-desc-teal { color: #0F6E56; }
+.framework-stack { margin: 2rem 0; }
+.layer { display: flex; align-items: flex-start; gap: 16px; padding: 1.25rem 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.layer:last-child { border-bottom: none; }
+.layer-num { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; flex-shrink: 0; margin-top: 1px; }
+.layer-num-navy { background: #EEF1F7; color: #1B2B4B; }
+.layer-num-teal { background: #E1F5EE; color: #085041; }
+.layer-num-coral { background: #FAECE7; color: #712B13; }
+.layer-body { flex: 1; }
+.layer-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+.layer-q { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 5px; font-style: italic; }
+.layer-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+.bim-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin: 1.5rem 0; }
+.bim-card { padding: 1.25rem; border-radius: 12px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); }
+.bim-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; vertical-align: middle; }
+.bim-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+.bim-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.55; }
+.saeo-band { background: #1B2B4B; border-radius: 12px; padding: 2rem; margin: 2.5rem 0; }
+.saeo-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #5DCAA5; margin-bottom: 0.75rem; }
+.saeo-heading { font-size: 22px; font-weight: 500; color: #FFFFFF; margin-bottom: 0.75rem; line-height: 1.3; }
+.saeo-body { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 1.5rem; max-width: 520px; }
+.saeo-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; margin-bottom: 1.5rem; }
+.saeo-stat { }
+.saeo-stat-num { font-size: 22px; font-weight: 500; color: #5DCAA5; }
+.saeo-stat-label { font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+.saeo-cta { display: inline-flex; align-items: center; gap: 6px; background: #1D9E75; color: #fff; font-size: 13px; font-weight: 500; padding: 9px 18px; border-radius: 8px; }
+.q7-list { margin: 1.5rem 0; }
+.q7-item { display: flex; align-items: flex-start; gap: 14px; padding: 0.85rem 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.q7-item:last-child { border-bottom: none; }
+.q7-n { font-size: 12px; font-weight: 500; color: #1D9E75; width: 18px; flex-shrink: 0; padding-top: 1px; }
+.q7-text { font-size: 14px; color: var(--color-text-primary); font-weight: 500; flex: 1; }
+.q7-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; line-height: 1.5; }
+.close-section { border-top: 0.5px solid var(--color-border-tertiary); padding-top: 2.5rem; margin-top: 1rem; }
+.close-hl { font-size: 24px; font-weight: 500; line-height: 1.3; color: var(--color-text-primary); max-width: 520px; margin-bottom: 1.25rem; }
+.tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 1.5rem; }
+.tag { display: inline-flex; padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+.tag-teal { background: #E1F5EE; color: #085041; border: 0.5px solid #9FE1CB; }
+.tag-navy { background: #EEF1F7; color: #1B2B4B; border: 0.5px solid #C5CEDF; }
+.tag-coral { background: #FAECE7; color: #712B13; border: 0.5px solid #F5C4B3; }
+</style>
+
+<div class="page" style="padding: 2rem 0 3rem;">
+
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-mark">
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="#5DCAA5" stroke-width="2" fill="none"/><circle cx="10" cy="10" r="2.5" fill="#5DCAA5"/></svg>
+      </div>
+      <span class="nav-name">Good Assumptions</span>
+    </div>
+    <div class="nav-links">
+      <span>Blog</span><span>Concepts</span><span>Case Studies</span><span>Research</span><span style="color:#1B2B4B;font-weight:500;">About</span>
+    </div>
+    <div class="nav-cta">Try SAEO.ai →</div>
+  </nav>
+
+  <div class="section">
+    <div class="eyebrow">About Good Assumptions</div>
+    <div class="display">Marketing is the science of understanding why people do what they do — and designing for it.</div>
+    <div class="body-lg">Most marketing doesn't fail because the team wasn't good enough. It fails because the wrong problem got solved at the wrong layer. Good Assumptions exists to change that.</div>
+    <div class="body-lg">We are a behavioral marketing intelligence practice. We connect the academic science of human decision-making to the practical problems practitioners face every day — and we built a platform to do it at scale.</div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="eyebrow">Our definition</div>
+    <div class="h2">What marketing actually is</div>
+    <div class="body">The classic definition — right product, right person, right time — was built for a linear world. Consumers don't move linearly anymore. The power has shifted. The journey is fragmented. The decision isn't a moment; it's a threshold.</div>
+
+    <div class="pull">
+      <div class="pull-text">"Marketing is the art and science of understanding, guiding, and nudging human behavior through meaningful interactions that build lasting relationships between brands and consumers across every touchpoint of the journey."</div>
+      <div class="pull-attr">— Good Assumptions working definition</div>
+    </div>
+
+    <div class="body">This is not a semantic update. It is a structural shift in how the discipline should think. The consumer is not a target to be reached. They are a person moving through psychological states — and every state has its own logic, its own friction, its own opportunity.</div>
+    <div class="body">That shift — from audience targeting to behavioral understanding — is the foundation of everything we do.</div>
+
+    <div class="def-grid">
+      <div class="def-cell">
+        <div class="def-label">Old model</div>
+        <div class="def-val">Right message, right channel, right time</div>
+        <div class="def-desc">Assumes a rational consumer moving predictably through a funnel. Optimizes for reach and frequency. Treats behavior as the output of exposure.</div>
+      </div>
+      <div class="def-cell def-cell-teal">
+        <div class="def-label def-label-teal">Good Assumptions model</div>
+        <div class="def-val def-val-teal">Right understanding, right threshold, right intervention</div>
+        <div class="def-desc def-desc-teal">Assumes a human moving through psychological transitions. Optimizes for decision-moment alignment. Treats behavior as the output of context, cognition, and design.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="eyebrow">How we think</div>
+    <div class="h2">Our goals in every engagement</div>
+    <div class="body">Five things. In order. The sequence matters — each one creates the conditions for the next.</div>
+    <div class="q7-list">
+      <div class="q7-item">
+        <div class="q7-n">01</div>
+        <div>
+          <div class="q7-text">Understand the customer through empathy and data</div>
+          <div class="q7-sub">Not demographics. Behavioral profiles. What they believe, what they fear, what they're in the middle of deciding.</div>
+        </div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">02</div>
+        <div>
+          <div class="q7-text">Anticipate needs at critical moments of the journey</div>
+          <div class="q7-sub">Threshold moments — the liminal points where a consumer transitions from one psychological state to the next — are where marketing either earns trust or loses it.</div>
+        </div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">03</div>
+        <div>
+          <div class="q7-text">Influence decisions using choice architecture and behavioral intelligence</div>
+          <div class="q7-sub">Kahneman, Thaler, Norman — the research exists. The work is connecting it to the practitioner's actual problem.</div>
+        </div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">04</div>
+        <div>
+          <div class="q7-text">Create frictionless experiences across every touchpoint</div>
+          <div class="q7-sub">Digital, physical, or somewhere in between. Friction is a behavioral failure before it's a UX failure.</div>
+        </div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">05</div>
+        <div>
+          <div class="q7-text">Build relationships beyond loyalty — toward advocacy and cultural relevance</div>
+          <div class="q7-sub">Loyalty is a behavior. Advocacy is an identity. The difference is whether the brand has become part of how the consumer sees themselves.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="eyebrow">The framework</div>
+    <div class="h2">Eight layers. One connected system.</div>
+    <div class="body">Every layer answers a question that cannot be honestly answered without the layer above it. The sequence is not arbitrary — it is the diagnostic order that decades of practice and behavioral research produced.</div>
+
+    <div class="framework-stack">
+      <div class="layer">
+        <div class="layer-num layer-num-navy">01</div>
+        <div class="layer-body">
+          <div class="layer-name">Brand identity</div>
+          <div class="layer-q">Who are you?</div>
+          <div class="layer-desc">The Kapferer Prism across six dimensions: physique, personality, culture, relationship, reflection, self-image. Reveals the coherence gaps that show up in campaigns, not in guidelines.</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-navy">02</div>
+        <div class="layer-body">
+          <div class="layer-name">Marketing maturity</div>
+          <div class="layer-q">Where are you?</div>
+          <div class="layer-desc">Five stages across ten dimensions. Calibrates strategy to what the organization can actually execute — not what it aspires to execute. The most ignored diagnostic in the discipline.</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-navy">03</div>
+        <div class="layer-body">
+          <div class="layer-name">7 Questions brief</div>
+          <div class="layer-q">What are you doing, and why?</div>
+          <div class="layer-desc">Seven questions in the right order: role before objectives, audience before message, measurement before reaction. The brief structure that eliminates the most common strategic failures before they start.</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-teal">04</div>
+        <div class="layer-body">
+          <div class="layer-name">BIM framework</div>
+          <div class="layer-q">Why does behavior happen?</div>
+          <div class="layer-desc">Four pillars — Cognitive, Emotional, Social, Environment & Design. The psychological vocabulary for every consumer decision. Built from Kahneman, Thaler, Norman, and 60 years of accumulated behavioral research.</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-teal">05</div>
+        <div class="layer-body">
+          <div class="layer-name">Liminal transitions</div>
+          <div class="layer-q">When does behavior shift?</div>
+          <div class="layer-desc">133 threshold moments across 17 categories. The when layer: where brand-consumer alignment is most fragile and most consequential. Every transition carries its own intervention logic and failure mode signature.</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-teal">06</div>
+        <div class="layer-body">
+          <div class="layer-name">Persona journey</div>
+          <div class="layer-q">Who are you reaching?</div>
+          <div class="layer-desc">BIM-mapped personas with transition forecasts. Not demographic sketches — behavioral prediction models. Which threshold moments will this consumer encounter with this brand, and what happens at each one?</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-navy">07</div>
+        <div class="layer-body">
+          <div class="layer-name">Experience blueprint</div>
+          <div class="layer-q">What is the strategy?</div>
+          <div class="layer-desc">The deliverable. Synthesizes persona journeys, applies maturity constraints, identifies highest-leverage intervention points. Not a document of opinions — a documented argument for why this specific thing, at this specific threshold, is the highest-leverage use of available resources.</div>
+        </div>
+      </div>
+      <div class="layer">
+        <div class="layer-num layer-num-coral">08</div>
+        <div class="layer-body">
+          <div class="layer-name">SAEO diagnostic</div>
+          <div class="layer-q">Where is it failing?</div>
+          <div class="layer-desc">Strategy / Application / Execution / Operations. The problem localization layer. Most marketing failures get addressed at the execution layer. Most of them live somewhere else. SAEO finds the right layer before anyone reaches for a fix.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="eyebrow">The behavioral science</div>
+    <div class="h2">BIM: the four pillars of human decision-making</div>
+    <div class="body">The Behavioral Influence Model is the analytical engine behind everything we build. It draws on six decades of behavioral economics and design research — and it asks four questions about every consumer decision.</div>
+    <div class="bim-grid">
+      <div class="bim-card">
+        <div class="bim-title">
+          <div class="bim-dot" style="background:#1D9E75;"></div>
+          Cognitive drivers
+        </div>
+        <div class="bim-desc">How people process information and evaluate options. Loss aversion, anchoring, endowment effect, effort justification. The mental shortcuts and predictable irrationalities that shape every choice before the consumer is consciously aware of them.</div>
+      </div>
+      <div class="bim-card">
+        <div class="bim-title">
+          <div class="bim-dot" style="background:#D85A30;"></div>
+          Emotional drivers
+        </div>
+        <div class="bim-desc">How feelings and psychological states influence decisions. Peak-end rule, IKEA effect, framing, FOMO. Emotion is not decoration on top of a rational decision — it is the decision, with reason applied after the fact.</div>
+      </div>
+      <div class="bim-card">
+        <div class="bim-title">
+          <div class="bim-dot" style="background:#7F77DD;"></div>
+          Social drivers
+        </div>
+        <div class="bim-desc">How peers, norms, and community dynamics shape behavior. Social proof, authority bias, bandwagon effect, scarcity perception. People follow the behavior of others, especially in moments of uncertainty — and those moments are exactly where marketing intervenes.</div>
+      </div>
+      <div class="bim-card">
+        <div class="bim-title">
+          <div class="bim-dot" style="background:#1B2B4B;"></div>
+          Environment & design
+        </div>
+        <div class="bim-desc">How physical and digital contexts nudge decisions before conscious thought. Default effect, choice overload, decoy effect, temporal discounting. The design of the choice environment is itself a form of messaging — one most brands don't control intentionally.</div>
+      </div>
+    </div>
+    <div class="pull">
+      <div class="pull-text">"We think, each of us, that we're much more rational than we are."</div>
+      <div class="pull-attr">— Daniel Kahneman</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="section">
+    <div class="eyebrow">The 7 questions</div>
+    <div class="h2">Strategy starts with the right questions, in the right order</div>
+    <div class="body">Most strategy processes start with what. Good Assumptions starts with why — and then works forward. The 7 Questions brief is the structure that forces strategic clarity before anyone touches a creative brief or media plan.</div>
+    <div class="q7-list">
+      <div class="q7-item">
+        <div class="q7-n">1</div>
+        <div class="q7-text">What is the role of marketing in this organization?</div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">2</div>
+        <div class="q7-text">What are we doing, and why?</div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">3</div>
+        <div class="q7-text">Who are we talking to?</div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">4</div>
+        <div class="q7-text">What are we trying to say?</div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">5</div>
+        <div class="q7-text">Where are we trying to say it?</div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">6</div>
+        <div class="q7-text">How do we measure success?</div>
+      </div>
+      <div class="q7-item">
+        <div class="q7-n">7</div>
+        <div class="q7-text">How do we react when things change?</div>
+      </div>
+    </div>
+    <div class="body" style="margin-top:0.5rem;">These are not rhetorical. Each question has a structured answer format, an artifact set, and a connection to the behavioral layer that determines whether the answer is right. The 7 Questions brief is the foundation of every Experience Blueprint we build.</div>
+  </div>
+
+  <div class="saeo-band">
+    <div class="saeo-label">SAEO.ai — the platform</div>
+    <div class="saeo-heading">When the framework became too large to run in your head</div>
+    <div class="saeo-body">At some point the framework worked well enough to demand a tool that could run it at scale. 201 cognitive biases, 343 behavioral archetypes, 133 liminal transitions, 3,269 executable tactics, 55 industry verticals. SAEO.ai holds all of it — and routes to the right layer before anyone reaches for a solution.</div>
+    <div class="saeo-stats">
+      <div class="saeo-stat"><div class="saeo-stat-num">201</div><div class="saeo-stat-label">Cognitive biases mapped</div></div>
+      <div class="saeo-stat"><div class="saeo-stat-num">133</div><div class="saeo-stat-label">Liminal transitions</div></div>
+      <div class="saeo-stat"><div class="saeo-stat-num">3,269</div><div class="saeo-stat-label">Executable tactics</div></div>
+      <div class="saeo-stat"><div class="saeo-stat-num">55</div><div class="saeo-stat-label">Industry verticals</div></div>
+    </div>
+    <div class="saeo-cta">Explore SAEO.ai →</div>
+  </div>
+
+  <div class="close-section">
+    <div class="close-hl">Marketing has always deserved a better diagnostic framework than it has had.</div>
+    <div class="body">The discipline is not short of advice. It is not short of tools, channels, or tactics. What it has consistently lacked is a principled way of asking — before doing anything else — which layer of the system this problem actually lives in, and what the research says about why it behaves the way it does.</div>
+    <div class="body">Good Assumptions is that translation layer. Between the behavioral science and the practitioner's actual problem. Between the question and the right answer to it.</div>
+    <div class="tag-row">
+      <span class="tag tag-teal">Behavioral marketing</span>
+      <span class="tag tag-teal">Liminal transitions</span>
+      <span class="tag tag-navy">BIM framework</span>
+      <span class="tag tag-navy">SAEO diagnostic</span>
+      <span class="tag tag-coral">Marketing maturity</span>
+      <span class="tag tag-navy">7 Questions brief</span>
+    </div>
+  </div>
+
+</div>
