@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good Assumptions — Behavioral Marketing Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+    --font-serif: 'DM Serif Display', Georgia, serif;
+    --navy: #1B2B4B;
+    --navy-light: #EEF1F7;
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-mid: #9FE1CB;
+    --teal-dark: #085041;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --amber-light: #FAEEDA;
+    --amber-dark: #633806;
+    --pink-light: #FBEAF0;
+    --pink-dark: #72243E;
+    --off-white: #F8F7F4;
+    --slate: #4A5568;
+    --muted: #718096;
+    --border: rgba(27,43,75,0.1);
+    --border-med: rgba(27,43,75,0.18);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--off-white);
+    color: var(--navy);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── LAYOUT ── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .page-divider {
+    border: none;
+    border-top: 3px solid var(--navy);
+    margin: 0;
+    opacity: 1;
+  }
+
+  .page-gap {
+    height: 6rem;
+    background: var(--off-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .page-gap-inner {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .page-gap-line {
+    width: 60px;
+    height: 0.5px;
+    background: var(--muted);
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--navy);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .nav-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .nav-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    letter-spacing: 0.01em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 13px;
+    color: rgba(255,255,255,0.65);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .nav-links a:hover { color: #fff; }
+
+  .nav-cta {
+    background: var(--teal);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: background 0.15s;
+  }
+
+  .nav-cta:hover { background: #17835f; }
+
+  /* ── EYEBROW ── */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .section {
+    padding: 4rem 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .section:last-child { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.75rem;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--navy);
+  }
+
+  .section-link {
+    font-size: 13px;
+    color: var(--teal);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .section-link:hover { text-decoration: underline; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 5rem 0 4rem;
+    border-bottom: 0.5px solid var(--border);
+    background: #fff;
+  }
+
+  .hero-eyebrow {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  .hero-headline {
+    font-family: var(--font-serif);
+    font-size: clamp(36px, 5vw, 52px);
+    line-height: 1.15;
+    color: var(--navy);
+    max-width: 680px;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-sub {
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--slate);
+    max-width: 520px;
+    margin-bottom: 2.25rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    padding-top: 2rem;
+    border-top: 0.5px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .hero-stat-num {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    color: var(--navy);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .hero-stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: #243a63; }
+
+  .btn-teal {
+    background: var(--teal);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+
+  .btn-teal:hover { background: #17835f; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--navy);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 11px 22px;
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--navy);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+  }
+
+  .btn-outline:hover { background: var(--navy-light); }
+
+  .btn-outline-white {
+    background: transparent;
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255,255,255,0.35);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    transition: border-color 0.15s;
+  }
+
+  .btn-outline-white:hover { border-color: rgba(255,255,255,0.7); }
+
+  /* ── POSITION STRIP ── */
+  .position-strip {
+    background: var(--navy);
+    padding: 3rem 2rem;
+    margin: 0;
+  }
+
+  .position-strip-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .position-strip-text {
+    font-family: var(--font-serif);
+    font-size: clamp(18px, 2.5vw, 24px);
+    line-height: 1.55;
+    color: rgba(255,255,255,0.9);
+    max-width: 720px;
+  }
+
+  .position-strip-accent { color: var(--teal-mid); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    border: 0.5px solid transparent;
+    white-space: nowrap;
+  }
+
+  .badge-navy    { background: var(--navy-light); color: var(--navy);    border-color: #C5CEDF; }
+  .badge-teal    { background: var(--teal-light);  color: var(--teal-dark); border-color: var(--teal-mid); }
+  .badge-amber   { background: var(--amber-light); color: var(--amber-dark); border-color: #FAC775; }
+  .badge-coral   { background: var(--coral-light); color: #993C1D; border-color: #F5C4B3; }
+  .badge-purple  { background: var(--purple-light);color: var(--purple-dark); border-color: #CECBF6; }
+  .badge-green   { background: #EAF3DE; color: #3B6D11; border-color: #C0DD97; }
+
+  .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+  /* ── FEATURED ARTICLE ── */
+  .featured-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #fff;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .featured-img {
+    background: var(--navy);
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+  }
+
+  .featured-img-text {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.4;
+    text-align: center;
+    max-width: 260px;
+  }
+
+  .featured-img-tag {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--teal-mid);
+  }
+
+  .featured-body {
+    padding: 2rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .featured-title {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+  }
+
+  .featured-excerpt {
+    font-size: 14px;
+    color: var(--slate);
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
+  }
+
+  .featured-meta {
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.25rem;
+  }
+
+  .read-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--teal);
+    text-decoration: none;
+  }
+
+  .read-link:hover { text-decoration: underline; }
+
+  /* ── TERRITORY GRID ── */
+  .territory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .territory-card {
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    border: 0.5px solid transparent;
+  }
+
+  .territory-card-name {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .territory-card-desc {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .tc-teal  { background: var(--teal-light);   border-color: var(--teal-mid); }
+  .tc-teal .territory-card-name { color: var(--teal-dark); }
+  .tc-teal .territory-card-desc { color: #0F6E56; }
+
+  .tc-purple { background: var(--purple-light); border-color: #CECBF6; }
+  .tc-purple .territory-card-name { color: var(--purple-dark); }
+  .tc-purple .territory-card-desc { color: #534AB7; }
+
+  .tc-navy  { background: var(--navy-light);   border-color: #C5CEDF; }
+  .tc-navy .territory-card-name { color: var(--navy); }
+  .tc-navy .territory-card-desc { color: #2D4270; }
+
+  .tc-coral { background: var(--coral-light);  border-color: #F5C4B3; }
+  .tc-coral .territory-card-name { color: #712B13; }
+  .tc-coral .territory-card-desc { color: #993C1D; }
+
+  .tc-amber { background: var(--amber-light);  border-color: #FAC775; }
+  .tc-amber .territory-card-name { color: var(--amber-dark); }
+  .tc-amber .territory-card-desc { color: #854F0B; }
+
+  .tc-pink  { background: var(--pink-light);   border-color: #F4C0D1; }
+  .tc-pink .territory-card-name { color: var(--pink-dark); }
+  .tc-pink .territory-card-desc { color: #993556; }
+
+  /* ── ARTICLES GRID ── */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .article-card {
+    background: #fff;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+
+  .article-card:hover { box-shadow: 0 4px 20px rgba(27,43,75,0.08); }
+
+  .article-img {
+    height: 100px;
+  }
+
+  .article-body { padding: 1rem 1.1rem 1.1rem; }
+
+  .article-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+
+  .article-meta {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ── FRAMEWORK TEASER ── */
+  .framework-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3.5rem;
+    align-items: center;
+  }
+
+  .framework-headline {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    line-height: 1.3;
+    color: var(--navy);
+    margin-bottom: 1rem;
+  }
+
+  .framework-body {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--slate);
+    margin-bottom: 1.5rem;
+  }
+
+  .saeo-boxes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .saeo-box {
+    padding: 1.1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .saeo-letter {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .saeo-word { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+  .saeo-desc { font-size: 11px; line-height: 1.5; }
+
+  .sb-s { background: var(--navy-light); }
+  .sb-s .saeo-letter, .sb-s .saeo-word { color: var(--navy); }
+  .sb-s .saeo-desc { color: #2D4270; }
+
+  .sb-a { background: var(--teal-light); }
+  .sb-a .saeo-letter, .sb-a .saeo-word { color: var(--teal-dark); }
+  .sb-a .saeo-desc { color: #0F6E56; }
+
+  .sb-e { background: var(--amber-light); }
+  .sb-e .saeo-letter, .sb-e .saeo-word { color: var(--amber-dark); }
+  .sb-e .saeo-desc { color: #854F0B; }
+
+  .sb-o { background: var(--coral-light); }
+  .sb-o .saeo-letter, .sb-o .saeo-word { color: #712B13; }
+  .sb-o .saeo-desc { color: #993C1D; }
+
+  /* ── WHITE PAPERS ── */
+  .wp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .wp-card {
+    background: #fff;
+    border: 0.5px solid var(--border-med);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+
+  .wp-title {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+  }
+
+  .wp-abstract {
+    font-size: 13px;
+    color: var(--slate);
+    line-height: 1.6;
+    margin-bottom: 1.1rem;
+  }
+
+  .wp-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--teal);
+    text-decoration: none;
+  }
+
+  .wp-cta:hover { text-decoration: underline; }
+
+  .wp-access-open   { background: #EAF3DE; color: #3B6D11; border: 0.5px solid #C0DD97; }
+  .wp-access-gated  { background: var(--amber-light); color: #854F0B; border: 0.5px solid #FAC775; }
+
+  /* ── SAEO CONVERSION ── */
+  .saeo-band {
+    background: var(--navy);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+  }
+
+  .saeo-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal-mid);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .saeo-heading {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    color: #fff;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+    max-width: 560px;
+  }
+
+  .saeo-body {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+    max-width: 540px;
+  }
+
+  .saeo-gap {
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.65;
+    margin-bottom: 1.75rem;
+    padding: 0.9rem 1.1rem;
+    border-left: 2px solid var(--teal-mid);
+    max-width: 540px;
+  }
+
+  .saeo-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 1.75rem;
+  }
+
+  .saeo-stat-num {
+    font-family: var(--font-serif);
+    font-size: 26px;
+    color: var(--teal-mid);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .saeo-stat-label { font-size: 11px; color: rgba(255,255,255,0.4); line-height: 1.4; }
+
+  .saeo-ctas { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ── EMAIL CAPTURE ── */
+  .email-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+  }
+
+  .email-heading {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    color: var(--navy);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .email-sub {
+    font-size: 15px;
+    color: var(--slate);
+    line-height: 1.65;
+  }
+
+  .email-form { display: flex; gap: 8px; margin-bottom: 8px; }
+
+  .email-input {
+    flex: 1;
+    padding: 11px 14px;
+    border: 1px solid var(--border-med);
+    border-radius: var(--radius-md);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--navy);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .email-input:focus { border-color: var(--teal); }
+
+  .email-helper {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    padding: 3rem 0 2rem;
+    margin-top: 0;
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 2rem;
+    border-bottom: 0.5px solid rgba(255,255,255,0.1);
+    margin-bottom: 1.5rem;
+    gap: 2rem;
+  }
+
+  .footer-brand-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    max-width: 240px;
+    line-height: 1.55;
+  }
+
+  .footer-nav {
+    display: flex;
+    gap: 3.5rem;
+  }
+
+  .footer-col-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+  }
+
+  .footer-link {
+    display: block;
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    text-decoration: none;
+    margin-bottom: 8px;
+    transition: color 0.15s;
+  }
+
+  .footer-link:hover { color: rgba(255,255,255,0.8); }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-copy { font-size: 12px; color: rgba(255,255,255,0.3); }
+  .footer-legal { display: flex; gap: 16px; }
+  .footer-legal a { font-size: 12px; color: rgba(255,255,255,0.3); text-decoration: none; }
+  .footer-legal a:hover { color: rgba(255,255,255,0.6); }
+
+  /* ── ABOUT PAGE ── */
+  .about-hero {
+    padding: 5rem 0 4rem;
+    border-bottom: 0.5px solid var(--border);
+    background: #fff;
+  }
+
+  .about-display {
+    font-family: var(--font-serif);
+    font-size: clamp(32px, 4.5vw, 48px);
+    line-height: 1.18;
+    color: var(--navy);
+    max-width: 680px;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .about-lead {
+    font-size: 18px;
+    line-height: 1.75;
+    color: var(--slate);
+    max-width: 580px;
+    margin-bottom: 1rem;
+  }
+
+  .pull-quote {
+    border-left: 3px solid var(--teal);
+    padding: 1.1rem 1.5rem;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    background: var(--teal-light);
+    margin: 2rem 0;
+  }
+
+  .pull-quote-text {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-style: italic;
+    line-height: 1.55;
+    color: var(--teal-dark);
+    margin-bottom: 8px;
+  }
+
+  .pull-quote-attr {
+    font-size: 13px;
+    color: #0F6E56;
+  }
+
+  /* Compare grid */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin: 1.5rem 0;
+  }
+
+  .compare-cell {
+    background: #fff;
+    padding: 1.5rem;
+  }
+
+  .compare-cell-teal { background: var(--teal-light); }
+
+  .compare-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .compare-label-teal { color: #0F6E56; }
+
+  .compare-val {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--navy);
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+
+  .compare-val-teal { color: var(--teal-dark); }
+
+  .compare-desc { font-size: 13px; color: var(--slate); line-height: 1.6; }
+  .compare-desc-teal { color: #0F6E56; }
+
+  /* Goals list */
+  .goals-list { margin: 1.5rem 0; }
+
+  .goal-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 1rem 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .goal-item:last-child { border-bottom: none; }
+
+  .goal-num {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--teal);
+    width: 20px;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .goal-text { flex: 1; }
+  .goal-title { font-size: 15px; font-weight: 500; color: var(--navy); margin-bottom: 4px; }
+  .goal-desc { font-size: 13px; color: var(--slate); line-height: 1.55; }
+
+  /* Framework stack */
+  .framework-stack { margin: 1.5rem 0; }
+
+  .layer {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 1.25rem 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .layer:last-child { border-bottom: none; }
+
+  .layer-num {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .ln-navy   { background: var(--navy-light); color: var(--navy); }
+  .ln-teal   { background: var(--teal-light); color: var(--teal-dark); }
+  .ln-coral  { background: var(--coral-light); color: #712B13; }
+
+  .layer-body { flex: 1; }
+  .layer-name { font-size: 15px; font-weight: 500; color: var(--navy); margin-bottom: 3px; }
+  .layer-q    { font-size: 12px; color: var(--muted); font-style: italic; margin-bottom: 5px; }
+  .layer-desc { font-size: 13px; color: var(--slate); line-height: 1.55; }
+
+  /* BIM grid */
+  .bim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 1.5rem 0;
+  }
+
+  .bim-card {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--border-med);
+    background: #fff;
+  }
+
+  .bim-dot-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .bim-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .bim-title { font-size: 14px; font-weight: 500; color: var(--navy); }
+  .bim-desc  { font-size: 13px; color: var(--slate); line-height: 1.55; }
+
+  /* 7Q list */
+  .q7-list { margin: 1.5rem 0; }
+
+  .q7-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 0.85rem 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .q7-item:last-child { border-bottom: none; }
+  .q7-num { font-size: 12px; font-weight: 500; color: var(--teal); width: 18px; flex-shrink: 0; padding-top: 1px; }
+  .q7-text { font-size: 15px; color: var(--navy); font-weight: 500; }
+
+  /* Close section */
+  .about-close {
+    padding: 4rem 0 3rem;
+  }
+
+  .about-close-heading {
+    font-family: var(--font-serif);
+    font-size: clamp(22px, 3vw, 30px);
+    line-height: 1.3;
+    color: var(--navy);
+    max-width: 560px;
+    margin-bottom: 1.25rem;
+  }
+
+  .about-close-body {
+    font-size: 15px;
+    color: var(--slate);
+    line-height: 1.75;
+    max-width: 600px;
+    margin-bottom: 1rem;
+  }
+
+  .tags-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 1.75rem; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .featured-card,
+    .framework-grid,
+    .email-grid,
+    .wp-grid,
+    .bim-grid,
+    .compare-grid { grid-template-columns: 1fr; }
+    .territory-grid,
+    .articles-grid { grid-template-columns: repeat(2, 1fr); }
+    .saeo-stats { grid-template-columns: repeat(2, 1fr); }
+    .hero-stats { gap: 1.5rem; }
+    .footer-top { flex-direction: column; }
+    .footer-nav { gap: 2rem; }
+  }
+
+  @media (max-width: 500px) {
+    .territory-grid,
+    .articles-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <div class="nav-mark">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="#5DCAA5" stroke-width="1.8" fill="none"/>
+          <circle cx="10" cy="10" r="2.5" fill="#5DCAA5"/>
+        </svg>
+      </div>
+      <span class="nav-name">Good Assumptions</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#concepts">Concepts</a></li>
+      <li><a href="#whitepapers">White Papers</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <a href="https://saeo.ai" class="nav-cta">Try SAEO.ai →</a>
+  </div>
+</nav>
+
+
+<!-- ════════════════════════════════════════════
+     HOMEPAGE
+════════════════════════════════════════════ -->
+
+<!-- 01 HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="hero-eyebrow">Behavioral marketing intelligence</span>
+    <h1 class="hero-headline">Most marketing problems are diagnosis problems.</h1>
+    <p class="hero-sub">We connect the behavioral science of human decision-making to the practical problems practitioners face every day. Smart marketers. Better mental models.</p>
+    <div class="hero-ctas">
+      <a href="#framework" class="btn-primary">Start with the framework →</a>
+      <a href="https://saeo.ai" class="btn-outline">Try SAEO.ai</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">201</div>
+        <div class="hero-stat-label">Cognitive biases mapped</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">133</div>
+        <div class="hero-stat-label">Liminal transitions</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">3,269</div>
+        <div class="hero-stat-label">Executable tactics</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">55</div>
+        <div class="hero-stat-label">Industry verticals</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 POSITION STRIP -->
+<div class="position-strip">
+  <div class="position-strip-inner">
+    <p class="position-strip-text">"We explain the behavioral science behind marketing decisions that practitioners make every day <span class="position-strip-accent">without knowing why they work.</span>"</p>
+  </div>
+</div>
+
+<!-- 03 FEATURED -->
+<div style="background:#fff;">
+  <div class="container">
+    <div class="section" id="blog">
+      <div class="module-label" style="display:block;margin-bottom:1.25rem;">
+        <span class="eyebrow" style="margin:0;">Featured</span>
+      </div>
+      <div class="featured-card">
+        <div class="featured-img">
+          <span class="featured-img-tag">Featured article</span>
+          <p class="featured-img-text">Your customer isn't in a stage. They're standing in a doorway.</p>
+        </div>
+        <div class="featured-body">
+          <div class="badge-row">
+            <span class="badge badge-navy">Pillar Article</span>
+            <span class="badge badge-teal">T1 · Liminal</span>
+            <span class="badge badge-amber">Intermediate</span>
+          </div>
+          <h2 class="featured-title">Your customer isn't in a stage. They're standing in a doorway.</h2>
+          <p class="featured-excerpt">Why threshold moments matter more than funnel positions — and what that means for when and how you intervene.</p>
+          <div class="featured-meta">
+            <span>8 min read</span>
+            <span>·</span>
+            <span>Apr 2026</span>
+          </div>
+          <a href="#" class="read-link">Read the article →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 TERRITORIES -->
+<div style="background:var(--off-white);">
+  <div class="container">
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Explore by territory</h2>
+        <a href="#" class="section-link">View all →</a>
+      </div>
+      <div class="territory-grid">
+        <div class="territory-card tc-teal">
+          <div class="territory-card-name">T1 · Liminal transitions</div>
+          <div class="territory-card-desc">The 133 behavioral threshold moments — where brand-consumer alignment is most fragile and most consequential.</div>
+        </div>
+        <div class="territory-card tc-purple">
+          <div class="territory-card-name">T2 · Cognitive biases</div>
+          <div class="territory-card-desc">201 biases mapped to marketing applications. Loss aversion, anchoring, endowment effect, and the rest.</div>
+        </div>
+        <div class="territory-card tc-navy">
+          <div class="territory-card-name">T3 · BIM framework</div>
+          <div class="territory-card-desc">The four pillars: Cognitive, Emotional, Social, Environment & Design. The psychological vocabulary for every consumer decision.</div>
+        </div>
+        <div class="territory-card tc-coral">
+          <div class="territory-card-name">T4 · SAEO diagnostic</div>
+          <div class="territory-card-desc">Strategy, Application, Execution, Operations. Finding which layer the problem actually lives in before reaching for a fix.</div>
+        </div>
+        <div class="territory-card tc-amber">
+          <div class="territory-card-name">T5 · 7 Questions</div>
+          <div class="territory-card-desc">Role before objectives. Audience before message. Measurement before reaction. The brief structure that changes everything upstream.</div>
+        </div>
+        <div class="territory-card tc-pink">
+          <div class="territory-card-name">T6 · Brand & identity</div>
+          <div class="territory-card-desc">Kapferer's Prism, brand-consumer resonance, the observer effect, and how GEO is changing what brand identity requires.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 ARTICLES -->
+<div style="background:#fff;">
+  <div class="container">
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Latest from the blog</h2>
+        <a href="#" class="section-link">All articles →</a>
+      </div>
+      <div class="articles-grid">
+        <div class="article-card">
+          <div class="article-img" style="background:#1D9E75;"></div>
+          <div class="article-body">
+            <div class="badge-row"><span class="badge badge-teal">T1 · Liminal</span><span class="badge badge-navy">Pillar</span></div>
+            <div class="article-title">Loss aversion: why your customers are more afraid to lose than motivated to win</div>
+            <div class="article-meta"><span>6 min</span><span>·</span><span>Beginner</span></div>
+          </div>
+        </div>
+        <div class="article-card">
+          <div class="article-img" style="background:#534AB7;"></div>
+          <div class="article-body">
+            <div class="badge-row"><span class="badge badge-purple">T2 · Biases</span><span class="badge badge-coral">Case Study</span></div>
+            <div class="article-title">Why Dove's Real Beauty worked and Pepsi's Jenner ad didn't</div>
+            <div class="article-meta"><span>12 min</span><span>·</span><span>Intermediate</span></div>
+          </div>
+        </div>
+        <div class="article-card">
+          <div class="article-img" style="background:#D85A30;"></div>
+          <div class="article-body">
+            <div class="badge-row"><span class="badge badge-coral">T4 · SAEO</span><span class="badge badge-navy">Framework</span></div>
+            <div class="article-title">The BIM framework: a field guide to behavioral influence in marketing</div>
+            <div class="article-meta"><span>18 min</span><span>·</span><span>Intermediate</span></div>
+          </div>
+        </div>
+        <div class="article-card">
+          <div class="article-img" style="background:#BA7517;"></div>
+          <div class="article-body">
+            <div class="badge-row"><span class="badge badge-amber">T5 · 7Q</span><span class="badge badge-navy">Framework</span></div>
+            <div class="article-title">Seven questions every marketing brief should answer — and one most skip</div>
+            <div class="article-meta"><span>9 min</span><span>·</span><span>Beginner</span></div>
+          </div>
+        </div>
+        <div class="article-card">
+          <div class="article-img" style="background:#1B2B4B;"></div>
+          <div class="article-body">
+            <div class="badge-row"><span class="badge badge-navy">T6 · Brand</span><span class="badge badge-navy">Pillar</span></div>
+            <div class="article-title">The observer effect: how AI is exposing the gap between brand performance and authenticity</div>
+            <div class="article-meta"><span>11 min</span><span>·</span><span>Expert</span></div>
+          </div>
+        </div>
+        <div class="article-card">
+          <div class="article-img" style="background:#5DCAA5;"></div>
+          <div class="article-body">
+            <div class="badge-row"><span class="badge badge-teal">T1 · Liminal</span><span class="badge badge-coral">Critique</span></div>
+            <div class="article-title">What Apple's latest campaign gets right about identity transitions — and one thing it misses</div>
+            <div class="article-meta"><span>7 min</span><span>·</span><span>Intermediate</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 FRAMEWORK TEASER -->
+<div style="background:var(--off-white);" id="framework">
+  <div class="container">
+    <div class="section">
+      <div class="framework-grid">
+        <div>
+          <span class="eyebrow">The diagnostic framework</span>
+          <h2 class="framework-headline">Marketing problems don't live where you find them.</h2>
+          <p class="framework-body">They live one layer up. Or down. The campaign was the last place the failure lived and the first place everyone looked. Good Assumptions is a framework for finding the right layer before reaching for a fix.</p>
+          <a href="#about" class="btn-primary" style="font-size:13px;padding:10px 18px;">Explore the framework →</a>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:500;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:10px;">The SAEO diagnostic</div>
+          <div class="saeo-boxes">
+            <div class="saeo-box sb-s">
+              <div class="saeo-letter">S</div>
+              <div class="saeo-word">Strategy</div>
+              <div class="saeo-desc">Are we solving the right problem?</div>
+            </div>
+            <div class="saeo-box sb-a">
+              <div class="saeo-letter">A</div>
+              <div class="saeo-word">Application</div>
+              <div class="saeo-desc">Are we implementing the strategy correctly?</div>
+            </div>
+            <div class="saeo-box sb-e">
+              <div class="saeo-letter">E</div>
+              <div class="saeo-word">Execution</div>
+              <div class="saeo-desc">Do we have the right tools to deliver?</div>
+            </div>
+            <div class="saeo-box sb-o">
+              <div class="saeo-letter">O</div>
+              <div class="saeo-word">Operations</div>
+              <div class="saeo-desc">Are internal processes supporting the strategy?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 07 WHITE PAPERS -->
+<div style="background:#fff;" id="whitepapers">
+  <div class="container">
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">White papers</h2>
+        <a href="#" class="section-link">All research →</a>
+      </div>
+      <div class="wp-grid">
+        <div class="wp-card">
+          <div class="badge-row">
+            <span class="badge badge-teal">T1 · Liminal</span>
+            <span class="badge wp-access-open" style="padding:3px 9px;border-radius:4px;font-size:11px;font-weight:500;">Open access</span>
+          </div>
+          <div class="wp-title">Reasoning modes in liminal transitions: how cognitive reconfiguration at threshold moments reshapes marketing intervention logic</div>
+          <p class="wp-abstract">How consumers shift between deliberative and intuitive reasoning at behavioral thresholds — and what that means for when and how brands intervene.</p>
+          <a href="#" class="wp-cta">Read the paper →</a>
+        </div>
+        <div class="wp-card">
+          <div class="badge-row">
+            <span class="badge badge-navy">T3 · BIM</span>
+            <span class="badge wp-access-gated" style="padding:3px 9px;border-radius:4px;font-size:11px;font-weight:500;">Email gate</span>
+          </div>
+          <div class="wp-title">Beyond retrieval: how combinatorial creativity and systematic collision transform behavioral intelligence into marketing innovation</div>
+          <p class="wp-abstract">Why the most effective behavioral interventions aren't found — they're constructed. The architecture of collision-based intelligence in marketing practice.</p>
+          <a href="#" class="wp-cta">Download the paper →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 08 SAEO CONVERSION -->
+<div style="background:var(--off-white);">
+  <div class="container">
+    <div class="section" style="border-bottom:none;">
+      <div class="saeo-band">
+        <span class="saeo-eyebrow">SAEO.ai — behavioral intelligence platform</span>
+        <h2 class="saeo-heading">When the framework became too large to run in your head.</h2>
+        <p class="saeo-body">SAEO.ai is the platform built directly from the Good Assumptions framework. It locates marketing problems in the right layer, identifies the behavioral mechanism, and routes to research-backed interventions for that specific combination.</p>
+        <p class="saeo-gap">"This article covers 5 liminal transitions. The SAEO.ai database contains 133 — each with mapped interventions, failure mode signatures, and industry-specific applications."</p>
+        <div class="saeo-stats">
+          <div><div class="saeo-stat-num">201</div><div class="saeo-stat-label">Cognitive biases mapped</div></div>
+          <div><div class="saeo-stat-num">133</div><div class="saeo-stat-label">Liminal transitions</div></div>
+          <div><div class="saeo-stat-num">3,269</div><div class="saeo-stat-label">Executable tactics</div></div>
+          <div><div class="saeo-stat-num">55</div><div class="saeo-stat-label">Industry verticals</div></div>
+        </div>
+        <div class="saeo-ctas">
+          <a href="https://saeo.ai" class="btn-teal">Try SAEO.ai →</a>
+          <a href="#" class="btn-outline-white">Join the waitlist</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 09 EMAIL -->
+<div style="background:#fff;">
+  <div class="container">
+    <div class="section">
+      <div class="email-grid">
+        <div>
+          <h2 class="email-heading">Sharp thinking, not noise.</h2>
+          <p class="email-sub">Behavioral science applied to marketing practice. New framework pieces, case study breakdowns, and white paper releases — when they're ready, not on a schedule.</p>
+        </div>
+        <div>
+          <div class="email-form">
+            <input class="email-input" type="email" placeholder="your@email.com">
+            <button class="btn-primary" style="white-space:nowrap;">Subscribe →</button>
+          </div>
+          <div class="email-helper">No cadence commitments. Unsubscribe anytime.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PAGE BREAK
+════════════════════════════════════════════ -->
+<hr class="page-divider">
+<div class="page-gap">
+  <div class="page-gap-inner">
+    <div class="page-gap-line"></div>
+    <span>About Good Assumptions</span>
+    <div class="page-gap-line"></div>
+  </div>
+</div>
+<hr class="page-divider">
+
+
+<!-- ════════════════════════════════════════════
+     ABOUT PAGE
+════════════════════════════════════════════ -->
+
+<!-- ABOUT HERO -->
+<section class="about-hero" id="about">
+  <div class="container">
+    <span class="eyebrow">About Good Assumptions</span>
+    <h1 class="about-display">Marketing is the science of understanding why people do what they do — and designing for it.</h1>
+    <p class="about-lead">Most marketing doesn't fail because the team wasn't good enough. It fails because the wrong problem got solved at the wrong layer. Good Assumptions exists to change that.</p>
+    <p class="about-lead" style="margin-top:0.5rem;">We are a behavioral marketing intelligence practice. We connect the academic science of human decision-making to the practical problems practitioners face every day — and we built a platform to do it at scale.</p>
+  </div>
+</section>
+
+<!-- OUR DEFINITION -->
+<div style="background:var(--off-white);">
+  <div class="container">
+    <div class="section">
+      <span class="eyebrow">Our definition</span>
+      <h2 style="font-family:var(--font-serif);font-size:26px;color:var(--navy);margin-bottom:1rem;line-height:1.3;">What marketing actually is</h2>
+      <p style="font-size:15px;color:var(--slate);line-height:1.75;max-width:600px;margin-bottom:0;">The classic definition — right product, right person, right time — was built for a linear world. Consumers don't move linearly anymore. The journey is fragmented. The decision isn't a moment; it's a threshold.</p>
+      <div class="pull-quote">
+        <p class="pull-quote-text">"Marketing is the art and science of understanding, guiding, and nudging human behavior through meaningful interactions that build lasting relationships between brands and consumers across every touchpoint of the journey."</p>
+        <p class="pull-quote-attr">— Good Assumptions working definition</p>
+      </div>
+      <p style="font-size:15px;color:var(--slate);line-height:1.75;max-width:600px;">The consumer is not a target to be reached. They are a person moving through psychological states — and every state has its own logic, its own friction, its own opportunity.</p>
+      <div class="compare-grid" style="margin-top:1.75rem;">
+        <div class="compare-cell">
+          <div class="compare-label">Old model</div>
+          <div class="compare-val">Right message, right channel, right time</div>
+          <div class="compare-desc">Assumes a rational consumer moving predictably through a funnel. Optimizes for reach and frequency. Treats behavior as the output of exposure.</div>
+        </div>
+        <div class="compare-cell compare-cell-teal">
+          <div class="compare-label compare-label-teal">Good Assumptions model</div>
+          <div class="compare-val compare-val-teal">Right understanding, right threshold, right intervention</div>
+          <div class="compare-desc compare-desc-teal">Assumes a human moving through psychological transitions. Optimizes for decision-moment alignment. Treats behavior as the output of context, cognition, and design.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OUR GOALS -->
+<div style="background:#fff;">
+  <div class="container">
+    <div class="section">
+      <span class="eyebrow">How we think</span>
+      <h2 style="font-family:var(--font-serif);font-size:26px;color:var(--navy);margin-bottom:0.5rem;line-height:1.3;">Our goals in every engagement</h2>
+      <p style="font-size:15px;color:var(--slate);line-height:1.75;margin-bottom:0;">Five things. In order. The sequence matters — each one creates the conditions for the next.</p>
+      <div class="goals-list">
+        <div class="goal-item">
+          <div class="goal-num">01</div>
+          <div class="goal-text">
+            <div class="goal-title">Understand the customer through empathy and data</div>
+            <div class="goal-desc">Not demographics. Behavioral profiles. What they believe, what they fear, what they're in the middle of deciding.</div>
+          </div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-num">02</div>
+          <div class="goal-text">
+            <div class="goal-title">Anticipate needs at critical moments of the journey</div>
+            <div class="goal-desc">Threshold moments — the liminal points where a consumer transitions from one psychological state to the next — are where marketing either earns trust or loses it.</div>
+          </div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-num">03</div>
+          <div class="goal-text">
+            <div class="goal-title">Influence decisions using choice architecture and behavioral intelligence</div>
+            <div class="goal-desc">Kahneman, Thaler, Norman — the research exists. The work is connecting it to the practitioner's actual problem.</div>
+          </div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-num">04</div>
+          <div class="goal-text">
+            <div class="goal-title">Create frictionless experiences across every touchpoint</div>
+            <div class="goal-desc">Digital, physical, or somewhere in between. Friction is a behavioral failure before it's a UX failure.</div>
+          </div>
+        </div>
+        <div class="goal-item">
+          <div class="goal-num">05</div>
+          <div class="goal-text">
+            <div class="goal-title">Build relationships beyond loyalty — toward advocacy and cultural relevance</div>
+            <div class="goal-desc">Loyalty is a behavior. Advocacy is an identity. The difference is whether the brand has become part of how the consumer sees themselves.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FRAMEWORK STACK -->
+<div style="background:var(--off-white);">
+  <div class="container">
+    <div class="section">
+      <span class="eyebrow">The framework</span>
+      <h2 style="font-family:var(--font-serif);font-size:26px;color:var(--navy);margin-bottom:0.5rem;line-height:1.3;">Eight layers. One connected system.</h2>
+      <p style="font-size:15px;color:var(--slate);line-height:1.75;max-width:600px;margin-bottom:0;">Every layer answers a question that cannot be honestly answered without the layer above it. The sequence is not arbitrary.</p>
+      <div class="framework-stack">
+        <div class="layer"><div class="layer-num ln-navy">01</div><div class="layer-body"><div class="layer-name">Brand identity</div><div class="layer-q">Who are you?</div><div class="layer-desc">The Kapferer Prism across six dimensions. Reveals the coherence gaps that show up in campaigns, not in guidelines.</div></div></div>
+        <div class="layer"><div class="layer-num ln-navy">02</div><div class="layer-body"><div class="layer-name">Marketing maturity</div><div class="layer-q">Where are you?</div><div class="layer-desc">Five stages across ten dimensions. Calibrates strategy to what the organisation can actually execute — not what it aspires to execute.</div></div></div>
+        <div class="layer"><div class="layer-num ln-navy">03</div><div class="layer-body"><div class="layer-name">7 Questions brief</div><div class="layer-q">What are you doing, and why?</div><div class="layer-desc">Seven questions in the right order: role before objectives, audience before message, measurement before reaction.</div></div></div>
+        <div class="layer"><div class="layer-num ln-teal">04</div><div class="layer-body"><div class="layer-name">BIM framework</div><div class="layer-q">Why does behavior happen?</div><div class="layer-desc">Four pillars — Cognitive, Emotional, Social, Environment & Design. The psychological vocabulary for every consumer decision. Built from Kahneman, Thaler, and Norman.</div></div></div>
+        <div class="layer"><div class="layer-num ln-teal">05</div><div class="layer-body"><div class="layer-name">Liminal transitions</div><div class="layer-q">When does behavior shift?</div><div class="layer-desc">133 threshold moments across 17 categories. The when layer: where brand-consumer alignment is most fragile and most consequential.</div></div></div>
+        <div class="layer"><div class="layer-num ln-teal">06</div><div class="layer-body"><div class="layer-name">Persona journey</div><div class="layer-q">Who are you reaching?</div><div class="layer-desc">BIM-mapped personas with transition forecasts. Not demographic sketches — behavioral prediction models.</div></div></div>
+        <div class="layer"><div class="layer-num ln-navy">07</div><div class="layer-body"><div class="layer-name">Experience blueprint</div><div class="layer-q">What is the strategy?</div><div class="layer-desc">The deliverable. Synthesizes persona journeys, applies maturity constraints, identifies highest-leverage intervention points. A documented argument, not a document of opinions.</div></div></div>
+        <div class="layer"><div class="layer-num ln-coral">08</div><div class="layer-body"><div class="layer-name">SAEO diagnostic</div><div class="layer-q">Where is it failing?</div><div class="layer-desc">Strategy / Application / Execution / Operations. The problem localization layer. Most marketing failures get addressed at the execution layer. Most of them live somewhere else.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BIM -->
+<div style="background:#fff;">
+  <div class="container">
+    <div class="section">
+      <span class="eyebrow">The behavioral science</span>
+      <h2 style="font-family:var(--font-serif);font-size:26px;color:var(--navy);margin-bottom:0.5rem;line-height:1.3;">BIM: the four pillars of human decision-making</h2>
+      <p style="font-size:15px;color:var(--slate);line-height:1.75;max-width:600px;margin-bottom:0;">Six decades of behavioral economics and design research. Four questions about every consumer decision.</p>
+      <div class="bim-grid">
+        <div class="bim-card">
+          <div class="bim-dot-title"><div class="bim-dot" style="background:var(--teal);"></div><div class="bim-title">Cognitive drivers</div></div>
+          <p class="bim-desc">How people process information and evaluate options. Loss aversion, anchoring, endowment effect, effort justification. The mental shortcuts that shape every choice before the consumer is consciously aware of them.</p>
+        </div>
+        <div class="bim-card">
+          <div class="bim-dot-title"><div class="bim-dot" style="background:var(--coral);"></div><div class="bim-title">Emotional drivers</div></div>
+          <p class="bim-desc">How feelings and psychological states influence decisions. Peak-end rule, IKEA effect, framing, FOMO. Emotion is not decoration on top of a rational decision — it is the decision, with reason applied after the fact.</p>
+        </div>
+        <div class="bim-card">
+          <div class="bim-dot-title"><div class="bim-dot" style="background:#7F77DD;"></div><div class="bim-title">Social drivers</div></div>
+          <p class="bim-desc">How peers, norms, and community dynamics shape behavior. Social proof, authority bias, bandwagon effect, scarcity perception. People follow others especially in moments of uncertainty — exactly where marketing intervenes.</p>
+        </div>
+        <div class="bim-card">
+          <div class="bim-dot-title"><div class="bim-dot" style="background:var(--navy);"></div><div class="bim-title">Environment & design</div></div>
+          <p class="bim-desc">How physical and digital contexts nudge decisions before conscious thought. Default effect, choice overload, decoy effect, temporal discounting. The design of a choice environment is itself a form of messaging.</p>
+        </div>
+      </div>
+      <div class="pull-quote">
+        <p class="pull-quote-text">"We think, each of us, that we're much more rational than we are."</p>
+        <p class="pull-quote-attr">— Daniel Kahneman</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 7 QUESTIONS -->
+<div style="background:var(--off-white);">
+  <div class="container">
+    <div class="section">
+      <span class="eyebrow">The 7 questions</span>
+      <h2 style="font-family:var(--font-serif);font-size:26px;color:var(--navy);margin-bottom:0.5rem;line-height:1.3;">Strategy starts with the right questions, in the right order</h2>
+      <p style="font-size:15px;color:var(--slate);line-height:1.75;max-width:600px;margin-bottom:0;">Most strategy processes start with what. Good Assumptions starts with why — and works forward from there.</p>
+      <div class="q7-list">
+        <div class="q7-item"><div class="q7-num">1</div><div class="q7-text">What is the role of marketing in this organisation?</div></div>
+        <div class="q7-item"><div class="q7-num">2</div><div class="q7-text">What are we doing, and why?</div></div>
+        <div class="q7-item"><div class="q7-num">3</div><div class="q7-text">Who are we talking to?</div></div>
+        <div class="q7-item"><div class="q7-num">4</div><div class="q7-text">What are we trying to say?</div></div>
+        <div class="q7-item"><div class="q7-num">5</div><div class="q7-text">Where are we trying to say it?</div></div>
+        <div class="q7-item"><div class="q7-num">6</div><div class="q7-text">How do we measure success?</div></div>
+        <div class="q7-item"><div class="q7-num">7</div><div class="q7-text">How do we react when things change?</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SAEO ABOUT -->
+<div style="background:#fff;">
+  <div class="container">
+    <div class="section" style="border-bottom:none;">
+      <div class="saeo-band">
+        <span class="saeo-eyebrow">SAEO.ai — the platform</span>
+        <h2 class="saeo-heading">When the framework became too large to run in your head.</h2>
+        <p class="saeo-body">At some point the framework worked well enough to demand a tool that could run it at scale. 201 cognitive biases, 343 behavioral archetypes, 133 liminal transitions, 3,269 executable tactics, 55 industry verticals. SAEO.ai holds all of it — and routes to the right layer before anyone reaches for a solution.</p>
+        <div class="saeo-stats">
+          <div><div class="saeo-stat-num">201</div><div class="saeo-stat-label">Cognitive biases mapped</div></div>
+          <div><div class="saeo-stat-num">133</div><div class="saeo-stat-label">Liminal transitions</div></div>
+          <div><div class="saeo-stat-num">3,269</div><div class="saeo-stat-label">Executable tactics</div></div>
+          <div><div class="saeo-stat-num">55</div><div class="saeo-stat-label">Industry verticals</div></div>
+        </div>
+        <div class="saeo-ctas">
+          <a href="https://saeo.ai" class="btn-teal">Explore SAEO.ai →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT CLOSE -->
+<div style="background:var(--off-white);">
+  <div class="container">
+    <div class="about-close">
+      <h2 class="about-close-heading">Marketing has always deserved a better diagnostic framework than it has had.</h2>
+      <p class="about-close-body">The discipline is not short of advice. It is not short of tools, channels, or tactics. What it has consistently lacked is a principled way of asking — before doing anything else — which layer of the system this problem actually lives in, and what the research says about why it behaves the way it does.</p>
+      <p class="about-close-body">Good Assumptions is that translation layer. Between the behavioral science and the practitioner's actual problem. Between the question and the right answer to it.</p>
+      <p class="about-close-body" style="font-style:italic;color:var(--muted);">Good Assumptions exists to make that diagnosis possible before the campaign runs, not after.</p>
+      <div class="tags-row">
+        <span class="badge badge-teal">Behavioral marketing</span>
+        <span class="badge badge-teal">Liminal transitions</span>
+        <span class="badge badge-navy">BIM framework</span>
+        <span class="badge badge-navy">SAEO diagnostic</span>
+        <span class="badge badge-coral">Marketing maturity</span>
+        <span class="badge badge-navy">7 Questions brief</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── SHARED FOOTER ── -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">
+          <div class="nav-mark" style="width:24px;height:24px;border-radius:5px;">
+            <svg width="12" height="12" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="7" stroke="#5DCAA5" stroke-width="2" fill="none"/>
+              <circle cx="10" cy="10" r="2.5" fill="#5DCAA5"/>
+            </svg>
+          </div>
+          Good Assumptions
+        </div>
+        <p class="footer-tagline">Behavioral marketing intelligence. The science behind why campaigns work — and why they don't.</p>
+      </div>
+      <div class="footer-nav">
+        <div>
+          <div class="footer-col-title">Content</div>
+          <a href="#blog" class="footer-link">Blog</a>
+          <a href="#" class="footer-link">Concepts</a>
+          <a href="#whitepapers" class="footer-link">White Papers</a>
+          <a href="#" class="footer-link">Case Studies</a>
+        </div>
+        <div>
+          <div class="footer-col-title">Platform</div>
+          <a href="https://saeo.ai" class="footer-link">SAEO.ai</a>
+          <a href="#" class="footer-link">Join waitlist</a>
+          <a href="#" class="footer-link">Consulting</a>
+        </div>
+        <div>
+          <div class="footer-col-title">Company</div>
+          <a href="#about" class="footer-link">About</a>
+          <a href="#" class="footer-link">Newsletter</a>
+          <a href="#" class="footer-link">LinkedIn</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Good Assumptions LLC · goodassumptions.com</div>
+      <div class="footer-legal">
+        <a href="#">Privacy policy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
