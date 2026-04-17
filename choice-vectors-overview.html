@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Choice Vectors — Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.12);
+    --green-text:  #5DCAA5;
+
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.12);
+    --amber-text:  #FAC775;
+
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.12);
+    --red-text:    #F0997B;
+
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.12);
+    --purple-text: #AFA9EC;
+
+    --blue:        #4A8FD4;
+    --blue-bg:     rgba(74,143,212,0.12);
+    --blue-text:   #87BEF0;
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Page header ── */
+  .page-header {
+    padding: 64px 0 48px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .ga-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .page-title {
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .page-title em { font-style: italic; color: var(--text-2); }
+  .page-intro {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.75;
+    max-width: 580px;
+    font-weight: 300;
+  }
+
+  /* ── Reframe ── */
+  .reframe {
+    background: var(--bg-3);
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+    padding: 20px 22px;
+    margin-bottom: 48px;
+  }
+  .reframe-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+  .reframe-text {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .reframe-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Reference table ── */
+  .table-section { margin-bottom: 48px; }
+  .table-header { margin-bottom: 14px; }
+  .table-title { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 3px; }
+  .table-sub { font-size: 12px; color: var(--text-3); }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-3); }
+  .leg-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+
+  .ref-table { width: 100%; border-collapse: collapse; margin-bottom: 32px; }
+  .ref-table thead tr { border-bottom: 0.5px solid var(--border-med); }
+  .ref-table th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 8px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .ref-table th:first-child { text-align: left; }
+  .ref-table th.left { text-align: left; }
+  .ref-table tbody tr {
+    border-bottom: 0.5px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .ref-table tbody tr:last-child { border-bottom: none; }
+  .ref-table tbody tr:hover { background: var(--bg-2); }
+  .ref-table td {
+    font-size: 12px;
+    padding: 10px 8px;
+    color: var(--text-2);
+    text-align: right;
+    vertical-align: top;
+    font-family: var(--font-mono);
+  }
+  .ref-table td:first-child { text-align: left; font-family: var(--font-sans); }
+  .ref-table td.left { text-align: left; font-family: var(--font-sans); }
+  .pillar-name { font-size: 12px; font-weight: 500; }
+  .pillar-sub { font-size: 11px; color: var(--text-3); margin-top: 2px; font-family: var(--font-sans); }
+  .total-num { font-weight: 500; color: var(--text-1); }
+
+  .p-cognitive { color: var(--amber-text); }
+  .p-emotional { color: var(--red-text); }
+  .p-social    { color: var(--purple-text); }
+  .p-env       { color: var(--blue-text); }
+
+  /* Sub-category chips */
+  .cat-dist { display: flex; gap: 3px; flex-wrap: wrap; }
+  .cat-chip {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-family: var(--font-sans);
+    white-space: nowrap;
+  }
+  .chip-frame  { background: var(--amber-bg); color: var(--amber-text); }
+  .chip-simp   { background: var(--bg-3); color: var(--text-3); border: 0.5px solid var(--border); }
+  .chip-loss   { background: var(--red-bg); color: var(--red-text); }
+  .chip-id     { background: var(--purple-bg); color: var(--purple-text); }
+  .chip-proof  { background: var(--blue-bg); color: var(--blue-text); }
+  .chip-feed   { background: var(--green-bg); color: var(--green-text); }
+  .chip-motiv  { background: var(--amber-bg); color: var(--amber-text); }
+  .chip-auth   { background: var(--purple-bg); color: var(--purple-text); }
+
+  /* Difficulty pip row */
+  .diff-bar { display: flex; gap: 2px; justify-content: flex-end; }
+  .dp { width: 6px; height: 10px; border-radius: 1px; background: var(--border-med); }
+  .dp.on { background: var(--text-3); }
+  .dp.hi { background: var(--red); }
+
+  .ref-table tfoot tr { border-top: 0.5px solid var(--border-med); }
+  .ref-table tfoot td {
+    font-size: 11px;
+    padding: 8px 8px;
+    color: var(--text-3);
+    font-family: var(--font-sans);
+  }
+  .tf-num { font-family: var(--font-mono); font-size: 12px; text-align: right; }
+
+  /* ── Anchor nav ── */
+  .anchor-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .anchor-pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    color: var(--text-2);
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.12s;
+    text-decoration: none;
+    display: inline-block;
+    letter-spacing: 0.02em;
+  }
+  .anchor-pill:hover, .anchor-pill.active {
+    background: var(--bg-3);
+    border-color: var(--border-med);
+    color: var(--text-1);
+  }
+
+  /* ── Pillar section ── */
+  .pillar-section {
+    padding: 56px 0 60px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .pillar-section:last-child { border-bottom: none; }
+
+  .pillar-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .pillar-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .pillar-count {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+  .pillar-heading {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .pillar-hook {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 18px;
+    font-style: italic;
+    font-weight: 300;
+  }
+  .pillar-body {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-bottom: 24px;
+    font-weight: 300;
+    max-width: 600px;
+  }
+  .pillar-body strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── 3-card stack ── */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .card { display: flex; background: var(--bg-2); }
+  .card + .card { border-top: 0.5px solid var(--border); }
+  .card-stripe { width: 3px; flex-shrink: 0; }
+
+  .s-top    { background: var(--green); }
+  .s-mid    { background: var(--amber); }
+  .s-deep   { background: var(--text-3); }
+  .s-cog    { background: var(--amber); }
+  .s-emo    { background: var(--red); }
+  .s-soc    { background: var(--purple); }
+  .s-env    { background: var(--blue); }
+
+  .card-inner { padding: 14px 18px; flex: 1; }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .card-name { font-size: 13px; font-weight: 500; color: var(--text-1); line-height: 1.4; }
+  .card-id   { font-size: 11px; color: var(--text-3); font-weight: 300; }
+  .card-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .b-acc  { background: var(--green-bg);  color: var(--green-text); }
+  .b-stab { background: var(--blue-bg);   color: var(--blue-text); }
+  .b-arr  { background: var(--amber-bg);  color: var(--amber-text); }
+  .b-rec  { background: var(--purple-bg); color: var(--purple-text); }
+  .b-prev { background: var(--red-bg);    color: var(--red-text); }
+
+  .card-hook {
+    font-size: 12px;
+    color: var(--text-2);
+    font-style: italic;
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .card-meta {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 7px;
+    font-family: var(--font-mono);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Insight ── */
+  .insight {
+    background: var(--bg-3);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+  }
+  .insight-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .insight-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding-top: 1px;
+  }
+  .insight-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--red-bg);
+    color: var(--red-text);
+  }
+  .insight-tag.saeo   { background: var(--amber-bg);  color: var(--amber-text); }
+  .insight-tag.bim    { background: var(--blue-bg);   color: var(--blue-text); }
+  .insight-tag.mat    { background: var(--purple-bg); color: var(--purple-text); }
+  .insight-tag.green  { background: var(--green-bg);  color: var(--green-text); }
+
+  .insight-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .insight-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Back link ── */
+  .back-link {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-3);
+    text-decoration: none;
+    margin-top: 8px;
+    transition: color 0.12s;
+    cursor: pointer;
+  }
+  .back-link:hover { color: var(--text-2); }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <div class="ga-label">Good Assumptions · Behavioral Intelligence</div>
+    <h1 class="page-title">Choice Vectors<br><em>are not tactics.</em></h1>
+    <p class="page-intro">
+      343 documented behavioral forces — each one the psychological mechanism that makes a tactic work,
+      or explains why it doesn't. Organized here by BIM pillar and by what they do to a decision moment:
+      accelerate it, stabilize it, arrest its decay, or redirect it toward a better outcome.
+    </p>
+  </header>
+
+  <!-- ── Reframe ── -->
+  <div class="reframe">
+    <div class="reframe-label">The distinction that matters</div>
+    <p class="reframe-text">
+      A tactic is a thing you do. A vector is <strong>why that thing moves behavior</strong>.
+      "Limited-time offer" is a tactic. Loss Aversion activated by temporal pressure is the vector.
+      When a tactic fails, brands ask "what different tactic should we try?" The better question is:
+      <strong>which vector was supposed to be active, and did the conditions for it actually exist?</strong>
+      343 vectors map to 160 liminal transitions — the moments in a consumer journey where behavior can shift.
+      That's the diagnostic architecture. Vectors are the mechanism layer between the consumer's psychology and your execution.
+    </p>
+  </div>
+
+  <!-- ── Reference table ── */
+  <div class="table-section">
+    <div class="table-header">
+      <div class="table-title">343 vectors by BIM pillar</div>
+      <div class="table-sub">Click any row to jump to that pillar's section</div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--amber)"></div> Cognitive Drivers</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--red)"></div> Emotional Drivers</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--purple)"></div> Social Influence</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div> Environment &amp; Design</div>
+    </div>
+
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>BIM Pillar</th>
+          <th>Vectors</th>
+          <th>Avg Difficulty</th>
+          <th class="left">Top Framework Categories</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="document.getElementById('cognitive').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name p-cognitive">Cognitive Drivers</div>
+            <div class="pillar-sub">Framing, anchoring, simplification</div>
+          </td>
+          <td class="total-num">118</td>
+          <td>
+            <div class="diff-bar">
+              <div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div>
+              <div class="dp on"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div>
+            </div>
+          </td>
+          <td class="left">
+            <div class="cat-dist">
+              <span class="cat-chip chip-frame">46 framing</span>
+              <span class="cat-chip chip-simp">38 simplification</span>
+              <span class="cat-chip chip-simp">16 memory</span>
+              <span class="cat-chip chip-simp">10 choice arch.</span>
+            </div>
+          </td>
+        </tr>
+        <tr onclick="document.getElementById('emotional').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name p-emotional">Emotional Drivers</div>
+            <div class="pillar-sub">Loss, identity, motivation, aspiration</div>
+          </td>
+          <td class="total-num">88</td>
+          <td>
+            <div class="diff-bar">
+              <div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div>
+              <div class="dp on hi"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div>
+            </div>
+          </td>
+          <td class="left">
+            <div class="cat-dist">
+              <span class="cat-chip chip-loss">24 loss &amp; risk</span>
+              <span class="cat-chip chip-id">21 identity</span>
+              <span class="cat-chip chip-motiv">16 motivation</span>
+              <span class="cat-chip chip-motiv">13 aspiration</span>
+            </div>
+          </td>
+        </tr>
+        <tr onclick="document.getElementById('environment').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name p-env">Environment &amp; Design</div>
+            <div class="pillar-sub">Feedback, timing, salience, habit</div>
+          </td>
+          <td class="total-num">86</td>
+          <td>
+            <div class="diff-bar">
+              <div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div>
+              <div class="dp on"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div>
+            </div>
+          </td>
+          <td class="left">
+            <div class="cat-dist">
+              <span class="cat-chip chip-feed">25 feedback</span>
+              <span class="cat-chip chip-simp">17 timing</span>
+              <span class="cat-chip chip-simp">17 visual</span>
+              <span class="cat-chip chip-simp">9 salience</span>
+            </div>
+          </td>
+        </tr>
+        <tr onclick="document.getElementById('social').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name p-social">Social Influence</div>
+            <div class="pillar-sub">Proof, authority, group dynamics</div>
+          </td>
+          <td class="total-num">51</td>
+          <td>
+            <div class="diff-bar">
+              <div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div><div class="dp on"></div>
+              <div class="dp on"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div><div class="dp"></div>
+            </div>
+          </td>
+          <td class="left">
+            <div class="cat-dist">
+              <span class="cat-chip chip-proof">21 social proof</span>
+              <span class="cat-chip chip-auth">19 authority</span>
+              <span class="cat-chip chip-simp">5 group dynamics</span>
+              <span class="cat-chip chip-simp">4 commitment</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total active vectors in SAEO database</td>
+          <td class="tf-num total-num">343</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- ── Anchor nav ── -->
+  <nav class="anchor-nav">
+    <a class="anchor-pill active" href="#cognitive">Cognitive Drivers</a>
+    <a class="anchor-pill" href="#emotional">Emotional Drivers</a>
+    <a class="anchor-pill" href="#environment">Environment &amp; Design</a>
+    <a class="anchor-pill" href="#social">Social Influence</a>
+  </nav>
+
+
+  <!-- ═══════════════════════════════════════════
+       COGNITIVE DRIVERS
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="cognitive">
+    <div class="pillar-meta">
+      <span class="pillar-label p-cognitive">Cognitive Drivers</span>
+      <span class="pillar-count">118 vectors</span>
+    </div>
+    <h2 class="pillar-heading">The largest pillar.<br>The most misapplied one.</h2>
+    <p class="pillar-hook">
+      118 vectors govern how information is framed, simplified, and encoded into decision-making.
+      Brands default here because rational messaging feels safe. But most Cognitive vectors aren't about giving people more information — they're about changing the reference point the information is measured against.
+    </p>
+    <p class="pillar-body">
+      The Cognitive Drivers pillar covers framing, anchoring, simplification, memory strategies, and choice architecture.
+      <strong>46 of the 118 are framing and anchoring vectors</strong> — the largest single cluster — 
+      which means the most-used behavioral tool in marketing is reference-point manipulation.
+      Every price display, every comparison chart, every before/after narrative is running on Cognitive framing.
+      <br><br>
+      The failure mode: brands apply Cognitive vectors to Emotional problems.
+      A customer who's losing confidence in their decision doesn't need a clearer information hierarchy.
+      They need a story about what their decision says about them.
+      <strong>Cognitive vectors work at Consideration and Decision stages.</strong>
+      At Retention and Re-engagement, the active pillar almost always shifts.
+    </p>
+
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-top"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Change Framing <span class="card-id">&nbsp;CV-024</span></div>
+            </div>
+            <span class="card-badge b-acc">59 transitions · Accelerate</span>
+          </div>
+          <p class="card-hook">
+            Communicates the positive side of behavior change or competitor switching by reframing disruption as opportunity.
+            Based on Prospect Theory: framing change as gain rather than loss reduces psychological resistance
+            and activates approach motivation instead of avoidance. 
+            Every challenger brand needs this vector before it needs anything else.
+          </p>
+          <div class="card-meta">
+            <span>Consideration stage</span>
+            <span>difficulty 6/10</span>
+            <span>Cognitive Framing &amp; Anchoring</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-mid"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Streamlined Onboarding <span class="card-id">&nbsp;CV-320</span></div>
+            </div>
+            <span class="card-badge b-acc">50 transitions · Accelerate</span>
+          </div>
+          <p class="card-hook">
+            Optimizes first product contact by minimizing cognitive load and engineering early wins.
+            Based on Serial Position Effect and progressive learning theory — 
+            initial experience quality determines whether the Endowment Effect activates.
+            Poor onboarding means the trial period never creates psychological ownership. The trial fails before it starts.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 6/10</span>
+            <span>Simplification &amp; Complexity Reduction</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-deep"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Cognitive Dissonance Resolution <span class="card-id">&nbsp;CV-339</span></div>
+            </div>
+            <span class="card-badge b-stab">36 transitions · Stabilize</span>
+          </div>
+          <p class="card-hook">
+            Addresses the tension between a customer's positive past experience and current dissatisfaction
+            by providing frameworks that separate temporary problems from fundamental value.
+            Based on Festinger's dissonance theory — when this vector is absent at product failure moments,
+            customers don't just churn. They become vocal detractors.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 5/10</span>
+            <span>Cognitive Framing &amp; Anchoring</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag saeo">SAEO · Application Layer</span>
+      </div>
+      <p class="insight-text">
+        Cognitive vectors require <strong>sequence, not just presence</strong>.
+        Change Framing at Consideration only works if Streamlined Onboarding activates the Endowment Effect at first use,
+        and Cognitive Dissonance Resolution is queued for the first friction moment.
+        Most brands deploy these independently, campaign by campaign, without designing the vector chain.
+        The SAEO Application layer diagnostic question is: which vectors are active at each stage,
+        and are they sequenced to reinforce each other — or deployed in isolation where they lose half their effect?
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       EMOTIONAL DRIVERS
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="emotional">
+    <div class="pillar-meta">
+      <span class="pillar-label p-emotional">Emotional Drivers</span>
+      <span class="pillar-count">88 vectors</span>
+    </div>
+    <h2 class="pillar-heading">88 vectors.<br>The highest average difficulty.</h2>
+    <p class="pillar-hook">
+      Emotional vectors are the hardest to execute and the most powerful when they land.
+      Difficulty score averages 5.9/10 across the pillar — the highest of the four.
+      They require organizational readiness that most teams haven't built before they need it.
+    </p>
+    <p class="pillar-body">
+      The Emotional Drivers pillar covers Loss &amp; Risk Communication (24 vectors),
+      Identity &amp; Ownership Psychology (21 vectors), Motivation &amp; Empowerment (16),
+      Emotional Influence &amp; Mood Management (14), and Future Visualization (13).
+      <strong>Identity is the second-largest framework cluster at 21 vectors</strong> — 
+      which means nearly a quarter of Emotional vectors operate on who the consumer believes they are,
+      not what they feel in the moment.
+      <br><br>
+      Continued Commitment (CV-047) and Relationship Investment Amplification (CV-342) are the two most-linked vectors
+      in the entire database at 77 transitions each. Both are Emotional. Both operate on the same mechanism:
+      making the accumulated investment visible enough that leaving feels like losing something real.
+      <strong>The vector with the most reach in the database is not a tactic. It's an identity structure.</strong>
+    </p>
+
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-emo"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Continued Commitment <span class="card-id">&nbsp;CV-047</span></div>
+            </div>
+            <span class="card-badge b-stab">77 transitions · Stabilize</span>
+          </div>
+          <p class="card-hook">
+            Surfaces previous consumer investment — time, data, decisions — to encourage ongoing engagement.
+            Based on Commitment Escalation and Sunk Cost research.
+            The mechanism: people continue investments to justify what they've already spent,
+            and consistency with past actions reduces cognitive dissonance.
+            This vector is the #1 linked vector in the database. It's everywhere in the Retention stage because it works.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 6/10</span>
+            <span>Commitment &amp; Consistency · Social Influence</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-mid"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Switching Cost Amplification <span class="card-id">&nbsp;CV-327</span></div>
+            </div>
+            <span class="card-badge b-arr">54 transitions · Arrest</span>
+          </div>
+          <p class="card-hook">
+            Quantifies the total economic and psychological cost of leaving — setup complexity, migration risk,
+            learning curves, data loss, opportunity cost — making churn feel expensive before the consumer has done the math.
+            The hardest implementation vector in this tier at difficulty 9/10.
+            Deployed wrong, it reads as a threat. Deployed right, it reads as honesty.
+          </p>
+          <div class="card-meta">
+            <span>Reactivation stage</span>
+            <span>difficulty 9/10</span>
+            <span>Loss Aversion &amp; Risk Communication</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-deep"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Identity Threat Response <span class="card-id">&nbsp;CV-329</span></div>
+            </div>
+            <span class="card-badge b-arr">52 transitions · Arrest</span>
+          </div>
+          <p class="card-hook">
+            Frames potential churn as inconsistent with who the consumer believes they are —
+            their values, their role, their self-image.
+            Based on Identity Protection Bias and Social Identity Theory.
+            When a fitness brand says "people like you don't quit," that's Identity Threat Response.
+            It's also the vector most at risk of backfiring when deployed inauthentically.
+          </p>
+          <div class="card-meta">
+            <span>Reactivation stage</span>
+            <span>difficulty 6/10</span>
+            <span>Identity &amp; Ownership Psychology</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag">BIM Pillar Mismatch</span>
+      </div>
+      <p class="insight-text">
+        Emotional vectors get deployed at the wrong stage in two ways.
+        First, brands flood Awareness with emotional creative (fear, aspiration, humor)
+        while Retention campaigns revert to rational messaging — feature lists and usage stats.
+        But the highest-impact Emotional vectors are <strong>Retention and Reactivation instruments</strong>,
+        not Awareness ones. Second, brands apply Identity vectors to consumers who haven't yet formed an identity connection with the brand.
+        Identity Threat Response requires prior identity alignment to exist. 
+        Deployed at first conversion, it reads as presumptuous. Deployed at month 6, it reads as deeply known.
+        Timing is the variable most teams skip in the planning brief.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       ENVIRONMENT & DESIGN
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="environment">
+    <div class="pillar-meta">
+      <span class="pillar-label p-env">Environment &amp; Design</span>
+      <span class="pillar-count">86 vectors</span>
+    </div>
+    <h2 class="pillar-heading">Vectors that work<br>whether you designed for them or not.</h2>
+    <p class="pillar-hook">
+      Environment &amp; Design vectors operate on the context around a decision, not the content of it.
+      Feedback systems, timing, visual salience, and habit formation are active at every touchpoint — 
+      and they're running on whatever defaults you've built, intentionally or not.
+    </p>
+    <p class="pillar-body">
+      The E&amp;D pillar's largest cluster is Feedback &amp; Reinforcement Systems (25 vectors) —
+      which tells you something important: the behavioral architecture of your product,
+      how and when it tells consumers they're doing the right thing,
+      is the highest-leverage design surface in this pillar.
+      Timing &amp; Contextual Triggers (17 vectors) is next. The <em>when</em> matters as much as the <em>what</em>.
+      <br><br>
+      <strong>Post-purchase Communication (CV-196)</strong> is the most-linked E&amp;D vector with 38 transition links — 
+      and it's one of the most systematically neglected. Brands invest heavily in pre-purchase persuasion
+      and almost nothing in post-purchase reinforcement. But post-purchase is where buyer's remorse,
+      self-consistency maintenance, and the foundation for repeat conversion all live.
+    </p>
+
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-env"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Post-purchase Communication <span class="card-id">&nbsp;CV-196</span></div>
+            </div>
+            <span class="card-badge b-stab">38 transitions · Stabilize</span>
+          </div>
+          <p class="card-hook">
+            Strategic engagement after the transaction to reinforce the decision, reduce buyer's remorse,
+            and build loyalty through ongoing value demonstration.
+            Based on choice-supportive bias and relationship maintenance theory.
+            The consumer who feels good about their decision at day 3 is three times more likely to still be a customer at month 6.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 5/10</span>
+            <span>Feedback &amp; Reinforcement Systems</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-mid"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Temporal Perspective Reframing <span class="card-id">&nbsp;CV-343</span></div>
+            </div>
+            <span class="card-badge b-stab">40 transitions · Stabilize</span>
+          </div>
+          <p class="card-hook">
+            Shifts focus from immediate frustrations to longer-term value trajectories.
+            Based on Hershfield's research on future-self connection and temporal discounting.
+            Consumers undervalue future benefits relative to immediate costs — 
+            this vector makes future outcomes vivid and personally relevant enough to compete with present pain.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 6/10</span>
+            <span>Timing &amp; Contextual Triggers</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-deep"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Initial Offer <span class="card-id">&nbsp;CV-142</span></div>
+            </div>
+            <span class="card-badge b-acc">48 transitions · Accelerate</span>
+          </div>
+          <p class="card-hook">
+            Reduces perceived purchase risk through introductory pricing, creating an anchored reference point
+            and beginning Endowment Effect activation before the full commitment.
+            The mechanism isn't generosity — it's lowering the decision threshold
+            so the consumer crosses it and psychological ownership begins.
+          </p>
+          <div class="card-meta">
+            <span>Decision stage</span>
+            <span>difficulty 6/10</span>
+            <span>Choice Architecture &amp; Defaults</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag mat">Marketing Maturity Gap</span>
+      </div>
+      <p class="insight-text">
+        Environment &amp; Design vectors require <strong>cross-functional ownership that most org structures don't have</strong>.
+        Post-purchase Communication sits at the intersection of marketing, product, and CX.
+        Temporal Perspective Reframing requires the product to surface data that most analytics stacks don't capture.
+        Initial Offer requires pricing authority that marketing rarely controls.
+        The maturity failure here is structural — these vectors can't be deployed campaign by campaign.
+        They require persistent behavioral architecture that most companies haven't built
+        because no single team owns the full sequence.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       SOCIAL INFLUENCE
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="social">
+    <div class="pillar-meta">
+      <span class="pillar-label p-social">Social Influence</span>
+      <span class="pillar-count">51 vectors</span>
+    </div>
+    <h2 class="pillar-heading">The smallest pillar.<br>Built before the campaign needs it.</h2>
+    <p class="pillar-hook">
+      Social Influence vectors are permission structures — signals that tell the consumer
+      their decision is sanctioned by someone credible, a group they belong to, or the weight of evidence.
+      You can't build these in-campaign. They're infrastructure, not creative.
+    </p>
+    <p class="pillar-body">
+      Social Proof &amp; Community (21 vectors) and Authority &amp; Credibility (19 vectors)
+      account for nearly 80% of the Social Influence pillar.
+      Both operate on the same fundamental mechanism: <strong>borrowed conviction</strong>.
+      The consumer who isn't certain looks for a signal that others are.
+      The consumer who's skeptical looks for a source whose skepticism has already been resolved.
+      <br><br>
+      Trust &amp; Transparency (CV-302) is the Social Influence vector with the deepest link structure
+      across VALIDATION, RECOVERY, and CRISIS functional categories — 
+      meaning it's relevant not just at acquisition but across the entire trust arc of the customer journey.
+      Most brands deploy it at Awareness. Its highest-impact applications are at Recovery and Re-engagement.
+    </p>
+
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-soc"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Trust &amp; Transparency <span class="card-id">&nbsp;CV-302</span></div>
+            </div>
+            <span class="card-badge b-acc">Accelerate · Prevent · Recovery</span>
+          </div>
+          <p class="card-hook">
+            Openly sharing pricing, processes, policies, and product realities to reduce skepticism and build credibility.
+            Trust &amp; Transparency links to LIM-011 (Skepticism → Trust), LIM-147 (Post-Crisis → Trust Rebuilt),
+            and eight exit/crisis transitions where it functions as the prevention mechanism.
+            Everlane built $100M in revenue on radical cost transparency. Domino's used it to reverse a brand crisis.
+          </p>
+          <div class="card-meta">
+            <span>Consideration · Recovery stages</span>
+            <span>difficulty 5/10</span>
+            <span>Authority &amp; Credibility</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-mid"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Social Investment Highlighting <span class="card-id">&nbsp;CV-345</span></div>
+            </div>
+            <span class="card-badge b-arr">30 transitions · Arrest</span>
+          </div>
+          <p class="card-hook">
+            Makes visible the social connections, community status, and relationships
+            that a consumer would lose by leaving — networks, contributions, reputation, shared achievements.
+            Based on Robert Putnam's social capital research.
+            The mechanism isn't FOMO. It's that social investments feel genuinely non-transferable.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 8/10</span>
+            <span>Social Proof &amp; Community</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-deep"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div>
+              <div class="card-name">Continued Commitment <span class="card-id">&nbsp;CV-047</span></div>
+            </div>
+            <span class="card-badge b-stab">77 transitions · Stabilize</span>
+          </div>
+          <p class="card-hook">
+            Technically filed under Social Influence / Commitment &amp; Consistency,
+            but operates across all four pillars in practice.
+            It's listed here because its mechanism is fundamentally social:
+            people are consistent with their public commitments and past decisions
+            because inconsistency is socially costly, not just cognitively uncomfortable.
+          </p>
+          <div class="card-meta">
+            <span>Retention stage</span>
+            <span>difficulty 6/10</span>
+            <span>Commitment &amp; Consistency</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag">BIM Pillar Mismatch</span>
+      </div>
+      <p class="insight-text">
+        Social Influence vectors <strong>can't be manufactured at deployment time</strong>.
+        Authority Bias requires existing credibility signals. Social Proof requires real evidence of adoption.
+        Trust &amp; Transparency requires a history of authentic disclosure.
+        The brand that discovers it needs Social Influence vectors when the campaign is already live
+        has already lost the timing window.
+        The diagnostic failure here is a planning gap — Social Influence infrastructure belongs in the
+        12-month brand capability plan, not in the campaign brief. 
+        Most teams invert this: they plan the creative first and look for the credibility signals second.
+        That's why influencer partnerships get bolted on last, social proof modules get populated with weak reviews,
+        and transparency efforts feel performative. The vector requires the asset. Build the asset first.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+</div>
+
+<script>
+  const sections = ['cognitive','emotional','environment','social'];
+  const pills = document.querySelectorAll('.anchor-pill');
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        pills.forEach(p => p.classList.remove('active'));
+        const t = document.querySelector(`.anchor-pill[href="#${e.target.id}"]`);
+        if (t) t.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+</script>
+</body>
+</html>

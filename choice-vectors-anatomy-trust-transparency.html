@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trust & Transparency — Anatomy · Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.12);
+    --green-text:  #5DCAA5;
+
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.12);
+    --amber-text:  #FAC775;
+
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.12);
+    --red-text:    #F0997B;
+
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.12);
+    --purple-text: #AFA9EC;
+
+    --blue:        #4A8FD4;
+    --blue-bg:     rgba(74,143,212,0.12);
+    --blue-text:   #87BEF0;
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 64px 0 52px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .ga-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .hero-sep { color: var(--text-3); font-size: 11px; }
+  .sample-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--purple-bg);
+    color: var(--purple-text);
+    border: 0.5px solid rgba(127,119,221,0.25);
+  }
+  .hero-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    border: 0.5px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .hero-title {
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: -0.025em;
+  }
+  .hero-def {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.75;
+    max-width: 580px;
+    font-weight: 300;
+    margin-bottom: 24px;
+  }
+
+  .hero-stats { display: flex; gap: 24px; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 3px; }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .stat-div { width: 0.5px; background: var(--border-med); align-self: stretch; margin: 4px 0; }
+
+  .pillar-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 20px; }
+  .ptag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .ptag.primary { background: var(--purple-bg); color: var(--purple-text); border: 0.5px solid rgba(127,119,221,0.2); }
+  .ptag.secondary { background: var(--bg-3); color: var(--text-3); border: 0.5px solid var(--border); }
+
+  /* ── Section structure ── */
+  .anatomy-section {
+    padding: 0 0 60px;
+    margin-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .section-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .section-num { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+  .section-title { font-size: 22px; font-weight: 300; color: var(--text-1); letter-spacing: -0.015em; }
+  .section-hook {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    font-weight: 300;
+    max-width: 580px;
+  }
+
+  /* ── Bias card (cognitive layer) ── */
+  .bias-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .bias-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 12px;
+    border-bottom: 0.5px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .bias-card-left { flex: 1; }
+  .bias-name { font-size: 14px; font-weight: 500; color: var(--text-1); margin-bottom: 2px; }
+  .bias-id { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+  .rank-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .rank-1 { background: var(--purple-bg); color: var(--purple-text); }
+  .rank-2 { background: var(--amber-bg); color: var(--amber-text); }
+  .rank-3 { background: var(--bg-3); color: var(--text-3); border: 0.5px solid var(--border); }
+
+  .bias-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  @media (max-width: 600px) {
+    .bias-body { grid-template-columns: 1fr; }
+    .bias-body .b-cell + .b-cell { border-left: none; border-top: 0.5px solid var(--border); }
+  }
+  .b-cell { padding: 12px 16px; }
+  .b-cell + .b-cell { border-left: 0.5px solid var(--border); }
+  .b-cell-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .b-cell-text { font-size: 12px; color: var(--text-2); line-height: 1.65; font-weight: 300; }
+  .b-cell-text.intervention { color: var(--green-text); }
+
+  /* ── Insight ── */
+  .insight { background: var(--bg-3); border-radius: 8px; padding: 16px 18px; margin-top: 20px; margin-bottom: 4px; }
+  .insight-top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .insight-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding-top: 2px;
+  }
+  .insight-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--purple-bg);
+    color: var(--purple-text);
+  }
+  .insight-tag.bim   { background: var(--blue-bg);   color: var(--blue-text); }
+  .insight-tag.emo   { background: var(--red-bg);    color: var(--red-text); }
+  .insight-tag.cog   { background: var(--amber-bg);  color: var(--amber-text); }
+  .insight-tag.green { background: var(--green-bg);  color: var(--green-text); }
+
+  .insight-text { font-size: 13px; color: var(--text-2); line-height: 1.75; font-weight: 300; }
+  .insight-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Transition card (behavioral layer) ── */
+  .trans-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .trans-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 12px;
+    border-bottom: 0.5px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .trans-name { font-size: 14px; font-weight: 500; color: var(--text-1); }
+  .trans-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .role-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .role-acc  { background: var(--green-bg);  color: var(--green-text); }
+  .role-prev { background: var(--red-bg);    color: var(--red-text); }
+  .role-rec  { background: var(--amber-bg);  color: var(--amber-text); }
+  .role-stab { background: var(--blue-bg);   color: var(--blue-text); }
+
+  .trans-body { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; }
+  @media (max-width: 600px) {
+    .trans-body { grid-template-columns: 1fr; }
+    .trans-body .t-cell + .t-cell { border-left: none; border-top: 0.5px solid var(--border); }
+  }
+  .t-cell { padding: 12px 16px; }
+  .t-cell + .t-cell { border-left: 0.5px solid var(--border); }
+  .t-cell-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .t-cell-text { font-size: 12px; color: var(--text-2); line-height: 1.65; font-weight: 300; }
+  .t-cell-text.warning { color: var(--red-text); }
+
+  /* ── Tactic chain ── */
+  .tactic-chain { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+  .tactic-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .tactic-stripe { width: 3px; border-radius: 2px; flex-shrink: 0; align-self: stretch; min-height: 40px; }
+  .ts-eng  { background: var(--purple); }
+  .ts-ret  { background: var(--green); }
+  .ts-act  { background: var(--blue); }
+
+  .tactic-inner { flex: 1; }
+  .tactic-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .tactic-name { font-size: 13px; font-weight: 500; color: var(--text-1); }
+  .tactic-via { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); margin-top: 2px; }
+  .tactic-id-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bg-3);
+    color: var(--text-3);
+    border: 0.5px solid var(--border);
+    flex-shrink: 0;
+  }
+  .tactic-outcome { font-size: 12px; color: var(--text-2); line-height: 1.6; font-weight: 300; margin-bottom: 6px; }
+  .tactic-footer { display: flex; gap: 10px; flex-wrap: wrap; }
+  .tactic-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .tag-cog  { background: var(--amber-bg);  color: var(--amber-text); }
+  .tag-eng  { background: var(--purple-bg); color: var(--purple-text); }
+  .tag-ret  { background: var(--green-bg);  color: var(--green-text); }
+  .tag-act  { background: var(--blue-bg);   color: var(--blue-text); }
+
+  /* ── Connection graph ── */
+  .graph-nodes {
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .graph-node {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 18px;
+    background: var(--bg-2);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .graph-node:last-child { border-bottom: none; }
+  .node-type-col { width: 90px; flex-shrink: 0; }
+  .node-type-tag {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .nt-acc   { background: var(--green-bg);  color: var(--green-text); }
+  .nt-prev  { background: var(--red-bg);    color: var(--red-text); }
+  .nt-rec   { background: var(--amber-bg);  color: var(--amber-text); }
+  .nt-stab  { background: var(--blue-bg);   color: var(--blue-text); }
+
+  .node-content { flex: 1; }
+  .node-transition { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 3px; }
+  .node-detail { font-size: 12px; color: var(--text-2); line-height: 1.55; font-weight: 300; }
+  .node-cat { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); margin-top: 3px; }
+  .node-prob { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); flex-shrink: 0; padding-top: 2px; }
+
+  /* ── Brand examples strip ── */
+  .brand-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 540px) { .brand-strip { grid-template-columns: 1fr; } }
+  .brand-cell {
+    padding: 14px 16px;
+    background: var(--bg-2);
+    border-right: 0.5px solid var(--border);
+  }
+  .brand-cell:last-child { border-right: none; }
+  .brand-name { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 3px; }
+  .brand-tactic { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); margin-bottom: 6px; }
+  .brand-result { font-size: 11px; color: var(--text-2); line-height: 1.55; font-weight: 300; }
+
+  /* ── Conversion footer ── */
+  .conversion-footer {
+    background: var(--bg-2);
+    border-top: 0.5px solid var(--border-med);
+    padding: 52px 24px 60px;
+    margin: 0 -24px;
+  }
+  .cf-inner { max-width: 760px; margin: 0 auto; }
+  .cf-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cf-dot { width: 4px; height: 4px; background: var(--purple); border-radius: 50%; }
+  .cf-headline {
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    letter-spacing: -0.015em;
+    max-width: 540px;
+  }
+  .cf-gap {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    max-width: 560px;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+  .cf-gap strong { color: var(--text-1); font-weight: 500; }
+  .cf-scale {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.75;
+    max-width: 520px;
+    font-weight: 300;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+  .cf-positioning { font-size: 14px; color: var(--text-2); font-weight: 300; margin-bottom: 32px; }
+  .cf-positioning strong { color: var(--text-1); font-weight: 500; }
+  .cf-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 560px) { .cf-stats { grid-template-columns: repeat(3, 1fr); } }
+  .cf-stat { padding: 14px 12px; text-align: center; border-right: 0.5px solid var(--border); }
+  .cf-stat:last-child { border-right: none; }
+  .cf-stat-num {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-1);
+    margin-bottom: 3px;
+  }
+  .cf-stat-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.4; }
+  .cf-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green-text);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 0.5px solid rgba(29,158,117,0.3);
+    transition: border-color 0.15s;
+  }
+  .cf-cta:hover { border-color: var(--green); }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="ga-label">Good Assumptions</span>
+      <span class="hero-sep">·</span>
+      <span class="ga-label">Behavioral Anatomy</span>
+      <span class="hero-sep">·</span>
+      <span class="sample-badge">Sample</span>
+      <span class="hero-id">CV-302</span>
+    </div>
+
+    <h1 class="hero-title">Trust &amp; Transparency</h1>
+    <p class="hero-def">
+      Openly sharing information about pricing, practices, policies, and product realities to build consumer confidence.
+      Not a brand value. A behavioral mechanism — one that links to 15 liminal transitions across
+      Validation, Recovery, and Crisis functional categories.
+      Most brands deploy it at Awareness. Its highest-impact applications are at Recovery.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">15</div>
+        <div class="stat-label">Transition links</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">5/10</div>
+        <div class="stat-label">Difficulty</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Intervention roles</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">Low</div>
+        <div class="stat-label">Ethical risk</div>
+      </div>
+    </div>
+
+    <div class="pillar-tags">
+      <span class="ptag primary">Social Influence (Primary)</span>
+      <span class="ptag secondary">Authority &amp; Credibility</span>
+      <span class="ptag secondary">Consideration · Recovery stages</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1: COGNITIVE LAYER
+       Biases active at LIM-011 (Skepticism → Trust)
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Cognitive Layer</h2>
+    </div>
+    <p class="section-hook">
+      At LIM-011 — the Skepticism → Trust transition, where Trust &amp; Transparency has its highest similarity score —
+      three biases are active. Each one is a different mechanism for why consumers withhold belief.
+      And each requires a different intervention from the vector.
+    </p>
+
+    <!-- Bias 1: Naïve Cynicism -->
+    <div class="bias-card">
+      <div class="bias-card-header">
+        <div class="bias-card-left">
+          <div class="bias-name">Naïve Cynicism</div>
+          <div class="bias-id">Cog-041 · Primary · Social Influence · rank 1</div>
+        </div>
+        <span class="rank-badge rank-1">Primary</span>
+      </div>
+      <div class="bias-body">
+        <div class="b-cell">
+          <div class="b-cell-label">Why it's active</div>
+          <p class="b-cell-text">Consumers assume brands communicate out of self-interest, not genuine intent. Every marketing message arrives pre-discounted. The consumer isn't weighing whether to believe — they've already concluded there's an agenda.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">How it manifests</div>
+          <p class="b-cell-text">Sustainability claims dismissed as greenwashing. "We care about you" language read as boilerplate. Price promotions assumed to be manipulated. Any positive brand claim read through a lens of what the brand gets out of saying it.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">Intervention note</div>
+          <p class="b-cell-text intervention">Provide transparent, verifiable evidence — not assertions. Naïve Cynicism is not overcome by louder claims. It's overcome by disclosure that costs the brand something: cost structures, factory conditions, negative product comparisons.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bias 2: Imposter Syndrome (at this transition) -->
+    <div class="bias-card">
+      <div class="bias-card-header">
+        <div class="bias-card-left">
+          <div class="bias-name">Imposter Syndrome</div>
+          <div class="bias-id">Cog-201 · Primary · Emotional Drivers · rank 2</div>
+        </div>
+        <span class="rank-badge rank-2">Primary</span>
+      </div>
+      <div class="bias-body">
+        <div class="b-cell">
+          <div class="b-cell-label">Why it's active</div>
+          <p class="b-cell-text">High-achieving consumers doubt their own judgment when evaluating premium offerings. The skepticism isn't about the brand — it's about whether they're the right person to be making this decision. Trust has to be extended to the consumer's self-assessment, not just the product.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">How it manifests</div>
+          <p class="b-cell-text">A qualified professional hesitates on a high-end tool because they're not sure they're "advanced enough" to benefit. The brand's transparency about who the product is for becomes a trust signal — inclusion or exclusion both matter.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">Intervention note</div>
+          <p class="b-cell-text intervention">Offer personalized validation alongside product transparency. Show who the product is genuinely designed for — including evidence that people like this consumer use it successfully. Transparency about fit is as powerful as transparency about price.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bias 3: Semmelweis Reflex -->
+    <div class="bias-card">
+      <div class="bias-card-header">
+        <div class="bias-card-left">
+          <div class="bias-name">Semmelweis Reflex</div>
+          <div class="bias-id">Cog-039 · Core · Environment &amp; Design · rank 3</div>
+        </div>
+        <span class="rank-badge rank-3">Core</span>
+      </div>
+      <div class="bias-body">
+        <div class="b-cell">
+          <div class="b-cell-label">Why it's active</div>
+          <p class="b-cell-text">Consumers resist new information that contradicts their established beliefs or prior category experiences. If they've been burned by a competitor's "transparency" theater before, genuine transparency gets categorized as more of the same.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">How it manifests</div>
+          <p class="b-cell-text">Loyal customers reject new product versions despite improvement. Skeptical consumers interpret new disclosure as a reaction to past deception, not evidence of genuine character. The reference class is poisoned by prior category behavior.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">Intervention note</div>
+          <p class="b-cell-text intervention">Introduce transparency gradually and in ways that align with existing beliefs before extending to contested territory. Lead with the disclosures that feel least threatening, build a track record, then move to the harder ones. Trust requires a history, not a moment.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Cognitive pattern</span>
+        <span class="insight-tag cog">Three Different Skepticism Types</span>
+      </div>
+      <p class="insight-text">
+        Naïve Cynicism, Imposter Syndrome, and Semmelweis Reflex are three entirely different reasons a consumer withholds trust — and each requires a different application of Trust &amp; Transparency.
+        <strong>Cynicism requires verifiable disclosure that costs the brand something.</strong>
+        <strong>Imposter Syndrome requires transparency about who the product is genuinely for.</strong>
+        <strong>Semmelweis Reflex requires gradual track-record building, not a single transparency moment.</strong>
+        Most trust-building campaigns treat skepticism as a single unified state and deploy one transparency message against all three. That's why trust campaigns so often underperform their potential.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2: BEHAVIORAL LAYER
+       Three transitions where CV-302 is most active
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Behavioral Layer</h2>
+    </div>
+    <p class="section-hook">
+      Trust &amp; Transparency operates across three distinct intervention roles — accelerate, prevent, and recovery.
+      Each deploys differently, at different moments, with different risk profiles.
+      Here are the three highest-similarity transitions across those roles.
+    </p>
+
+    <!-- Transition 1: LIM-011 Skepticism → Trust (accelerate) -->
+    <div class="trans-card">
+      <div class="trans-header">
+        <div>
+          <div class="trans-name">LIM-011 — Skepticism → Trust</div>
+          <div class="trans-meta">VALIDATION · Social Influence · forward transition · similarity 0.68</div>
+        </div>
+        <span class="role-badge role-acc">Accelerate</span>
+      </div>
+      <div class="trans-body">
+        <div class="t-cell">
+          <div class="t-cell-label">Why it's effective</div>
+          <p class="t-cell-text">Openly sharing information builds credibility by reducing uncertainty — the core mechanism of the Skepticism → Trust transition. Transparency doesn't persuade; it removes the objection that makes persuasion impossible.</p>
+        </div>
+        <div class="t-cell">
+          <div class="t-cell-label">Deploy moment</div>
+          <p class="t-cell-text">Initial customer interactions and throughout the consideration journey. The deploy trigger is first meaningful contact — when the consumer is evaluating whether to invest attention. Not post-purchase. Not at renewal. Now.</p>
+        </div>
+        <div class="t-cell">
+          <div class="t-cell-label">What NOT to do</div>
+          <p class="t-cell-text warning">Selective disclosure — sharing the favorable information while obscuring the unfavorable. Consumers at this transition are specifically looking for what you're not saying. Any omission is found and interpreted as deception.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transition 2: LIM-074 Skepticism Reinforcement (prevent) -->
+    <div class="trans-card">
+      <div class="trans-header">
+        <div>
+          <div class="trans-name">LIM-074 — Skepticism Reinforcement</div>
+          <div class="trans-meta">CRISIS · Social Influence · exit transition · similarity 0.63</div>
+        </div>
+        <span class="role-badge role-prev">Prevent</span>
+      </div>
+      <div class="trans-body">
+        <div class="t-cell">
+          <div class="t-cell-label">Why it's effective</div>
+          <p class="t-cell-text">Skepticism Reinforcement is the exit state where doubt compounds into confirmed distrust. Trust &amp; Transparency prevents this by maintaining open, honest communication before the skepticism hardens — catching it at uncertainty, not conviction.</p>
+        </div>
+        <div class="t-cell">
+          <div class="t-cell-label">Deploy moment</div>
+          <p class="t-cell-text">When initially engaging with skeptical audiences — category-level skeptics, consumers who've been burned by competitors, or segments with documented distrust of the vertical. The deploy trigger is audience identification, not behavioral signal.</p>
+        </div>
+        <div class="t-cell">
+          <div class="t-cell-label">What NOT to do</div>
+          <p class="t-cell-text warning">Do not deploy if the brand is actively hiding information or has a history of misleading consumers. Transparency in this state without genuine underlying honesty doesn't prevent Skepticism Reinforcement — it accelerates it. The vector requires the truth to work.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transition 3: LIM-147 Post-Crisis → Trust Rebuilt (recovery) -->
+    <div class="trans-card">
+      <div class="trans-header">
+        <div>
+          <div class="trans-name">LIM-147 — Post-Crisis → Trust Rebuilt</div>
+          <div class="trans-meta">RECOVERY · Emotional Drivers · forward transition · similarity 0.62</div>
+        </div>
+        <span class="role-badge role-rec">Recovery</span>
+      </div>
+      <div class="trans-body">
+        <div class="t-cell">
+          <div class="t-cell-label">Why it's effective</div>
+          <p class="t-cell-text">Post-crisis trust requires behavioral evidence, not messaging. Trust &amp; Transparency at this transition means providing concrete proof of changed behavior — not statements about values — combined with open communication about what failed and why. Behavioral integrity theory: the gap between words and actions is the trust variable.</p>
+        </div>
+        <div class="t-cell">
+          <div class="t-cell-label">Deploy moment</div>
+          <p class="t-cell-text">Consistently after behavioral changes are implemented — not announced, implemented. The counter-narrative must be built from evidence: here's the specific thing that failed, here's the specific change made, here's the proof it held. Each step reinforced with open documentation.</p>
+        </div>
+        <div class="t-cell">
+          <div class="t-cell-label">What NOT to do</div>
+          <p class="t-cell-text warning">Superficial transparency — announcing the commitment to transparency without underlying systemic change. At LIM-147, consumers are specifically calibrated to detect discrepancy between word and action. Perceived insincerity at recovery doesn't just fail. It extends the crisis.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3: EXECUTION LAYER
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Execution Layer</h2>
+    </div>
+    <p class="section-hook">
+      Three tactics link directly to Trust &amp; Transparency via the vector-tactic chain.
+      All three cluster around Cognitive Drivers — which reveals something important:
+      transparency works by changing what the consumer knows, and that's a cognitive operation,
+      even though the outcome is emotional.
+    </p>
+
+    <!-- Real world examples first -->
+    <div class="brand-strip">
+      <div class="brand-cell">
+        <div class="brand-name">Everlane</div>
+        <div class="brand-tactic">Radical Transparency · 2013</div>
+        <p class="brand-result">Published cost breakdowns — materials, labor, transport, markup — for every product. Revenue grew from $12M to $100M by 2016. The mechanism: removing the adversarial frame from pricing.</p>
+      </div>
+      <div class="brand-cell">
+        <div class="brand-name">Domino's</div>
+        <div class="brand-tactic">Pizza Turnaround · 2010</div>
+        <p class="brand-result">National ads featuring real customer complaints and behind-the-scenes recipe change documentation. Same-store sales up 14.3% in Q1 2010 — the largest quarterly increase in company history at the time.</p>
+      </div>
+      <div class="brand-cell">
+        <div class="brand-name">Patagonia</div>
+        <div class="brand-tactic">Footprint Chronicles · 2007</div>
+        <p class="brand-result">Interactive supply chain mapping — factories, environmental impact, worker conditions — for every product. Revenue grew from $340M in 2010 to $1B in 2017. Transparency as competitive positioning, not compliance.</p>
+      </div>
+    </div>
+
+    <div class="tactic-chain">
+
+      <div class="tactic-card">
+        <div class="tactic-stripe ts-eng"></div>
+        <div class="tactic-inner">
+          <div class="tactic-top">
+            <div>
+              <div class="tactic-name">Transparency</div>
+              <div class="tactic-via">via CV-302 direct link · PT-2998 · rank 1 · similarity 0.7154</div>
+            </div>
+            <span class="tactic-id-badge">PT-2998</span>
+          </div>
+          <p class="tactic-outcome">
+            Core transparency execution: clearly communicating pricing, practices, and policies.
+            Expected outcomes: 15% increase in customer trust scores, 30% reduction in pricing-related support queries,
+            80% of customer feedback mentioning transparency positively.
+            Validated against Sway and Patagonia implementations.
+          </p>
+          <div class="tactic-footer">
+            <span class="tactic-tag tag-cog">Cognitive Drivers</span>
+            <span class="tactic-tag tag-eng">Engagement objective</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tactic-card">
+        <div class="tactic-stripe ts-ret"></div>
+        <div class="tactic-inner">
+          <div class="tactic-top">
+            <div>
+              <div class="tactic-name">Impact Transparency</div>
+              <div class="tactic-via">via CV-302 direct link · PT-1376 · rank 2 · similarity 0.7135</div>
+            </div>
+            <span class="tactic-id-badge">PT-1376</span>
+          </div>
+          <p class="tactic-outcome">
+            Extends transparency to business impact — environmental, social, financial — creating accountability signals
+            that go beyond product claims.
+            Expected outcomes: 15% trust score improvement, 50% increase in quality customer feedback, 20% reduction in support tickets from information confusion.
+            Buffer's salary and revenue disclosures produced significant media coverage and talent attraction alongside customer trust.
+          </p>
+          <div class="tactic-footer">
+            <span class="tactic-tag tag-cog">Cognitive Drivers</span>
+            <span class="tactic-tag tag-eng">Engagement objective</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tactic-card">
+        <div class="tactic-stripe ts-act"></div>
+        <div class="tactic-inner">
+          <div class="tactic-top">
+            <div>
+              <div class="tactic-name">Transparency Emphasis</div>
+              <div class="tactic-via">via CV-302 direct link · PT-3003 · rank 3 · similarity 0.7081</div>
+            </div>
+            <span class="tactic-id-badge">PT-3003</span>
+          </div>
+          <p class="tactic-outcome">
+            Retention-stage transparency: maintaining honest communication through product issues, pricing changes, and service challenges rather than only deploying transparency at acquisition.
+            Expected outcomes: 15% trust score increase, 95% negative feedback resolved within 48 hours, 90% staff awareness of transparency policies.
+            The mechanism: consistency of disclosure over time is what converts trust into loyalty.
+          </p>
+          <div class="tactic-footer">
+            <span class="tactic-tag tag-cog">Cognitive Drivers</span>
+            <span class="tactic-tag tag-ret">Retention objective</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Execution insight</span>
+        <span class="insight-tag bim">BIM Pillar Observation</span>
+      </div>
+      <p class="insight-text">
+        All three tactics file under <strong>Cognitive Drivers</strong> — which is counterintuitive for a vector that produces emotional outcomes like trust and loyalty.
+        The explanation: trust is built by changing what the consumer knows, not by appealing directly to how they feel.
+        Transparency changes the information state. The emotional response (trust, safety, confidence) follows from the cognitive update.
+        This is why emotional transparency campaigns that don't actually disclose anything real don't build trust —
+        they're trying to produce the emotional output without triggering the cognitive mechanism that causes it.
+        <strong>Feel-good brand films are not Trust &amp; Transparency. Showing your cost sheet is.</strong>
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4: CONNECTION GRAPH
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Connection Graph</h2>
+    </div>
+    <p class="section-hook">
+      15 transitions in the SAEO database link to Trust &amp; Transparency.
+      The vector operates across three intervention roles — accelerate, prevent, and recovery —
+      and spans VALIDATION, CRISIS, and RECOVERY functional categories.
+      Here are the highest-similarity connections by role.
+    </p>
+
+    <div class="graph-nodes">
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-acc">Accelerate</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-011 — Skepticism → Trust</div>
+          <p class="node-detail">The canonical application. Consumer is evaluating whether to believe. Disclosure of verifiable information removes the barrier. Naïve Cynicism is the primary bias active here.</p>
+          <div class="node-cat">VALIDATION · Social Influence · forward</div>
+        </div>
+        <div class="node-prob">0.68</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-acc">Accelerate</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-147 — Post-Crisis → Trust Rebuilt</div>
+          <p class="node-detail">After brand failure, transparency about what changed — not just what happened — is what closes the gap between acknowledgment and belief. Behavioral evidence required; messaging alone insufficient.</p>
+          <div class="node-cat">RECOVERY · Emotional Drivers · forward</div>
+        </div>
+        <div class="node-prob">0.62</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-prev">Prevent</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-074 — Skepticism Reinforcement</div>
+          <p class="node-detail">The exit state where doubt compounds. Trust &amp; Transparency prevents entry into this state when deployed proactively with skeptical audiences — before the skepticism hardens into conviction.</p>
+          <div class="node-cat">CRISIS · Social Influence · exit</div>
+        </div>
+        <div class="node-prob">0.63</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-prev">Prevent</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-139 — Trust Overextension</div>
+          <p class="node-detail">The post-resolution state where established trust leads consumers to assume the brand can do no wrong. Proactive transparency about limitations prevents this from becoming a setup for a more damaging future failure.</p>
+          <div class="node-cat">RELATIONSHIP · Cognitive Drivers · post-resolution</div>
+        </div>
+        <div class="node-prob">0.63</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-prev">Prevent</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-045 — Private → Public Complaint</div>
+          <p class="node-detail">Consistent transparency throughout the relationship reduces the perceived betrayal that drives private complaints public. The consumer who already knows the brand's limitations doesn't feel deceived when they encounter them.</p>
+          <div class="node-cat">CRISIS · Social Influence · crisis</div>
+        </div>
+        <div class="node-prob">0.55</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-rec">Recovery</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-158 — Crisis Trust Collapse</div>
+          <p class="node-detail">Full trust collapse following a crisis and inadequate initial response. Recovery here requires transparency that specifically addresses what the initial response got wrong — not just the original failure. The meta-failure requires its own disclosure.</p>
+          <div class="node-cat">RECOVERY · Emotional Drivers · exit</div>
+        </div>
+        <div class="node-prob">0.60</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col"><span class="node-type-tag nt-stab">Stabilize</span></div>
+        <div class="node-content">
+          <div class="node-transition">LIM-146 — Referred → Trusting</div>
+          <p class="node-detail">Referred consumers arrive with borrowed trust — from whoever referred them. Transparency at onboarding stabilizes that trust by grounding it in firsthand evidence rather than leaving it entirely dependent on the referral relationship.</p>
+          <div class="node-cat">VALIDATION · Social Influence · forward</div>
+        </div>
+        <div class="node-prob">0.59</div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Most important pattern</span>
+        <span class="insight-tag green">Prevent is the highest-value role</span>
+      </div>
+      <p class="insight-text">
+        Of CV-302's 15 transition links, 8 are in the Prevent role — the largest single cluster.
+        That means <strong>Trust &amp; Transparency's biggest behavioral impact isn't building trust at acquisition.
+        It's stopping the states that destroy it before they form.</strong>
+        Brands that only deploy this vector at Awareness are getting roughly half of its available leverage.
+        The other half is deployed consistently, throughout the customer relationship, as a systemic practice —
+        not a campaign moment. That's the distinction between transparency as marketing tactic and transparency as organizational behavior.
+        Only the second one prevents LIM-074, LIM-139, and LIM-045 from firing.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── Conversion footer ── -->
+<div class="conversion-footer">
+  <div class="cf-inner">
+    <div class="cf-eyebrow">
+      <div class="cf-dot"></div>
+      CV-302 · 1 of 343 choice vectors in the SAEO database
+    </div>
+
+    <h2 class="cf-headline">This is what one vector looks like fully mapped.</h2>
+
+    <p class="cf-gap">
+      Trust &amp; Transparency's anatomy — three biases, three deploy moments with distinct intervention roles,
+      three tactics with documented outcomes, seven transition connections — is one data point in a system of 343 vectors.
+      Each one is linked to the liminal transitions where it's most active, the biases it needs to overcome,
+      and the tactics that execute against it.
+      <strong>Running that map against your customer journey — identifying which vectors are active at which moments,
+      which biases are blocking them, and whether your current tactics are aligned to the right mechanism —
+      is what SAEO is built to do.</strong>
+    </p>
+
+    <p class="cf-scale">
+      343 choice vectors. 201 cognitive biases. 160 liminal transitions.
+      Each entity semantically linked, similarity-scored, and mapped to the BIM pillar and consumer journey stage where it fires.
+    </p>
+
+    <p class="cf-positioning">
+      <strong>Good Assumptions</strong> teaches the framework. <strong>SAEO</strong> runs the diagnosis.
+    </p>
+
+    <div class="cf-stats">
+      <div class="cf-stat">
+        <div class="cf-stat-num">343</div>
+        <div class="cf-stat-label">Vectors mapped</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">201</div>
+        <div class="cf-stat-label">Biases linked</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">160</div>
+        <div class="cf-stat-label">Liminal states</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">15</div>
+        <div class="cf-stat-label">T&amp;T transitions</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">4</div>
+        <div class="cf-stat-label">BIM pillars</div>
+      </div>
+    </div>
+
+    <a href="https://saeo.ai" class="cf-cta">Explore SAEO.ai →</a>
+  </div>
+</div>
+
+</body>
+</html>

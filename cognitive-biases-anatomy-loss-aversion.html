@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loss Aversion — Anatomy · Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.12);
+    --green-text:  #5DCAA5;
+
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.12);
+    --amber-text:  #FAC775;
+
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.12);
+    --red-text:    #F0997B;
+
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.12);
+    --purple-text: #AFA9EC;
+
+    --blue:        #4A8FD4;
+    --blue-bg:     rgba(74,143,212,0.12);
+    --blue-text:   #87BEF0;
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 0; }
+
+  /* ── Hero ── */
+  .hero {
+    padding: 64px 0 52px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .ga-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .hero-sep { color: var(--text-3); font-size: 11px; }
+  .sample-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: var(--red-bg);
+    color: var(--red-text);
+    border: 0.5px solid rgba(216,90,48,0.25);
+  }
+  .hero-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    border: 0.5px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 3px;
+  }
+
+  .hero-title {
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.1;
+    margin-bottom: 14px;
+    letter-spacing: -0.025em;
+  }
+  .hero-def {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.75;
+    max-width: 580px;
+    font-weight: 300;
+    margin-bottom: 24px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .stat-div {
+    width: 0.5px;
+    background: var(--border-med);
+    align-self: stretch;
+    margin: 4px 0;
+  }
+
+  /* ── Pillar tags ── */
+  .pillar-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  .ptag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .ptag.primary { background: var(--red-bg); color: var(--red-text); border: 0.5px solid rgba(216,90,48,0.2); }
+  .ptag.secondary { background: var(--bg-3); color: var(--text-3); border: 0.5px solid var(--border); }
+
+  /* ── Section structure ── */
+  .anatomy-section {
+    padding: 0 0 60px;
+    margin-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .anatomy-section:last-of-type { border-bottom: none; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .section-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--text-1);
+    letter-spacing: -0.015em;
+  }
+  .section-hook {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 28px;
+    font-weight: 300;
+    max-width: 580px;
+  }
+
+  /* ── Bias card (cognitive layer) ── */
+  .bias-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .bias-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 12px;
+    border-bottom: 0.5px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .bias-card-left { flex: 1; }
+  .bias-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 2px;
+  }
+  .bias-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .rank-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .rank-1 { background: var(--red-bg); color: var(--red-text); }
+  .rank-2 { background: var(--amber-bg); color: var(--amber-text); }
+  .rank-3 { background: var(--bg-3); color: var(--text-3); border: 0.5px solid var(--border); }
+
+  .bias-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  @media (max-width: 600px) {
+    .bias-body { grid-template-columns: 1fr; }
+    .bias-body .b-cell + .b-cell { border-left: none; border-top: 0.5px solid var(--border); }
+  }
+  .b-cell {
+    padding: 12px 16px;
+  }
+  .b-cell + .b-cell { border-left: 0.5px solid var(--border); }
+  .b-cell-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .b-cell-text {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .b-cell-text.intervention { color: var(--green-text); }
+
+  /* ── Insight panel ── */
+  .insight {
+    background: var(--bg-3);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-top: 20px;
+    margin-bottom: 4px;
+  }
+  .insight-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .insight-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding-top: 2px;
+  }
+  .insight-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--red-bg);
+    color: var(--red-text);
+  }
+  .insight-tag.bim  { background: var(--blue-bg); color: var(--blue-text); }
+  .insight-tag.soc  { background: var(--purple-bg); color: var(--purple-text); }
+  .insight-tag.cog  { background: var(--amber-bg); color: var(--amber-text); }
+  .insight-tag.green { background: var(--green-bg); color: var(--green-text); }
+
+  .insight-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .insight-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Vector card (behavioral layer) ── */
+  .vector-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .vector-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 12px;
+    border-bottom: 0.5px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .vector-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .vector-id {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+  }
+  .role-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .role-acc   { background: var(--green-bg); color: var(--green-text); }
+  .role-stab  { background: var(--blue-bg); color: var(--blue-text); }
+  .role-rec   { background: var(--amber-bg); color: var(--amber-text); }
+
+  .vector-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+  }
+  @media (max-width: 600px) {
+    .vector-body { grid-template-columns: 1fr; }
+    .vector-body .v-cell + .v-cell { border-left: none; border-top: 0.5px solid var(--border); }
+  }
+  .v-cell { padding: 12px 16px; }
+  .v-cell + .v-cell { border-left: 0.5px solid var(--border); }
+  .v-cell-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .v-cell-text {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .v-cell-text.warning { color: var(--red-text); }
+
+  /* ── Tactic chain cards ── */
+  .tactic-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .tactic-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .tactic-stripe {
+    width: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    align-self: stretch;
+    min-height: 40px;
+  }
+  .ts-cog  { background: var(--amber); }
+  .ts-emo  { background: var(--red); }
+  .ts-ret  { background: var(--green); }
+
+  .tactic-inner { flex: 1; }
+  .tactic-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .tactic-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .tactic-via {
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+  }
+  .tactic-id-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bg-3);
+    color: var(--text-3);
+    border: 0.5px solid var(--border);
+    flex-shrink: 0;
+  }
+  .tactic-outcome {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 6px;
+  }
+  .tactic-footer {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .tactic-pillar-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .tag-cog { background: var(--amber-bg); color: var(--amber-text); }
+  .tag-emo { background: var(--red-bg); color: var(--red-text); }
+  .tag-ret { background: var(--green-bg); color: var(--green-text); }
+
+  /* ── Connection graph ── */
+  .graph-section {
+    margin-bottom: 4px;
+  }
+  .graph-nodes {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .graph-node {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 18px;
+    background: var(--bg-2);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .graph-node:last-child { border-bottom: none; }
+  .node-type-col {
+    width: 100px;
+    flex-shrink: 0;
+  }
+  .node-type-tag {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 3px;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .nt-inbound  { background: var(--blue-bg); color: var(--blue-text); }
+  .nt-success  { background: var(--green-bg); color: var(--green-text); }
+  .nt-exit     { background: var(--amber-bg); color: var(--amber-text); }
+  .nt-post     { background: var(--purple-bg); color: var(--purple-text); }
+  .nt-reentry  { background: var(--red-bg); color: var(--red-text); }
+
+  .node-content { flex: 1; }
+  .node-transition {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 3px;
+  }
+  .node-detail {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .node-prob {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-3);
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  /* ── Conversion footer ── */
+  .conversion-footer {
+    background: var(--bg-2);
+    border-top: 0.5px solid var(--border-med);
+    padding: 52px 24px 60px;
+    margin: 0 -24px;
+  }
+  .cf-inner { max-width: 760px; margin: 0 auto; }
+
+  .cf-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cf-dot {
+    width: 4px;
+    height: 4px;
+    background: var(--red);
+    border-radius: 50%;
+  }
+
+  .cf-headline {
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    letter-spacing: -0.015em;
+    max-width: 540px;
+  }
+
+  .cf-gap {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    max-width: 560px;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+  .cf-gap strong { color: var(--text-1); font-weight: 500; }
+
+  .cf-scale {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.75;
+    max-width: 520px;
+    font-weight: 300;
+    margin-bottom: 28px;
+    font-style: italic;
+  }
+
+  .cf-positioning {
+    font-size: 14px;
+    color: var(--text-2);
+    font-weight: 300;
+    margin-bottom: 32px;
+  }
+  .cf-positioning strong { color: var(--text-1); font-weight: 500; }
+
+  .cf-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 560px) {
+    .cf-stats { grid-template-columns: repeat(3, 1fr); }
+  }
+  .cf-stat {
+    padding: 14px 12px;
+    text-align: center;
+    border-right: 0.5px solid var(--border);
+  }
+  .cf-stat:last-child { border-right: none; }
+  .cf-stat-num {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-1);
+    margin-bottom: 3px;
+  }
+  .cf-stat-label {
+    font-size: 10px;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+  }
+
+  .cf-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green-text);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 0.5px solid rgba(29,158,117,0.3);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .cf-cta:hover { border-color: var(--green); color: var(--green-text); }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="ga-label">Good Assumptions</span>
+      <span class="hero-sep">·</span>
+      <span class="ga-label">Behavioral Anatomy</span>
+      <span class="hero-sep">·</span>
+      <span class="sample-badge">Sample</span>
+      <span class="hero-id">Cog-134</span>
+    </div>
+
+    <h1 class="hero-title">Loss Aversion</h1>
+    <p class="hero-def">
+      Losses feel roughly 2.5× more painful than equivalent gains feel good. 
+      This isn't irrationality — it's the asymmetry the brain evolved to survive on.
+      And it's running on every retention campaign, churn intervention, urgency trigger, 
+      and free trial conversion in your stack right now.
+    </p>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-num">50</div>
+        <div class="stat-label">Liminal transitions</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">34</div>
+        <div class="stat-label">Usage events</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">1/5</div>
+        <div class="stat-label">Complexity</div>
+      </div>
+      <div class="stat-div"></div>
+      <div class="stat">
+        <div class="stat-num">2.5×</div>
+        <div class="stat-label">Pain-to-gain ratio</div>
+      </div>
+    </div>
+
+    <div class="pillar-tags">
+      <span class="ptag primary">Emotional Drivers (Primary)</span>
+      <span class="ptag secondary">Cognitive Drivers</span>
+      <span class="ptag secondary">Environment &amp; Design</span>
+      <span class="ptag secondary">Social Influence</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1: COGNITIVE LAYER
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Cognitive Layer</h2>
+    </div>
+    <p class="section-hook">
+      Loss Aversion doesn't operate alone. Three biases cluster around it consistently across the 50 transitions where it's active. 
+      Each amplifies a different part of the mechanism — and each requires a different intervention.
+    </p>
+
+    <!-- Bias 1: Loss Aversion (primary) -->
+    <div class="bias-card">
+      <div class="bias-card-header">
+        <div class="bias-card-left">
+          <div class="bias-name">Loss Aversion</div>
+          <div class="bias-id">Cog-134 · Primary · Emotional Drivers</div>
+        </div>
+        <span class="rank-badge rank-1">Primary</span>
+      </div>
+      <div class="bias-body">
+        <div class="b-cell">
+          <div class="b-cell-label">Why it's active</div>
+          <p class="b-cell-text">The consumer is more sensitive to what they might lose by waiting or switching than to what they might gain. The asymmetry runs at every decision inflection point — urgency, renewal, churn, upgrade.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">How it manifests</div>
+          <p class="b-cell-text">Fear of missing a limited-time offer. Reluctance to cancel despite low engagement. Resistance to switching even when alternatives are better. Every "I should just keep it" thought is Loss Aversion speaking.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">Intervention note</div>
+          <p class="b-cell-text intervention">Highlight what the consumer will lose by waiting — not what they gain by acting. "Don't miss out" outperforms "get it now" by 31% in verified click-through tests.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bias 2: Escalation of Commitment -->
+    <div class="bias-card">
+      <div class="bias-card-header">
+        <div class="bias-card-left">
+          <div class="bias-name">Escalation of Commitment</div>
+          <div class="bias-id">Cog-132 · Core · Cognitive Drivers · 24 co-occurrences</div>
+        </div>
+        <span class="rank-badge rank-2">Core</span>
+      </div>
+      <div class="bias-body">
+        <div class="b-cell">
+          <div class="b-cell-label">Why it's active</div>
+          <p class="b-cell-text">When a customer is considering churn, they may continue using the service even while dissatisfied — trying to "get their money's worth" before abandoning. The prior investment becomes the reason to stay, not the current value.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">How it manifests</div>
+          <p class="b-cell-text">Customers extract maximum value from remaining subscription periods while planning to cancel. Or they justify continued use by citing what they've already spent, even when the product no longer serves them.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">Intervention note</div>
+          <p class="b-cell-text intervention">Reinforce the value of the product relative to their prior research decision. Don't fight the sunk cost — validate it. "You spent time choosing well. Here's why that holds."</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bias 3: Sunk Cost Fallacy -->
+    <div class="bias-card">
+      <div class="bias-card-header">
+        <div class="bias-card-left">
+          <div class="bias-name">Sunk Cost Fallacy</div>
+          <div class="bias-id">Cog-130 · Supporting · Emotional Drivers · 5 co-occurrences</div>
+        </div>
+        <span class="rank-badge rank-3">Supporting</span>
+      </div>
+      <div class="bias-body">
+        <div class="b-cell">
+          <div class="b-cell-label">Why it's active</div>
+          <p class="b-cell-text">Consumers continue or renew because of what they've already invested — not because of current value. The sunk cost becomes the rationale: "I've already paid for it, I'll use it more next month."</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">How it manifests</div>
+          <p class="b-cell-text">Auto-renewal without re-evaluation. Subscriptions renewed despite minimal use. The "I'll get around to it" rationalization that keeps a product on the card statement for 18 months.</p>
+        </div>
+        <div class="b-cell">
+          <div class="b-cell-label">Intervention note</div>
+          <p class="b-cell-text intervention">Reframe the subscription as an ongoing opportunity, not a sunk cost. Offer engagement incentives that shift focus from "I already paid" to "here's the value available now."</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Cognitive pattern</span>
+        <span class="insight-tag cog">Cognitive + Emotional Collision</span>
+      </div>
+      <p class="insight-text">
+        Loss Aversion, Escalation of Commitment, and Sunk Cost Fallacy form a <strong>retention triad</strong> that's almost always mishandled. 
+        Brands treat churn risk as an information problem (send feature reminder emails) 
+        when the active mechanism is emotional: the pain of perceived loss is outweighing the pull of current value. 
+        The cognitive layer here is about <strong>reference points, not evidence</strong>. 
+        The intervention needs to change what the consumer is measuring against — not add more to measure.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2: BEHAVIORAL LAYER
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Behavioral Layer</h2>
+    </div>
+    <p class="section-hook">
+      Three choice vectors surface most reliably across Loss Aversion's 50 transitions. 
+      Each moves a different mechanism — and each has a specific deploy moment where it works and a failure mode where it backfires.
+    </p>
+
+    <!-- Vector 1: Urgency Framing -->
+    <div class="vector-card">
+      <div class="vector-header">
+        <div>
+          <div class="vector-name">Urgency Framing</div>
+          <div class="vector-id">CV-299 · LIM-099 Urgency Gap</div>
+        </div>
+        <span class="role-badge role-acc">Accelerate</span>
+      </div>
+      <div class="vector-body">
+        <div class="v-cell">
+          <div class="v-cell-label">Why it's effective</div>
+          <p class="v-cell-text">Creates temporal pressure that activates Loss Aversion directly — the consumer fears missing the window more than they want the gain. Loss-framed urgency outperforms gain-framed urgency by 31% in click-through.</p>
+        </div>
+        <div class="v-cell">
+          <div class="v-cell-label">Deploy moment</div>
+          <p class="v-cell-text">When a user has shown interest but hasn't converted after a reasonable evaluation window. The trigger is hesitation confirmed by behavior data — not time elapsed since ad view.</p>
+        </div>
+        <div class="v-cell">
+          <div class="v-cell-label">What NOT to do</div>
+          <p class="v-cell-text warning">Fabricate scarcity or deadlines. Once a consumer notices a "24-hour" offer that resets daily, the urgency mechanism is permanently broken for that brand. Fake urgency destroys the instrument.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vector 2: Trial Periods -->
+    <div class="vector-card">
+      <div class="vector-header">
+        <div>
+          <div class="vector-name">Trial Periods</div>
+          <div class="vector-id">CV-282 · LIM-127 Commitment Avoidance · LIM-012</div>
+        </div>
+        <span class="role-badge role-acc">Accelerate</span>
+      </div>
+      <div class="vector-body">
+        <div class="v-cell">
+          <div class="v-cell-label">Why it's effective</div>
+          <p class="v-cell-text">Trials activate the Endowment Effect before the purchase decision. Once a consumer has experienced the product, the prospect of losing access feels like a loss — not a non-purchase. The conversion isn't "buy this." It's "don't lose what you have."</p>
+        </div>
+        <div class="v-cell">
+          <div class="v-cell-label">Deploy moment</div>
+          <p class="v-cell-text">The critical moment is immediately before trial expiration — with a clear, frictionless upgrade path and a loss-framed reminder of what access they'd be giving up. Not a discount appeal. A loss prevention offer.</p>
+        </div>
+        <div class="v-cell">
+          <div class="v-cell-label">What NOT to do</div>
+          <p class="v-cell-text warning">End trials abruptly without warning or upgrade path. Abrupt loss without a bridge creates frustration, not conversion urgency. The consumer needs a moment to feel the loss approaching, not a wall.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vector 3: Investment Recovery Framing -->
+    <div class="vector-card">
+      <div class="vector-header">
+        <div>
+          <div class="vector-name">Investment Recovery Framing</div>
+          <div class="vector-id">CV-333 · LIM-031, LIM-053, LIM-100</div>
+        </div>
+        <span class="role-badge role-rec">Recovery</span>
+      </div>
+      <div class="vector-body">
+        <div class="v-cell">
+          <div class="v-cell-label">Why it's effective</div>
+          <p class="v-cell-text">For lapsed users and churn candidates, this vector reframes return as recovering a prior investment rather than making a new commitment. Sunk cost psychology becomes an asset: "don't let what you built go to waste."</p>
+        </div>
+        <div class="v-cell">
+          <div class="v-cell-label">Deploy moment</div>
+          <p class="v-cell-text">Re-engagement windows — when a customer who has paused, lapsed, or shown cancellation signals. The prior investment must be specifically named (data, progress, configuration, relationships) to activate recovery framing.</p>
+        </div>
+        <div class="v-cell">
+          <div class="v-cell-label">What NOT to do</div>
+          <p class="v-cell-text warning">Overemphasize sunk costs if the customer perceives the initial investment as a mistake. Amplifying regret about a bad past decision doesn't motivate recovery — it confirms the exit. Read the signal before applying the frame.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3: EXECUTION LAYER
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Execution Layer</h2>
+    </div>
+    <p class="section-hook">
+      Three tactics surface through the vector chain for Loss Aversion's most active transitions. 
+      Each one has a BIM pillar home, a strategic objective, and a failure signature worth knowing.
+    </p>
+
+    <div class="tactic-chain">
+
+      <div class="tactic-card">
+        <div class="tactic-stripe ts-emo"></div>
+        <div class="tactic-inner">
+          <div class="tactic-top">
+            <div>
+              <div class="tactic-name">Algorithmic Personalization</div>
+              <div class="tactic-via">via Adaptive Journey Personalization · PT-063</div>
+            </div>
+            <span class="tactic-id-badge">PT-063</span>
+          </div>
+          <p class="tactic-outcome">
+            Personalization at the moment of loss-risk makes the consumer feel individually seen — 
+            which strengthens attachment and raises the perceived cost of leaving. 
+            A 10–15% conversion and engagement lift is documented; the mechanism is emotional resonance, not algorithmic novelty.
+          </p>
+          <div class="tactic-footer">
+            <span class="tactic-pillar-tag tag-emo">Emotional Drivers</span>
+            <span class="tactic-pillar-tag tag-ret">Retention objective</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tactic-card">
+        <div class="tactic-stripe ts-cog"></div>
+        <div class="tactic-inner">
+          <div class="tactic-top">
+            <div>
+              <div class="tactic-name">Choice-Driven Engagement</div>
+              <div class="tactic-via">via Active Participation · PT-0344</div>
+            </div>
+            <span class="tactic-id-badge">PT-0344</span>
+          </div>
+          <p class="tactic-outcome">
+            Giving consumers an active choice — how to continue, which plan to stay on, what to keep — 
+            converts passive attrition into an active decision moment. 
+            The consumer who chooses to stay is less likely to churn passively next cycle. 
+            Warby Parker saw a 10% conversion lift using participatory decision architectures.
+          </p>
+          <div class="tactic-footer">
+            <span class="tactic-pillar-tag tag-cog">Cognitive Drivers</span>
+            <span class="tactic-pillar-tag tag-ret">Activation objective</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tactic-card">
+        <div class="tactic-stripe ts-ret"></div>
+        <div class="tactic-inner">
+          <div class="tactic-top">
+            <div>
+              <div class="tactic-name">Privacy Feature Promotion</div>
+              <div class="tactic-via">via Anonymity Emphasis · PT-2128</div>
+            </div>
+            <span class="tactic-id-badge">PT-2128</span>
+          </div>
+          <p class="tactic-outcome">
+            At subscription-to-commitment transitions, privacy and data transparency reduce the perceived risk of deeper engagement. 
+            When consumers fear being "locked in," surfacing control features — cancellation ease, data portability — 
+            removes the loss-of-autonomy objection before it forms. Apple achieved 90%+ adoption of privacy controls using this frame.
+          </p>
+          <div class="tactic-footer">
+            <span class="tactic-pillar-tag tag-cog">Cognitive Drivers</span>
+            <span class="tactic-pillar-tag tag-ret">Retention objective</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Execution insight</span>
+        <span class="insight-tag bim">BIM Pillar Tension</span>
+      </div>
+      <p class="insight-text">
+        Notice the pillar split: Personalization and Journey Customization are <strong>Emotional Driver</strong> tactics 
+        deployed via behavioral vectors — they work because Loss Aversion is emotional, not logical. 
+        But Choice-Driven Engagement and Privacy Promotion are <strong>Cognitive Driver</strong> tactics 
+        that reduce the perceived risk of staying — they work because the fear of commitment is also a cognitive error. 
+        Most teams apply one or the other. The ones that consistently win churn fights deploy both in sequence: 
+        reduce cognitive risk first, then trigger emotional attachment.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4: CONNECTION GRAPH
+  ═══════════════════════════════════════════ -->
+  <div class="anatomy-section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Connection Graph</h2>
+    </div>
+    <p class="section-hook">
+      Loss Aversion's 50 active transitions span the Repeat Conversion and Loyal stages. 
+      Here are the transitions it connects to most frequently — inbound, outbound, exit gate, and re-entry.
+    </p>
+
+    <div class="graph-nodes">
+
+      <div class="graph-node">
+        <div class="node-type-col">
+          <span class="node-type-tag nt-inbound">Inbound</span>
+        </div>
+        <div class="node-content">
+          <div class="node-transition">LIM-099 — Urgency Gap</div>
+          <p class="node-detail">Consumer is interested but not converting. Loss Aversion fires when the window for a limited offer is visible. The inbound trigger is product familiarity + time pressure.</p>
+        </div>
+        <div class="node-prob">high</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col">
+          <span class="node-type-tag nt-inbound">Inbound</span>
+        </div>
+        <div class="node-content">
+          <div class="node-transition">LIM-127 — Commitment Avoidance</div>
+          <p class="node-detail">Consumer avoids full commitment due to optionality loss fear. Loss Aversion amplifies the perceived cost of locking in. Trial period is the most effective inbound mechanism here.</p>
+        </div>
+        <div class="node-prob">high</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col">
+          <span class="node-type-tag nt-success">Success Path</span>
+        </div>
+        <div class="node-content">
+          <div class="node-transition">LIM-121 — Ownership Lock</div>
+          <p class="node-detail">Successful resolution of Loss Aversion creates Ownership Lock — the consumer now resists leaving because they've built something. Integrations, data history, preferences, and relationship equity all accumulate here.</p>
+        </div>
+        <div class="node-prob">0.71</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col">
+          <span class="node-type-tag nt-exit">Exit Gate</span>
+        </div>
+        <div class="node-content">
+          <div class="node-transition">LIM-100 — ROI Doubt</div>
+          <p class="node-detail">When Loss Aversion is not resolved, the consumer shifts to ROI Doubt: the cost is now the anchor, and perceived value can't close the gap. The exit gate is a cognitive reframe — investment cost vs. uncertain return.</p>
+        </div>
+        <div class="node-prob">0.57</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col">
+          <span class="node-type-tag nt-post">Post-resolution</span>
+        </div>
+        <div class="node-content">
+          <div class="node-transition">LIM-031 — Expense → Investment</div>
+          <p class="node-detail">After Ownership Lock is established, the consumer reframes their prior expense as an investment — a psychological shift that reinforces loyalty and increases switching cost. This is the highest-value post-resolution state.</p>
+        </div>
+        <div class="node-prob">0.60</div>
+      </div>
+
+      <div class="graph-node">
+        <div class="node-type-col">
+          <span class="node-type-tag nt-reentry">Re-entry</span>
+        </div>
+        <div class="node-content">
+          <div class="node-transition">LIM-053 — via Investment Recovery Framing</div>
+          <p class="node-detail">Lapsed customers re-enter via Investment Recovery Framing — the prior investment (time, data, progress) becomes the pull. Loss Aversion is reactivated against the loss of what they built, not the product's future value.</p>
+        </div>
+        <div class="node-prob">0.68</div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Most important number</span>
+        <span class="insight-tag green">0.71 — Ownership Lock probability</span>
+      </div>
+      <p class="insight-text">
+        When Loss Aversion is successfully resolved — meaning the consumer's fear of losing is matched by a tangible sense of ownership — 
+        the transition to Ownership Lock carries a 0.71 probability weight. 
+        That's the highest success-path probability in Loss Aversion's connection graph. 
+        <strong>The playbook is: don't just prevent the loss. Create the ownership.</strong> 
+        Free trials that drive deep feature engagement, personalized onboarding that builds data attachment, 
+        and integration architecture that makes switching genuinely costly — these are Ownership Lock mechanisms, 
+        not just retention tactics. They're the difference between a customer who stayed and a customer who can't leave.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── Conversion footer ── -->
+<div class="conversion-footer">
+  <div class="cf-inner">
+    <div class="cf-eyebrow">
+      <div class="cf-dot"></div>
+      Cog-134 · 1 of 201 cognitive biases in the SAEO database
+    </div>
+
+    <h2 class="cf-headline">This is what one bias looks like fully mapped.</h2>
+
+    <p class="cf-gap">
+      Loss Aversion's anatomy — four sections, three biases, three vectors, three tactics, six transition connections — 
+      is one data point in a system of 201 biases, each linked to the liminal transitions where they're most active, 
+      the vectors that work with or against them, and the tactics that account for them. 
+      <strong>Running that diagnosis against your customer journey — identifying which biases are active at which moments, 
+      and whether your current interventions are hitting the right layer — is what SAEO is built to do.</strong>
+    </p>
+
+    <p class="cf-scale">
+      201 biases. 343 choice vectors. 160 liminal transitions. 
+      Each entity semantically linked, similarity-scored, and mapped to the BIM pillar and consumer journey stage where it fires.
+    </p>
+
+    <p class="cf-positioning">
+      <strong>Good Assumptions</strong> teaches the framework. <strong>SAEO</strong> runs the diagnosis.
+    </p>
+
+    <div class="cf-stats">
+      <div class="cf-stat">
+        <div class="cf-stat-num">201</div>
+        <div class="cf-stat-label">Biases mapped</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">343</div>
+        <div class="cf-stat-label">Choice vectors</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">160</div>
+        <div class="cf-stat-label">Liminal states</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">50</div>
+        <div class="cf-stat-label">LA transitions</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">4</div>
+        <div class="cf-stat-label">BIM pillars</div>
+      </div>
+    </div>
+
+    <a href="https://saeo.ai" class="cf-cta">Explore SAEO.ai →</a>
+  </div>
+</div>
+
+</body>
+</html>

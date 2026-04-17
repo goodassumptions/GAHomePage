@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cognitive Biases — Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+    --accent:      #c8f0d8;
+
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.12);
+    --green-text:  #5DCAA5;
+
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.12);
+    --amber-text:  #FAC775;
+
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.12);
+    --red-text:    #F0997B;
+
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.12);
+    --purple-text: #AFA9EC;
+
+    --blue:        #4A8FD4;
+    --blue-bg:     rgba(74,143,212,0.12);
+    --blue-text:   #87BEF0;
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Page header ── */
+  .page-header {
+    padding: 64px 0 48px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .ga-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .page-title {
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .page-title em {
+    font-style: italic;
+    color: var(--text-2);
+  }
+  .page-intro {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.75;
+    max-width: 580px;
+    font-weight: 300;
+  }
+
+  /* ── Reframe block ── */
+  .reframe {
+    background: var(--bg-3);
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+    padding: 20px 22px;
+    margin-bottom: 48px;
+  }
+  .reframe-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+  .reframe-text {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .reframe-text strong {
+    color: var(--text-1);
+    font-weight: 500;
+  }
+
+  /* ── Reference table ── */
+  .table-section { margin-bottom: 48px; }
+  .table-header { margin-bottom: 14px; }
+  .table-title { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 3px; }
+  .table-sub { font-size: 12px; color: var(--text-3); }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .leg-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+  }
+  .ref-table thead tr { border-bottom: 0.5px solid var(--border-med); }
+  .ref-table th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 8px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .ref-table th:first-child { text-align: left; }
+  .ref-table th.mix-th { text-align: left; }
+  .ref-table tbody tr {
+    border-bottom: 0.5px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .ref-table tbody tr:last-child { border-bottom: none; }
+  .ref-table tbody tr:hover { background: var(--bg-2); }
+  .ref-table td {
+    font-size: 12px;
+    padding: 10px 8px;
+    color: var(--text-2);
+    text-align: right;
+    vertical-align: middle;
+    font-family: var(--font-mono);
+  }
+  .ref-table td:first-child {
+    text-align: left;
+    font-family: var(--font-sans);
+  }
+  .ref-table td.mix-col { text-align: left; }
+  .pillar-name-cell { font-size: 12px; font-weight: 500; color: var(--text-1); }
+  .pillar-sub-cell {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 400;
+    font-family: var(--font-sans);
+    margin-top: 2px;
+  }
+  .total-num { font-weight: 500; color: var(--text-1); }
+
+  /* Complexity bars */
+  .complexity-bar {
+    display: flex;
+    gap: 2px;
+    justify-content: flex-end;
+  }
+  .cb-pip {
+    width: 6px;
+    height: 10px;
+    border-radius: 1px;
+    background: var(--border-med);
+  }
+  .cb-pip.on { background: var(--text-3); }
+
+  /* BIM pillar tag colors in table */
+  .p-cognitive   { color: var(--amber-text); }
+  .p-emotional   { color: var(--red-text); }
+  .p-social      { color: var(--purple-text); }
+  .p-env         { color: var(--blue-text); }
+
+  .bar-wrap {
+    display: flex;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    gap: 1px;
+    width: 90px;
+  }
+  .b-cog { background: var(--amber); }
+  .b-emo { background: var(--red); }
+  .b-soc { background: var(--purple); }
+  .b-env { background: var(--blue); }
+
+  .ref-table tfoot tr { border-top: 0.5px solid var(--border-med); }
+  .ref-table tfoot td {
+    font-size: 11px;
+    padding: 8px 8px;
+    color: var(--text-3);
+    font-family: var(--font-sans);
+  }
+  .tf-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: right;
+  }
+
+  /* ── Anchor nav ── */
+  .anchor-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .anchor-pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    color: var(--text-2);
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.12s;
+    text-decoration: none;
+    display: inline-block;
+    letter-spacing: 0.02em;
+  }
+  .anchor-pill:hover, .anchor-pill.active {
+    background: var(--bg-3);
+    border-color: var(--border-med);
+    color: var(--text-1);
+  }
+
+  /* ── Pillar section ── */
+  .pillar-section {
+    padding: 56px 0 60px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .pillar-section:last-child { border-bottom: none; }
+
+  .pillar-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .pillar-num-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .pillar-count-label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+  .pillar-heading {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .pillar-hook {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 18px;
+    font-style: italic;
+    font-weight: 300;
+  }
+  .pillar-body {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-bottom: 24px;
+    font-weight: 300;
+    max-width: 600px;
+  }
+  .pillar-body strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── 3-card stack ── */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .card {
+    display: flex;
+    background: var(--bg-2);
+  }
+  .card + .card { border-top: 0.5px solid var(--border); }
+  .card-stripe { width: 3px; flex-shrink: 0; }
+  .s-cog  { background: var(--amber); }
+  .s-emo  { background: var(--red); }
+  .s-soc  { background: var(--purple); }
+  .s-env  { background: var(--blue); }
+  .s-high { background: var(--green); }
+  .s-med  { background: var(--amber); }
+  .s-low  { background: var(--text-3); }
+
+  .card-inner { padding: 14px 18px; flex: 1; }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .card-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.4;
+  }
+  .card-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .t-high { background: var(--green-bg); color: var(--green-text); }
+  .t-med  { background: var(--amber-bg); color: var(--amber-text); }
+  .t-low  { background: var(--bg-3); color: var(--text-3); }
+  .t-cog  { background: var(--amber-bg); color: var(--amber-text); }
+  .t-emo  { background: var(--red-bg); color: var(--red-text); }
+  .t-soc  { background: var(--purple-bg); color: var(--purple-text); }
+  .t-env  { background: var(--blue-bg); color: var(--blue-text); }
+
+  .card-hook {
+    font-size: 12px;
+    color: var(--text-2);
+    font-style: italic;
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .card-meta {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 7px;
+    font-family: var(--font-mono);
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Insight ── */
+  .insight {
+    background: var(--bg-3);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+  }
+  .insight-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .insight-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding-top: 1px;
+  }
+  .insight-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--red-bg);
+    color: var(--red-text);
+  }
+  .insight-tag.saeo { background: var(--amber-bg); color: var(--amber-text); }
+  .insight-tag.bim  { background: var(--blue-bg); color: var(--blue-text); }
+  .insight-tag.mat  { background: var(--purple-bg); color: var(--purple-text); }
+
+  .insight-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .insight-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Back link ── */
+  .back-link {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--text-3);
+    text-decoration: none;
+    margin-top: 8px;
+    transition: color 0.12s;
+    cursor: pointer;
+  }
+  .back-link:hover { color: var(--text-2); }
+
+  /* ── Category sub-grid in reference table ── */
+  .cat-dist {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .cat-chip {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-family: var(--font-sans);
+    white-space: nowrap;
+  }
+  .chip-info { background: var(--bg-3); color: var(--text-3); }
+  .chip-act  { background: var(--amber-bg); color: var(--amber-text); }
+  .chip-mean { background: var(--red-bg); color: var(--red-text); }
+  .chip-mem  { background: var(--purple-bg); color: var(--purple-text); }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <div class="ga-label">Good Assumptions · Behavioral Intelligence</div>
+    <h1 class="page-title">Cognitive Biases<br><em>are not random quirks.</em></h1>
+    <p class="page-intro">
+      201 documented biases — each one a systematic error in how the brain handles information, meaning, action, and memory. 
+      They're organized here by BIM pillar: the layer of consumer psychology where each bias does most of its damage, or most of its work.
+    </p>
+  </header>
+
+  <!-- ── Reframe ── -->
+  <div class="reframe">
+    <div class="reframe-label">Not a list. A map.</div>
+    <p class="reframe-text">
+      Every bias textbook you've ever read treats these as a collection of curiosities. 
+      That's the wrong frame. <strong>Biases are organized by what they protect.</strong> 
+      The brain can't process everything — so it built shortcuts. Those shortcuts cluster around four problems: 
+      too much information, not enough meaning, the need to act fast, and what to remember. 
+      The BIM framework maps those problems to the layer of consumer psychology where they surface. 
+      Once you see the structure, you stop treating biases as one-off tactics and start using them as diagnostic tools.
+    </p>
+  </div>
+
+  <!-- ── Reference table ── -->
+  <div class="table-section">
+    <div class="table-header">
+      <div class="table-title">201 biases by BIM pillar</div>
+      <div class="table-sub">Click any row to jump to that pillar's section</div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--amber)"></div> Cognitive Drivers</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--red)"></div> Emotional Drivers</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--purple)"></div> Social Influence</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div> Environment &amp; Design</div>
+    </div>
+
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>BIM Pillar</th>
+          <th>Biases</th>
+          <th>Avg Complexity</th>
+          <th class="mix-th">Category Distribution</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="document.getElementById('cognitive').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name-cell p-cognitive">Cognitive Drivers</div>
+            <div class="pillar-sub-cell">Information filtering &amp; meaning-making</div>
+          </td>
+          <td class="total-num">94</td>
+          <td>
+            <div class="complexity-bar">
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip"></div>
+              <div class="cb-pip"></div>
+            </div>
+          </td>
+          <td class="mix-col">
+            <div class="cat-dist">
+              <span class="cat-chip chip-mean">40 meaning</span>
+              <span class="cat-chip chip-act">27 action</span>
+              <span class="cat-chip chip-info">14 info</span>
+              <span class="cat-chip chip-mem">13 memory</span>
+            </div>
+          </td>
+        </tr>
+        <tr onclick="document.getElementById('environment').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name-cell p-env">Environment &amp; Design</div>
+            <div class="pillar-sub-cell">Context, choice architecture &amp; priming</div>
+          </td>
+          <td class="total-num">59</td>
+          <td>
+            <div class="complexity-bar">
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip"></div>
+              <div class="cb-pip"></div>
+              <div class="cb-pip"></div>
+            </div>
+          </td>
+          <td class="mix-col">
+            <div class="cat-dist">
+              <span class="cat-chip chip-info">24 info</span>
+              <span class="cat-chip chip-mem">17 memory</span>
+              <span class="cat-chip chip-act">11 action</span>
+              <span class="cat-chip chip-mean">7 meaning</span>
+            </div>
+          </td>
+        </tr>
+        <tr onclick="document.getElementById('social').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name-cell p-social">Social Influence</div>
+            <div class="pillar-sub-cell">Authority, identity &amp; group dynamics</div>
+          </td>
+          <td class="total-num">33</td>
+          <td>
+            <div class="complexity-bar">
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip"></div>
+              <div class="cb-pip"></div>
+            </div>
+          </td>
+          <td class="mix-col">
+            <div class="cat-dist">
+              <span class="cat-chip chip-mean">15 meaning</span>
+              <span class="cat-chip chip-act">13 action</span>
+              <span class="cat-chip chip-info">3 info</span>
+              <span class="cat-chip chip-mem">2 memory</span>
+            </div>
+          </td>
+        </tr>
+        <tr onclick="document.getElementById('emotional').scrollIntoView({behavior:'smooth'})">
+          <td>
+            <div class="pillar-name-cell p-emotional">Emotional Drivers</div>
+            <div class="pillar-sub-cell">Fear, regret, urgency &amp; identity threat</div>
+          </td>
+          <td class="total-num">15</td>
+          <td>
+            <div class="complexity-bar">
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip on"></div>
+              <div class="cb-pip"></div>
+            </div>
+          </td>
+          <td class="mix-col">
+            <div class="cat-dist">
+              <span class="cat-chip chip-act">6 action</span>
+              <span class="cat-chip chip-mean">6 meaning</span>
+              <span class="cat-chip chip-info">2 info</span>
+              <span class="cat-chip chip-mem">1 memory</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Total active biases in SAEO database</td>
+          <td class="tf-num total-num">201</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- ── Anchor nav ── -->
+  <nav class="anchor-nav">
+    <a class="anchor-pill active" href="#cognitive">Cognitive Drivers</a>
+    <a class="anchor-pill" href="#environment">Environment &amp; Design</a>
+    <a class="anchor-pill" href="#social">Social Influence</a>
+    <a class="anchor-pill" href="#emotional">Emotional Drivers</a>
+  </nav>
+
+
+  <!-- ═══════════════════════════════════════════
+       COGNITIVE DRIVERS
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="cognitive">
+    <div class="pillar-meta">
+      <span class="pillar-num-label p-cognitive">Cognitive Drivers</span>
+      <span class="pillar-count-label">94 biases</span>
+    </div>
+    <h2 class="pillar-heading">The brain's noise filter<br>runs on bad math.</h2>
+    <p class="pillar-hook">
+      Nearly half the bias database lives here — and it makes sense. 
+      Cognitive biases are the brain doing its job: cutting the information load down to something manageable. 
+      The problem is the shortcuts it uses.
+    </p>
+    <p class="pillar-body">
+      The Cognitive Drivers pillar governs how people filter information, assign meaning, and form the beliefs that drive decisions. 
+      <strong>40 of the 94 biases here are meaning-making errors</strong> — the brain filling in gaps, finding patterns that don't exist, 
+      and projecting past experience onto new situations. Another 27 cluster around action: heuristics that let the brain commit 
+      to a decision without spending resources on full evaluation.
+      <br><br>
+      Most brands default to Cognitive messaging: features, benefits, logical arguments, price comparisons. 
+      That's not wrong — but it's playing on the surface. The deeper Cognitive lever is <strong>how you frame the information</strong>, 
+      not which information you share. Endowment, escalation of commitment, self-consistency — these don't respond to more information. 
+      They respond to reference points, ownership moments, and the story the consumer is already telling themselves.
+    </p>
+
+    <div class="stack">
+      <!-- Card 1: High usage / awareness stage -->
+      <div class="card">
+        <div class="card-stripe s-high"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Self-consistency Bias <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-105</span></div>
+            <span class="card-badge t-high">66 transitions</span>
+          </div>
+          <p class="card-hook">
+            People maintain a self-image of consistency — they remember their past choices as more aligned with their current beliefs than they actually were. 
+            This makes loyalty feel inevitable rather than chosen. And it makes any brand message that challenges that self-image feel like an attack.
+          </p>
+          <div class="card-meta">
+            <span>Loyal · Repeat Conversion</span>
+            <span>complexity 4/5</span>
+            <span>Not Enough Meaning</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2: Mid usage / decision stage -->
+      <div class="card">
+        <div class="card-stripe s-med"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Endowment Effect <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-141</span></div>
+            <span class="card-badge t-med">43 transitions</span>
+          </div>
+          <p class="card-hook">
+            Once someone owns something — even briefly, even a free trial — they value it more than they would to acquire it. 
+            The psychological ownership precedes the transaction. 
+            Free trials aren't marketing tactics. They're endowment activation.
+          </p>
+          <div class="card-meta">
+            <span>Repeat Conversion · Loyal</span>
+            <span>complexity 2/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 3: Strategic depth / commitment -->
+      <div class="card">
+        <div class="card-stripe s-low"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Escalation of Commitment <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-132</span></div>
+            <span class="card-badge t-low">147 transitions</span>
+          </div>
+          <p class="card-hook">
+            The most-linked bias in the database. People continue investing in decisions because of what they've already spent — 
+            time, money, identity. Churn protection, upsell resistance, and competitive switching all have Escalation of Commitment 
+            somewhere in the mechanism.
+          </p>
+          <div class="card-meta">
+            <span>Repeat Conversion · Loyal</span>
+            <span>complexity 3/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag bim">BIM Pillar Mismatch</span>
+      </div>
+      <p class="insight-text">
+        Cognitive Drivers get the most attention — and the shallowest application. 
+        <strong>Brands use cognitive tools (features, logic, price proof) to fight emotional problems.</strong> 
+        A customer who's losing confidence in their purchase didn't need more data. They needed a story about who they are. 
+        The BIM diagnostic failure here is mistaking the symptom (low engagement, low conversion) 
+        for a Cognitive problem when the active driver is Self-consistency or Loss Aversion — both of which require 
+        Emotional or narrative intervention, not additional evidence.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       ENVIRONMENT & DESIGN
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="environment">
+    <div class="pillar-meta">
+      <span class="pillar-num-label p-env">Environment &amp; Design</span>
+      <span class="pillar-count-label">59 biases</span>
+    </div>
+    <h2 class="pillar-heading">Context is doing more work<br>than your copy is.</h2>
+    <p class="pillar-hook">
+      The biases in this pillar don't live in the consumer's head — they live in the environment you build around them. 
+      And they fire whether you designed for them or not.
+    </p>
+    <p class="pillar-body">
+      Environment &amp; Design governs how context, order, contrast, and framing shape decisions without the consumer 
+      being aware of it. The Availability Heuristic (Cog-001, 333 usage events) and Framing Effect (Cog-024, 59 events) 
+      are the two highest-use biases in the entire database — both live here.
+      <br><br>
+      This is the pillar where <strong>choice architecture</strong> operates. What's shown first, what's shown alongside what, 
+      what's absent, what's repeated — these are all active design decisions whether brands treat them as such or not. 
+      A brand that hasn't consciously designed its choice environment has still designed one. 
+      The biases are running on whatever defaults exist.
+    </p>
+
+    <div class="stack">
+      <!-- Card 1: Availability Heuristic -->
+      <div class="card">
+        <div class="card-stripe s-high"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Availability Heuristic <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-001</span></div>
+            <span class="card-badge t-high">333 usage events</span>
+          </div>
+          <p class="card-hook">
+            What's easy to recall feels more likely, more common, more important. 
+            Reach and frequency aren't just media KPIs — they're the mechanism that makes your brand feel like the obvious choice 
+            when the consumer is standing at a decision point you're not in the room for.
+          </p>
+          <div class="card-meta">
+            <span>Awareness · Repeat Conversion</span>
+            <span>complexity 2/5</span>
+            <span>Too Much Information</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2: Framing Effect -->
+      <div class="card">
+        <div class="card-stripe s-med"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Framing Effect <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-024</span></div>
+            <span class="card-badge t-med">59 usage events</span>
+          </div>
+          <p class="card-hook">
+            The same information presented differently produces different decisions. 
+            "95% fat-free" and "5% fat" describe identical products. 
+            The frame — not the fact — is what lands emotionally.
+            Every message is framed. The question is whether you chose the frame or defaulted to one.
+          </p>
+          <div class="card-meta">
+            <span>All stages</span>
+            <span>complexity 2/5</span>
+            <span>Too Much Information</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 3: Anchoring -->
+      <div class="card">
+        <div class="card-stripe s-low"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Anchoring Effect <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-019</span></div>
+            <span class="card-badge t-low">21 usage events</span>
+          </div>
+          <p class="card-hook">
+            The first number seen becomes the reference for every number that follows. 
+            Pricing strategy, discount presentation, and value comparison all run on anchoring. 
+            Showing the original price before the sale price is not a formatting choice — 
+            it's an anchor being set.
+          </p>
+          <div class="card-meta">
+            <span>Awareness · 1st Conversion</span>
+            <span>complexity 1/5</span>
+            <span>Too Much Information</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag saeo">SAEO · Application Layer</span>
+      </div>
+      <p class="insight-text">
+        Environment &amp; Design is where <strong>default settings become strategy failures</strong>. 
+        The SAEO Application layer asks: are your behavioral tools actually deployed in the right context, 
+        at the right moment, in the right sequence? Most brands that understand Framing still don't apply it consistently — 
+        different teams own different touchpoints and each defaults to their own frame. 
+        The diagnostic failure is treating E&amp;D as a creative concern (design team's job) rather than a behavioral architecture decision 
+        that requires coordination across every customer-facing surface.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       SOCIAL INFLUENCE
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="social">
+    <div class="pillar-meta">
+      <span class="pillar-num-label p-social">Social Influence</span>
+      <span class="pillar-count-label">33 biases</span>
+    </div>
+    <h2 class="pillar-heading">People decide individually.<br>But not in isolation.</h2>
+    <p class="pillar-hook">
+      Social Influence biases don't require a crowd. They require a reference group — 
+      real, implied, or imagined. And consumers are almost always referencing one.
+    </p>
+    <p class="pillar-body">
+      The Social Influence pillar governs how authority, identity, group norms, and perceived consensus shape individual decisions. 
+      Authority Bias (Cog-064) has the highest usage count in this pillar at 45 events — 
+      which means it surfaces most frequently in the liminal moments where consumers need permission to believe.
+      <br><br>
+      <strong>Social biases are permission structures.</strong> A consumer who is already considering your product is looking 
+      for a signal that the decision is sanctioned — by someone credible, by their peer group, or by the evidence of widespread adoption. 
+      The brand that provides that signal at the right moment converts. 
+      The brand that doesn't loses to whatever reference the consumer finds on their own.
+    </p>
+
+    <div class="stack">
+      <!-- Card 1: Authority Bias -->
+      <div class="card">
+        <div class="card-stripe s-high"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Authority Bias <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-064</span></div>
+            <span class="card-badge t-high">45 usage events · 12 transitions</span>
+          </div>
+          <p class="card-hook">
+            People weight expert opinion disproportionately — not because they've verified the expertise, 
+            but because authority is a credibility shortcut. Influencer marketing, certifications, academic citations, 
+            and "as seen in" placement all run on Authority Bias. The mechanism isn't persuasion. It's permission.
+          </p>
+          <div class="card-meta">
+            <span>Awareness · 1st Conversion</span>
+            <span>complexity 1/5</span>
+            <span>Not Enough Meaning</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2: Reciprocity Bias -->
+      <div class="card">
+        <div class="card-stripe s-med"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Reciprocity Bias <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-198</span></div>
+            <span class="card-badge t-med">16 transitions</span>
+          </div>
+          <p class="card-hook">
+            The obligation to return a favor is near-universal across cultures. 
+            Free content, free tools, samples, and lead magnets aren't just generosity — 
+            they're reciprocity triggers. The mechanism: give first, unconditionally, 
+            and the social contract does the follow-up.
+          </p>
+          <div class="card-meta">
+            <span>Awareness · Conversion · Advocacy</span>
+            <span>complexity 1/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 3: Trait Ascription Bias -->
+      <div class="card">
+        <div class="card-stripe s-low"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Trait Ascription Bias <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-123</span></div>
+            <span class="card-badge t-low">43 transitions</span>
+          </div>
+          <p class="card-hook">
+            People see themselves as flexible and nuanced, and see others — including competitors and brands — 
+            as fixed and predictable. The brand that positions itself as attuned to individual complexity 
+            wins against the brand that makes assumptions about who its customers are.
+          </p>
+          <div class="card-meta">
+            <span>Loyal · Indecisive</span>
+            <span>complexity 3/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag mat">Marketing Maturity Gap</span>
+      </div>
+      <p class="insight-text">
+        Social Influence biases require <strong>sourcing, not just messaging</strong>. 
+        It's not enough to know Authority Bias is active at first conversion — you have to have built the authority signals 
+        that can be deployed at that moment. That's a pre-campaign capability question, not a creative execution question. 
+        Most brands discover they need social proof when they're already in-market and don't have it. 
+        That's a Marketing Maturity failure: the capability should exist before the campaign needs it.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+
+  <!-- ═══════════════════════════════════════════
+       EMOTIONAL DRIVERS
+  ═══════════════════════════════════════════ -->
+  <section class="pillar-section" id="emotional">
+    <div class="pillar-meta">
+      <span class="pillar-num-label p-emotional">Emotional Drivers</span>
+      <span class="pillar-count-label">15 biases</span>
+    </div>
+    <h2 class="pillar-heading">The smallest pillar.<br>The loudest decisions.</h2>
+    <p class="pillar-hook">
+      Only 15 biases — but Loss Aversion alone links to 50 liminal transitions. 
+      Emotional Drivers aren't common. They're intense. And they move at inflection points, 
+      not at awareness stages.
+    </p>
+    <p class="pillar-body">
+      Emotional Drivers govern fear of loss, regret, risk, urgency, and identity protection. 
+      They are the most powerful biases in the database by impact-per-event — and the most commonly misapplied. 
+      <strong>Brands reach for emotional levers at Awareness, when most Emotional biases are active at Retention, Churn Risk, and Re-engagement.</strong>
+      <br><br>
+      Loss Aversion (Cog-134) is the canonical example. Kahneman and Tversky established the 2.5× pain-to-gain asymmetry — 
+      losses hurt roughly twice as much as equivalent gains feel good. 
+      That asymmetry doesn't just inform pricing and urgency tactics. 
+      It structures the entire retention layer of the consumer journey.
+    </p>
+
+    <div class="stack">
+      <!-- Card 1: Loss Aversion -->
+      <div class="card">
+        <div class="card-stripe s-emo"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Loss Aversion <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-134</span></div>
+            <span class="card-badge t-emo">50 transitions · 34 usage events</span>
+          </div>
+          <p class="card-hook">
+            Losses feel 2.5× more painful than equivalent gains feel good. 
+            Every retention campaign, churn intervention, urgency trigger, and free trial conversion 
+            is operating on this mechanism — whether the brand knows it or not.
+          </p>
+          <div class="card-meta">
+            <span>Repeat Conversion · Loyal</span>
+            <span>complexity 1/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2: Status Quo Bias -->
+      <div class="card">
+        <div class="card-stripe s-med"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Status Quo Bias <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-148</span></div>
+            <span class="card-badge t-med">65 transitions</span>
+          </div>
+          <p class="card-hook">
+            Change feels risky even when staying is worse. 
+            Incumbents don't win on merit — they win on the emotional cost of switching. 
+            Every challenger brand is fighting Status Quo Bias before it's fighting any competitive advantage.
+          </p>
+          <div class="card-meta">
+            <span>Loyal · Lapsed</span>
+            <span>complexity 4/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+      <!-- Card 3: Sunk Cost Fallacy -->
+      <div class="card">
+        <div class="card-stripe s-low"></div>
+        <div class="card-inner">
+          <div class="card-top">
+            <div class="card-name">Sunk Cost Fallacy <span style="color:var(--text-3);font-weight:300;font-size:11px;">&nbsp;Cog-130</span></div>
+            <span class="card-badge t-low">Emotional Drivers</span>
+          </div>
+          <p class="card-hook">
+            Consumers continue with a product or relationship because of what they've already invested, 
+            not because of current value. This is a retention mechanism that works in your favor — 
+            until it doesn't, and the customer cancels with resentment instead of satisfaction.
+          </p>
+          <div class="card-meta">
+            <span>Repeat Conversion · Loyal</span>
+            <span>complexity 4/5</span>
+            <span>Need to Act Fast</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-tag">BIM Pillar Mismatch</span>
+      </div>
+      <p class="insight-text">
+        Emotional Drivers are <strong>the last place most brands apply emotional language, and the first place they should.</strong> 
+        The failure pattern: Awareness campaigns are flooded with emotional creative (fear, aspiration, humor) 
+        while Retention and Re-engagement campaigns fall back to rational messaging — 
+        "here's what you get with your subscription." 
+        But Loss Aversion, Status Quo Bias, and Sunk Cost are all active at Retention. 
+        The customer who's considering canceling needs an emotional intervention, not a feature list.
+      </p>
+    </div>
+
+    <a class="back-link" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Back to pillars</a>
+  </section>
+
+</div>
+
+<script>
+  // Scroll-track anchor pills
+  const sections = ['cognitive','environment','social','emotional'];
+  const pills = document.querySelectorAll('.anchor-pill');
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        pills.forEach(p => p.classList.remove('active'));
+        const target = document.querySelector(`.anchor-pill[href="#${e.target.id}"]`);
+        if (target) target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.25 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+</script>
+</body>
+</html>
