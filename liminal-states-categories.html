@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liminal States — Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Tokens ── */
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+    --accent:      #c8f0d8;
+
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.12);
+    --green-text:  #5DCAA5;
+
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.12);
+    --amber-text:  #FAC775;
+
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.12);
+    --red-text:    #F0997B;
+
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.12);
+    --purple-text: #AFA9EC;
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* ── Page header ── */
+  .page-header {
+    padding: 64px 0 48px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 48px;
+  }
+  .ga-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .page-title {
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .page-title em {
+    font-style: italic;
+    color: var(--text-2);
+  }
+  .page-intro {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.75;
+    max-width: 580px;
+    font-weight: 300;
+  }
+
+  /* ── Reference table ── */
+  .table-section { margin-bottom: 48px; }
+  .table-header { margin-bottom: 16px; }
+  .table-title { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 3px; }
+  .table-sub { font-size: 12px; color: var(--text-3); }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .leg {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-3);
+  }
+  .leg-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+  }
+  .ref-table thead tr {
+    border-bottom: 0.5px solid var(--border-med);
+  }
+  .ref-table th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 8px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .ref-table th:first-child { text-align: left; }
+  .ref-table th.mix-th { text-align: left; }
+  .ref-table tbody tr {
+    border-bottom: 0.5px solid var(--border);
+    cursor: pointer;
+    transition: background 0.12s;
+  }
+  .ref-table tbody tr:last-child { border-bottom: none; }
+  .ref-table tbody tr:hover { background: var(--bg-2); }
+  .ref-table td {
+    font-size: 12px;
+    padding: 9px 8px;
+    color: var(--text-2);
+    text-align: right;
+    vertical-align: middle;
+    font-family: var(--font-mono);
+  }
+  .ref-table td:first-child {
+    text-align: left;
+    font-family: var(--font-sans);
+  }
+  .ref-table td.mix-col { text-align: left; }
+  .cat-name-cell { font-size: 12px; font-weight: 500; color: var(--text-1); }
+  .cat-sub-cell {
+    font-size: 11px;
+    color: var(--text-3);
+    font-weight: 400;
+    font-family: var(--font-sans);
+  }
+  .num-zero { color: var(--border-med); }
+  .total-num { font-weight: 500; color: var(--text-1); }
+  .bar-wrap {
+    display: flex;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+    gap: 1px;
+    width: 90px;
+  }
+  .b-f { background: var(--green); }
+  .b-e { background: var(--amber); }
+  .b-c { background: var(--red); }
+  .b-d { background: var(--red); opacity: 0.5; }
+  .b-p { background: var(--purple); }
+  .b-t { background: #501313; }
+
+  .ref-table tfoot tr { border-top: 0.5px solid var(--border-med); }
+  .ref-table tfoot td {
+    font-size: 11px;
+    padding: 8px 8px;
+    color: var(--text-3);
+    font-family: var(--font-sans);
+  }
+  .tf-num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: right;
+  }
+
+  /* ── Anchor nav ── */
+  .anchor-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .anchor-pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 0.5px solid var(--border);
+    color: var(--text-2);
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.12s;
+    text-decoration: none;
+    display: inline-block;
+    letter-spacing: 0.02em;
+  }
+  .anchor-pill:hover,
+  .anchor-pill.active {
+    background: var(--bg-3);
+    border-color: var(--border-med);
+    color: var(--text-1);
+  }
+
+  /* ── Category section ── */
+  .cat-section {
+    padding: 56px 0 60px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .cat-section:last-child { border-bottom: none; }
+
+  .cat-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .cat-num-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .cat-count-label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+  .cat-heading {
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.2;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .cat-hook {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.7;
+    margin-bottom: 18px;
+    font-style: italic;
+    font-weight: 300;
+  }
+  .cat-body {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    margin-bottom: 24px;
+    font-weight: 300;
+    max-width: 600px;
+  }
+  .cat-body strong {
+    color: var(--text-1);
+    font-weight: 500;
+  }
+
+  /* ── Pattern note ── */
+  .pattern-note {
+    font-size: 12px;
+    color: var(--text-3);
+    padding: 10px 14px;
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 16px;
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  /* ── 3-card stack ── */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 0.5px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .card {
+    display: flex;
+    background: var(--bg-2);
+  }
+  .card + .card {
+    border-top: 0.5px solid var(--border);
+  }
+  .card-stripe { width: 3px; flex-shrink: 0; }
+  .s-f { background: var(--green); }
+  .s-e { background: var(--amber); }
+  .s-c { background: var(--red); }
+  .s-p { background: var(--purple); }
+
+  .card-inner { padding: 14px 18px; flex: 1; }
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .card-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.4;
+  }
+  .card-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+  .t-f { background: var(--green-bg); color: var(--green-text); }
+  .t-e { background: var(--amber-bg); color: var(--amber-text); }
+  .t-c { background: var(--red-bg); color: var(--red-text); }
+  .t-p { background: var(--purple-bg); color: var(--purple-text); }
+  .t-fs { background: var(--green-bg); color: var(--green-text); opacity: 0.65; }
+
+  .card-hook {
+    font-size: 12px;
+    color: var(--text-2);
+    font-style: italic;
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .card-bim {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 6px;
+    font-family: var(--font-mono);
+  }
+
+  /* ── Insight ── */
+  .insight {
+    background: var(--bg-3);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+  }
+  .insight-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .insight-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding-top: 2px;
+    flex-shrink: 0;
+  }
+  .insight-layer {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    color: var(--text-2);
+    white-space: nowrap;
+    font-family: var(--font-mono);
+  }
+  .insight-body {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .insight-body strong {
+    color: var(--text-1);
+    font-weight: 500;
+  }
+  .insight-body em { font-style: italic; }
+
+  /* ── Back link ── */
+  .back-top {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--text-3);
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.12s;
+  }
+  .back-top:hover { color: var(--text-2); }
+
+  /* ── Closing ── */
+  .closing {
+    padding: 56px 0 0;
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.8;
+    font-weight: 300;
+    max-width: 560px;
+  }
+  .closing p + p { margin-top: 16px; }
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="ga-label">Good Assumptions · Liminal States</div>
+    <h1 class="page-title">Nine categories.<br><em>None of them are funnel stages.</em></h1>
+    <p class="page-intro">Each one describes the nature of the psychological movement — what kind of shift is happening inside the consumer. Three transitions per category: what success looks like, what quiet failure looks like, what it looks like when something is actively breaking.</p>
+  </div>
+
+  <!-- Reference table -->
+  <div class="table-section">
+    <div class="table-header">
+      <div class="table-title">160 liminal transitions across 9 categories</div>
+      <div class="table-sub">Click any row to jump to that category</div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><div class="leg-dot b-f"></div>Forward</div>
+      <div class="leg"><div class="leg-dot b-e"></div>Exit</div>
+      <div class="leg"><div class="leg-dot b-c"></div>Crisis</div>
+      <div class="leg"><div class="leg-dot b-d"></div>Decay</div>
+      <div class="leg"><div class="leg-dot b-p"></div>Post-res</div>
+      <div class="leg"><div class="leg-dot b-t"></div>Terminal</div>
+    </div>
+
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Total</th>
+          <th style="color:#5DCAA5;">Fwd</th>
+          <th style="color:#FAC775;">Exit</th>
+          <th style="color:#F0997B;">Crs</th>
+          <th style="color:#888;">Dcy</th>
+          <th style="color:#AFA9EC;">Post</th>
+          <th style="color:#a05050;">Trm</th>
+          <th class="mix-th">Mix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="jumpTo('deepening')">
+          <td><span class="cat-name-cell">Deepening</span> <span class="cat-sub-cell">· Increasing Engagement</span></td>
+          <td class="total-num">37</td><td>9</td><td>28</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:24%"></div><div class="b-e" style="width:76%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('validation')">
+          <td><span class="cat-name-cell">Validation</span> <span class="cat-sub-cell">· Trust Building</span></td>
+          <td class="total-num">34</td><td>10</td><td>22</td><td>2</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:29%"></div><div class="b-e" style="width:65%"></div><div class="b-c" style="width:6%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('commitment')">
+          <td><span class="cat-name-cell">Commitment</span> <span class="cat-sub-cell">· Increasing Investment</span></td>
+          <td class="total-num">17</td><td>11</td><td>4</td><td class="num-zero">—</td><td>1</td><td>1</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:65%"></div><div class="b-e" style="width:23%"></div><div class="b-d" style="width:6%"></div><div class="b-p" style="width:6%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('crisis')">
+          <td><span class="cat-name-cell">Crisis</span> <span class="cat-sub-cell">· Problem States</span></td>
+          <td class="total-num">17</td><td>1</td><td>9</td><td>3</td><td>3</td><td class="num-zero">—</td><td>1</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:6%"></div><div class="b-e" style="width:53%"></div><div class="b-c" style="width:18%"></div><div class="b-d" style="width:18%"></div><div class="b-t" style="width:6%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('transformation')">
+          <td><span class="cat-name-cell">Transformation</span> <span class="cat-sub-cell">· Life Changes</span></td>
+          <td class="total-num">15</td><td>11</td><td>4</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:73%"></div><div class="b-e" style="width:27%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('amplification')">
+          <td><span class="cat-name-cell">Amplification</span> <span class="cat-sub-cell">· Private to Social</span></td>
+          <td class="total-num">12</td><td>12</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:100%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('recovery')">
+          <td><span class="cat-name-cell">Recovery</span> <span class="cat-sub-cell">· Problem Resolution</span></td>
+          <td class="total-num">11</td><td>5</td><td>2</td><td class="num-zero">—</td><td class="num-zero">—</td><td>4</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:45%"></div><div class="b-e" style="width:18%"></div><div class="b-p" style="width:36%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('relationship')">
+          <td><span class="cat-name-cell">Relationship</span> <span class="cat-sub-cell">· Maturation &amp; Identity</span></td>
+          <td class="total-num">10</td><td>7</td><td>1</td><td class="num-zero">—</td><td class="num-zero">—</td><td>2</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:70%"></div><div class="b-e" style="width:10%"></div><div class="b-p" style="width:20%"></div></div></td>
+        </tr>
+        <tr onclick="jumpTo('channel')">
+          <td><span class="cat-name-cell">Channel</span> <span class="cat-sub-cell">· Mode &amp; Platform Shifts</span></td>
+          <td class="total-num">7</td><td>5</td><td>2</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td><td class="num-zero">—</td>
+          <td class="mix-col"><div class="bar-wrap"><div class="b-f" style="width:71%"></div><div class="b-e" style="width:29%"></div></div></td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td style="font-weight:500; font-size:12px; color:#9c9a8e;">160 total</td>
+          <td class="tf-num" style="color:#9c9a8e;">160</td>
+          <td class="tf-num" style="color:#5DCAA5;">71</td>
+          <td class="tf-num" style="color:#FAC775;">50</td>
+          <td class="tf-num" style="color:#F0997B;">5</td>
+          <td class="tf-num" style="color:#888;">4</td>
+          <td class="tf-num" style="color:#AFA9EC;">7</td>
+          <td class="tf-num" style="color:#a05050;">1</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <!-- Anchor nav -->
+  <div class="anchor-nav" id="anchor-nav">
+    <a class="anchor-pill" onclick="jumpTo('validation')">Validation</a>
+    <a class="anchor-pill" onclick="jumpTo('deepening')">Deepening</a>
+    <a class="anchor-pill" onclick="jumpTo('commitment')">Commitment</a>
+    <a class="anchor-pill" onclick="jumpTo('crisis')">Crisis</a>
+    <a class="anchor-pill" onclick="jumpTo('transformation')">Transformation</a>
+    <a class="anchor-pill" onclick="jumpTo('amplification')">Amplification</a>
+    <a class="anchor-pill" onclick="jumpTo('recovery')">Recovery</a>
+    <a class="anchor-pill" onclick="jumpTo('relationship')">Relationship</a>
+    <a class="anchor-pill" onclick="jumpTo('channel')">Channel</a>
+  </div>
+
+  <!-- ── 01 VALIDATION ── -->
+  <div class="cat-section" id="validation">
+    <div class="cat-meta">
+      <span class="cat-num-label">01 of 09</span>
+      <span class="cat-count-label">34 transitions</span>
+    </div>
+    <h2 class="cat-heading">Validation</h2>
+    <p class="cat-hook">Trust is being decided right now — and your next move will either resolve it or close it off.</p>
+    <p class="cat-body">The consumer is deciding whether to believe you. Not whether to buy. Validation transitions fire at first contact, mid-evaluation, post-purchase, and mid-relationship. <strong>Trust is always being decided somewhere</strong> — and most brands only instrument the moments they can see.</p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Evaluating → Deciding · The Commitment Cliff</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"What pushes customers over the decision threshold?"</div>
+          <div class="card-bim">BIM: Emotional Drivers · ROI 9</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Health Inertia · The Stuck Status Quo</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"Why do people who want to be healthier keep not starting?" — Intention is real. The current state is comfortable enough.</div>
+          <div class="card-bim">BIM: Cognitive Drivers · ROI 9</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-c"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Buyer's Remorse Window · The Doubting Window</span><span class="card-badge t-c">Crisis</span></div>
+          <div class="card-hook">"What happens when buyers second-guess their purchase?" — Cognitive dissonance peaks the moment the decision is made. ROI 10.</div>
+          <div class="card-bim">BIM: Emotional Drivers</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">BIM + Liminal</span>
+      </div>
+      <div class="insight-body">The Buyer's Remorse Window opens <em>after</em> the sale — which most brands treat as a handoff to operations. But it's still a Validation transition. <strong>Emotional Drivers are running the show.</strong> Brands that respond with feature confirmations make the dissonance worse. The correct move is identity reinforcement: you made the right call, here's proof from people like you.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 02 DEEPENING ── -->
+  <div class="cat-section" id="deepening">
+    <div class="cat-meta">
+      <span class="cat-num-label">02 of 09</span>
+      <span class="cat-count-label">37 transitions</span>
+    </div>
+    <h2 class="cat-heading">Deepening</h2>
+    <p class="cat-hook">The relationship is either growing or quietly eroding — and most brands stop paying attention right when it matters most.</p>
+    <p class="cat-body">The largest category. 28 of 37 transitions are exits. Post-purchase is where most brands go quiet — and where most relationships actually fall apart. <strong>The exits don't announce themselves.</strong> Silence reads as retention. The data says otherwise.</p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Satisfied → Loyal · The Identity Commitment</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"Why do high-satisfaction customers still switch when a better deal appears?" — Satisfaction is a score. Loyalty is identity.</div>
+          <div class="card-bim">BIM: Emotional Drivers · ROI 9</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">ROI Doubt · The Uncertain Investment</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"When the math starts to feel wrong" — Delivering on the promise isn't enough if they can't articulate the value.</div>
+          <div class="card-bim">BIM: Cognitive Drivers · ROI 9</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-c"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Complaint Entrenchment · The Permanent Grievance</span><span class="card-badge t-c">Crisis</span></div>
+          <div class="card-hook">"When a customer's complaint becomes their identity" — No longer a request for resolution. A story they tell about who they are.</div>
+          <div class="card-bim">BIM: Emotional Drivers</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">SAEO Diagnostic</span>
+      </div>
+      <div class="insight-body">ROI Doubt is consistently misdiagnosed as an Execution problem — better reporting, clearer dashboards. But it's a <strong>Strategy problem.</strong> The brand never defined what "value" would look like for this customer before they bought. The SAEO diagnostic catches this: the symptom is in Execution, the failure is in Strategy Layer 03.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 03 COMMITMENT ── -->
+  <div class="cat-section" id="commitment">
+    <div class="cat-meta">
+      <span class="cat-num-label">03 of 09</span>
+      <span class="cat-count-label">17 transitions</span>
+    </div>
+    <h2 class="cat-heading">Commitment</h2>
+    <p class="cat-hook">The consumer is deciding whether to go further — and the psychology of going further is nothing like the psychology of getting started.</p>
+    <p class="cat-body">Commitment transitions are about escalating investment. The forward transitions here carry some of the highest ROI scores in the database. <strong>The exits are quieter</strong> — upgrade paths that stop converting, trials that expire without a decision.</p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Trial → Paid · The Payment Leap</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"When do free users decide to pay?" — The moment product-market fit becomes paying-customer-fit. ROI 10.</div>
+          <div class="card-bim">BIM: Cognitive Drivers</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Scale Paralysis · The Complexity Ceiling</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"Why do organizations with successful pilots still fail to roll out?" — Not decision fatigue. Organizational comprehension failure.</div>
+          <div class="card-bim">BIM: Environment &amp; Design · ROI 7</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-p"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Hollow Compliance Persistence · Surface Compliance, Absent Conviction</span><span class="card-badge t-p">Post-res</span></div>
+          <div class="card-hook">"If we removed the incentive today, would this consumer repeat the behavior tomorrow?" — Metrics positive. Commitment absent.</div>
+          <div class="card-bim">BIM: Cognitive Drivers · ROI 7</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">BIM Pillar mismatch</span>
+      </div>
+      <div class="insight-body">Hollow Compliance looks like retention on every dashboard. But the BIM pillar driving the behavior is <strong>Environment &amp; Design</strong> — inertia, sunk cost, defaults — not genuine commitment. When a competitor removes switching friction, these customers leave in clusters and nobody sees it coming.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 04 CRISIS ── -->
+  <div class="cat-section" id="crisis">
+    <div class="cat-meta">
+      <span class="cat-num-label">04 of 09</span>
+      <span class="cat-count-label">17 transitions</span>
+    </div>
+    <h2 class="cat-heading">Crisis</h2>
+    <p class="cat-hook">Something is actively breaking down — and the window to catch it is measured in hours, not campaign cycles.</p>
+    <p class="cat-body">The highest average ROI category. Brands that intervene correctly here often end up with <strong>stronger relationships than they had before.</strong> The Service Recovery Paradox lives in this category. So does Active → Churn — the only terminal transition in the database.</p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Dormant → Reactivated · The Comeback Hook</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"What brings dormant customers back to life?" — New context, not better messaging, is usually what reopens the door. ROI 7.</div>
+          <div class="card-bim">BIM: Cognitive Drivers</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Payment Threshold Stall · The Zero Crossing</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"Why do consumers who love the free product fail to pay?" — The $0-to-$X transition triggers a pain response. The act of paying is the barrier, not the price. ROI 9.</div>
+          <div class="card-bim">BIM: Environment &amp; Design</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-c"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Private → Public Complaint · The Reputation Bomb</span><span class="card-badge t-c">Crisis</span></div>
+          <div class="card-hook">"What turns private complaints into public crises?" — One unhappy customer becomes a warning to thousands. ROI 10.</div>
+          <div class="card-bim">BIM: Social Influence · Extreme intensity</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">BIM + SAEO Diagnostic</span>
+      </div>
+      <div class="insight-body">The Reputation Bomb is treated as a PR problem — an Execution failure. But the BIM pillar is Social Influence at extreme intensity. The consumer's primary need is to be witnessed, not fixed. Brands that lead with resolution messaging <strong>accelerate the escalation.</strong> The SAEO diagnostic locates this as an Application failure: right insight, wrong intervention layer.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 05 TRANSFORMATION ── -->
+  <div class="cat-section" id="transformation">
+    <div class="cat-meta">
+      <span class="cat-num-label">05 of 09</span>
+      <span class="cat-count-label">15 transitions</span>
+    </div>
+    <h2 class="cat-heading">Transformation</h2>
+    <p class="cat-hook">The consumer's life just changed. Their old relationship with your category may not fit who they're becoming.</p>
+    <p class="cat-body">Life transitions rewrite identity. Parenthood, relocation, diagnosis, career shift, homeownership. Transformation transitions create large windows of brand openness. <strong>They close faster than most acquisition strategies can move.</strong></p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Pre-Parent → Parent · The Everything Changes Moment</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"How does becoming a parent change everything?" — Priorities, spending, identity — reorganized simultaneously. ROI 10.</div>
+          <div class="card-bim">BIM: Cognitive Drivers · Extreme intensity</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Diagnosis Denial · The Identity Refusal</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"What does it look like when someone refuses to become a patient?" — The identity cost of accepting the new reality is too high.</div>
+          <div class="card-bim">BIM: Emotional Drivers · Extreme intensity</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-c"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Identity Mismatch · The Relevance Gap</span><span class="card-badge t-c">Crisis</span></div>
+          <div class="card-hook">"When the brand you relied on stops feeling like it's for you" — The consumer changed. The brand didn't notice.</div>
+          <div class="card-bim">BIM: Emotional Drivers</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">Persona Journey + BIM</span>
+      </div>
+      <div class="insight-body">Transformation transitions don't respond to product messaging. They respond to identity acknowledgment. Leading with features at a life transition moment is applying <strong>Cognitive logic to an Emotional and Social driver moment.</strong> The consumer isn't evaluating your product — they're asking whether your brand understands who they're becoming.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 06 AMPLIFICATION ── -->
+  <div class="cat-section" id="amplification">
+    <div class="cat-meta">
+      <span class="cat-num-label">06 of 09</span>
+      <span class="cat-count-label">12 transitions</span>
+    </div>
+    <h2 class="cat-heading">Amplification</h2>
+    <p class="cat-hook">Private satisfaction is deciding whether to go public — and the only direction this category moves is forward or not at all.</p>
+    <p class="cat-body">Every transition in Amplification is a forward movement. The failure mode isn't an exit — it's the <strong>absence of a forward one.</strong> Silence. The satisfied customer who never shares. The influential fan who keeps the endorsement private. Most advocacy programs try to push. That's usually the move that kills organic advocacy.</p>
+    <div class="pattern-note">All 12 transitions are forward movements. The three cards show the spectrum: the advocate who earns it, the one who stalls at the threshold, and the one who crosses because of exceptional recovery.</div>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">User → Advocate · The Champion Shift</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"What turns satisfied users into vocal champions?" — Identity is now tied to the product. They share because it reflects who they are. ROI 9.</div>
+          <div class="card-bim">BIM: Social Influence</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Influence Resistance · The Reluctant Voice</span><span class="card-badge t-fs">Forward — stalled</span></div>
+          <div class="card-hook">"Why do powerful fans refuse to use their influence for us?" — Genuine fan. Real reach. Won't deploy it. Endorsing costs social capital they've spent years building. ROI 9.</div>
+          <div class="card-bim">BIM: Social Influence</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Complaint → Advocate · The Turnaround Miracle</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"How do complainers become brand champions?" — The contrast between frustration and exceptional recovery creates advocacy satisfied customers rarely match. ROI 9.</div>
+          <div class="card-bim">BIM: Emotional Drivers · Extreme intensity</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">BIM — Social pillar, Cognitive intervention</span>
+      </div>
+      <div class="insight-body">Every Amplification transition is driven by Social Influence — but most advocacy programs apply Cognitive logic: referral bonuses, points, structured incentives. <strong>Incentivizing advocacy signals the brand doesn't believe the product earns it organically</strong> — which is precisely what kills the transition. You can't buy Social Influence. You can only earn the conditions for it, then get out of the way.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 07 RECOVERY ── -->
+  <div class="cat-section" id="recovery">
+    <div class="cat-meta">
+      <span class="cat-num-label">07 of 09</span>
+      <span class="cat-count-label">11 transitions</span>
+    </div>
+    <h2 class="cat-heading">Recovery</h2>
+    <p class="cat-hook">Trust was broken. The question isn't whether you fixed the problem — it's whether the relationship survived the fix.</p>
+    <p class="cat-body">The highest average ROI category in the database. Exceptional recovery creates loyalty that pre-crisis customers rarely reach. The Service Recovery Paradox is real and documented here. So are the four post-resolution exit states that show exactly <strong>how brands blow it in the moment right after they think they've fixed everything.</strong></p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Problem → Resolution · The Fix Moment</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"What defines a truly resolved problem?" — Acknowledgment, speed, and generosity that signals genuine care. Fixing the issue is the minimum. ROI 9.</div>
+          <div class="card-bim">BIM: Emotional Drivers</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Crisis Trust Collapse · The Permanent Damage Assessment</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"When does a brand crisis become permanent damage?" — Recovery attempts too slow, too thin, or contradicted by ongoing actions. The consumer concludes the crisis revealed something structural.</div>
+          <div class="card-bim">BIM: Emotional Drivers · ROI 7</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-p"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Consolidation Window Abandonment · Resolution Collapse</span><span class="card-badge t-p">Post-res</span></div>
+          <div class="card-hook">"Did success fade after we backed off?" — Metrics went positive. Brand reduced intervention. Consumer regressed. "It worked and then stopped" is harder to recover from than "it never worked." ROI 9.</div>
+          <div class="card-bim">BIM: Emotional Drivers</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">SAEO Diagnostic — Operations</span>
+      </div>
+      <div class="insight-body">Consolidation Window Abandonment is almost always an <strong>Operations failure masquerading as a Strategy success.</strong> The strategy worked — consumer came back. But the operational system read "resolved" and stopped the intervention cadence. The SAEO diagnostic locates this at the Operations layer: the strategy was sound, but the infrastructure for holding a recovered relationship didn't exist.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 08 RELATIONSHIP ── -->
+  <div class="cat-section" id="relationship">
+    <div class="cat-meta">
+      <span class="cat-num-label">08 of 09</span>
+      <span class="cat-count-label">10 transitions</span>
+    </div>
+    <h2 class="cat-heading">Relationship</h2>
+    <p class="cat-hook">The dynamic between consumer and brand is maturing — or calcifying into something that looks like loyalty and isn't.</p>
+    <p class="cat-body">Identity-level shifts in how the consumer relates to the brand. The slowest transitions in the database. Hollow Retention lives here: technically retained, psychologically absent, <strong>invisible in every standard metric until it surfaces as a churn cohort.</strong></p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Champion → Executive Sponsor · The Authority Assumption</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"Why does the person who loves your product most often fail to become the person who buys it?" — Believing in the product and betting your professional reputation on it are different commitments. ROI 9.</div>
+          <div class="card-bim">BIM: Social Influence · High intensity</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Sponsorship Stall · The Authority Deflection</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"What does it look like when the person who loves your product won't buy it?" — Keeps advocating. Deflects commitment to a committee. Deal enters indefinite hold.</div>
+          <div class="card-bim">BIM: Social Influence · ROI 7</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-p"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Hollow Retention · The Loyal Stranger</span><span class="card-badge t-p">Post-res</span></div>
+          <div class="card-hook">"Do they engage only minimally without advocacy?" — Subscription active. Psychologically absent. Sunk cost doing the work of loyalty. Invisible until the churn event arrives at scale. ROI 9.</div>
+          <div class="card-bim">BIM: Cognitive Drivers · Low intensity</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">Marketing Maturity + SAEO Operations</span>
+      </div>
+      <div class="insight-body">Detecting Hollow Retention requires behavioral signal infrastructure — engagement depth, advocacy monitoring, sentiment layering — that most organizations at Maturity Stage 1 or 2 don't have. <strong>The SAEO diagnostic locates this as an Operations failure:</strong> the brand can't see what's happening in the relationship layer until the churn cohort surfaces in the monthly report. By then, the retention number was never real.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- ── 09 CHANNEL ── -->
+  <div class="cat-section" id="channel">
+    <div class="cat-meta">
+      <span class="cat-num-label">09 of 09</span>
+      <span class="cat-count-label">7 transitions</span>
+    </div>
+    <h2 class="cat-heading">Channel</h2>
+    <p class="cat-hook">The consumer is moving between modes of engagement — and the relationship either survives the move or it doesn't.</p>
+    <p class="cat-body">The smallest category, and the one most consistently misread as a technical problem. A consumer moving across a channel is also re-evaluating their relationship with the brand in a new context. <strong>Most brands track the channel event. Few track what happens to the relationship inside it.</strong></p>
+    <div class="stack">
+      <div class="card">
+        <div class="card-stripe s-f"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Digital → Physical · The Offline Bridge</span><span class="card-badge t-f">Forward</span></div>
+          <div class="card-hook">"What drives the shift from digital to physical?" — The in-store experience either confirms the brand the consumer already formed — or doesn't. ROI 7.</div>
+          <div class="card-bim">BIM: Environment &amp; Design · Low intensity</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-e"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Digital Resistance · The Analog Holdout</span><span class="card-badge t-e">Exit</span></div>
+          <div class="card-hook">"When going digital feels like losing something" — Not incapability. A belief that the digital format is inferior. The value was in the physical interaction itself.</div>
+          <div class="card-bim">BIM: Emotional Drivers · Medium intensity · ROI 7</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-stripe s-c"></div>
+        <div class="card-inner">
+          <div class="card-top"><span class="card-name">Channel Drop-off · The Lost Thread</span><span class="card-badge t-c">Crisis</span></div>
+          <div class="card-hook">"The consumer moved channels and the brand didn't follow" — Not disengagement from the brand. Disengagement from the mode of contact. The thread breaks quietly.</div>
+          <div class="card-bim">BIM: Environment &amp; Design</div>
+        </div>
+      </div>
+    </div>
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">What most brands miss</span>
+        <span class="insight-layer">BIM — Environment vs Emotional mismatch</span>
+      </div>
+      <div class="insight-body">Digital Resistance is almost always treated as an adoption problem — better UX, smoother onboarding. But the BIM pillar is <strong>Emotional, not Environmental.</strong> The consumer isn't struggling with the interface. They're grieving a relationship format they valued. UX optimization applied to an Emotional driver moment confirms the brand doesn't understand what the consumer is actually experiencing.</div>
+    </div>
+    <a class="back-top" onclick="jumpTo('anchor-nav')">↑ Back to categories</a>
+  </div>
+
+  <!-- Closing -->
+  <div class="closing">
+    <p>These nine categories cover the full arc of a consumer relationship. They overlap. They fire simultaneously. A consumer in Commitment is often also in Validation. A consumer in Recovery may also be approaching Amplification.</p>
+    <p>That's not a flaw in the model — it's the model. Real behavior isn't sequential. The intelligence that helps you respond to it shouldn't be either.</p>
+  </div>
+
+</div>
+
+<script>
+  function jumpTo(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.anchor-pill').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.anchor-pill').forEach(p => {
+      const fn = p.getAttribute('onclick') || '';
+      if (fn.includes("'" + id + "'")) p.classList.add('active');
+    });
+  }
+
+  const sections = ['validation','deepening','commitment','crisis','transformation','amplification','recovery','relationship','channel'];
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.getBoundingClientRect().top < 140) current = id;
+    });
+    document.querySelectorAll('.anchor-pill').forEach(p => {
+      const fn = p.getAttribute('onclick') || '';
+      p.classList.toggle('active', current !== '' && fn.includes("'" + current + "'"));
+    });
+  }, { passive: true });
+</script>
+
+</body>
+</html>
