@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good Assumptions · Unified Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+:root{
+  --bg:    #0f0f0e;
+  --bg-2:  #141412;
+  --bg-3:  #1a1a17;
+  --bg-4:  #222220;
+  --bg-5:  #2a2a27;
+
+  --t1: #eae8de;
+  --t2: #a8a59a;
+  --t3: #6a6860;
+  --t4: #3d3c38;
+
+  --border:     rgba(255,255,255,0.07);
+  --border-med: rgba(255,255,255,0.13);
+  --border-hi:  rgba(255,255,255,0.22);
+
+  --lim:    #FAC775; --lim-bg: rgba(186,117,23,0.10); --lim-bd: rgba(186,117,23,0.25);
+  --cog:    #AFA9EC; --cog-bg: rgba(127,119,221,0.10); --cog-bd: rgba(127,119,221,0.25);
+  --cv:     #87BEF0; --cv-bg:  rgba(74,143,212,0.10);  --cv-bd:  rgba(74,143,212,0.25);
+  --pt:     #5DCAA5; --pt-bg:  rgba(29,158,117,0.10);  --pt-bd:  rgba(29,158,117,0.25);
+  --coral:  #F0997B; --coral-bg:rgba(216,90,48,0.10);  --coral-bd:rgba(216,90,48,0.25);
+
+  --saeo-coral: #CB4A2B;
+  --saeo-teal:  #18B09A;
+  --ga-teal:  #275e63;
+  --ga-gold:  #b98f5a;
+  --ga-parch: #f7f4ee;
+
+  --ui:   'DM Sans', system-ui, sans-serif;
+  --disp: 'DM Serif Display', Georgia, serif;
+  --mono: 'DM Mono', monospace;
+
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;
+  --s6:24px;--s8:32px;--s10:40px;--s12:48px;--s16:64px;
+  --r1:3px;--r2:6px;--r3:10px;--r4:16px;
+}
+
+body{background:var(--bg);color:var(--t1);font-family:var(--ui);font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+
+.shell{display:grid;grid-template-columns:240px 1fr;min-height:100dvh}
+
+.sidebar{position:sticky;top:0;height:100dvh;overflow-y:auto;background:var(--bg-2);border-right:0.5px solid var(--border-med);padding:var(--s8) var(--s5);display:flex;flex-direction:column;gap:var(--s6);scrollbar-width:none;}
+.sidebar::-webkit-scrollbar{display:none}
+
+.sb-brand{display:flex;flex-direction:column;gap:var(--s3)}
+.sb-mark{display:flex;align-items:center;gap:var(--s2)}
+.sb-title{font-family:var(--disp);font-size:16px;color:var(--t1);letter-spacing:-0.01em}
+.sb-sub{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--t3)}
+.sb-meta{font-size:11px;color:var(--t4);padding:var(--s2) 0;border-top:0.5px solid var(--border);border-bottom:0.5px solid var(--border)}
+
+.sb-nav{display:flex;flex-direction:column;gap:var(--s1)}
+.sb-group{margin-top:var(--s4)}
+.sb-group-label{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t4);padding:0 var(--s2);margin-bottom:var(--s1)}
+.sb-nav a{display:block;padding:5px var(--s2);font-size:12px;color:var(--t3);text-decoration:none;border-radius:var(--r1);transition:color 120ms,background 120ms;}
+.sb-nav a:hover,.sb-nav a.active{color:var(--t1);background:var(--bg-4)}
+
+.sb-footer{margin-top:auto;font-size:10px;color:var(--t4);line-height:1.6}
+
+main{min-width:0;padding:0 var(--s10) var(--s16);max-width:900px}
+
+.section{padding:var(--s12) 0;border-bottom:0.5px solid var(--border)}
+.section:last-child{border-bottom:none}
+
+.s-eyebrow{font-size:10px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--t3);margin-bottom:var(--s3);display:flex;align-items:center;gap:var(--s2)}
+.s-num{font-family:var(--mono);font-size:10px;color:var(--t4);background:var(--bg-3);border:0.5px solid var(--border);padding:1px 6px;border-radius:var(--r1)}
+.s-title{font-family:var(--disp);font-size:32px;line-height:1.1;letter-spacing:-0.02em;color:var(--t1)}
+.s-lead{margin-top:var(--s3);font-size:14px;color:var(--t2);line-height:1.75;max-width:560px;font-weight:300}
+
+.cover{padding:var(--s16) 0 var(--s12);border-bottom:0.5px solid var(--border);position:relative;overflow:hidden;}
+.cover-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 50% 40% at 85% 15%,rgba(29,158,117,0.05) 0%,transparent 70%),radial-gradient(ellipse 40% 50% at 15% 85%,rgba(127,119,221,0.04) 0%,transparent 70%);}
+.cover-kicker{font-size:10px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--t3);margin-bottom:var(--s5);display:flex;align-items:center;gap:var(--s3)}
+.cover-kicker::before{content:'';display:block;width:20px;height:0.5px;background:var(--t4)}
+.cover-h1{font-family:var(--disp);font-size:clamp(40px,5vw,64px);line-height:1.0;letter-spacing:-0.03em;color:var(--t1);margin-bottom:var(--s5)}
+.cover-h1 em{font-style:italic;color:var(--t2)}
+.cover-sub{font-size:15px;color:var(--t2);line-height:1.8;max-width:500px;font-weight:300;margin-bottom:var(--s8)}
+.cover-arch{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);max-width:600px;margin-bottom:var(--s8);}
+.arch-card{background:var(--bg-3);border:0.5px solid var(--border-med);border-radius:var(--r3);padding:var(--s5);}
+.arch-card-label{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:var(--s2)}
+.arch-card-name{font-family:var(--disp);font-size:20px;color:var(--t1);margin-bottom:var(--s2)}
+.arch-card-def{font-size:12px;color:var(--t2);line-height:1.6}
+.cover-meta{display:flex;gap:var(--s8);flex-wrap:wrap}
+.meta-item{display:flex;flex-direction:column;gap:3px}
+.meta-label{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3)}
+.meta-val{font-family:var(--mono);font-size:12px;color:var(--t2)}
+
+.label{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--t3);margin-bottom:var(--s3)}
+.mono{font-family:var(--mono);font-size:0.9em;color:var(--t3)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--s3)}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--s3)}
+.mt-4{margin-top:var(--s4)}.mt-6{margin-top:var(--s6)}.mt-8{margin-top:var(--s8)}
+
+.card{background:var(--bg-3);border:0.5px solid var(--border);border-radius:var(--r3);padding:var(--s5)}
+.card-sm{background:var(--bg-3);border:0.5px solid var(--border);border-radius:var(--r2);padding:var(--s4)}
+.card-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:var(--s2)}
+.card-body{font-size:12px;color:var(--t2);line-height:1.65}
+
+.callout{background:var(--bg-3);border-left:2px solid var(--lim);border-radius:0 var(--r2) var(--r2) 0;padding:var(--s3) var(--s4);font-size:12px;color:var(--t2);line-height:1.7;margin-top:var(--s4);}
+.callout strong{color:var(--t1);font-weight:500}
+.callout.cog{border-left-color:var(--cog)}.callout.cv{border-left-color:var(--cv)}.callout.pt{border-left-color:var(--pt)}.callout.coral{border-left-color:var(--coral)}.callout.teal{border-left-color:var(--saeo-teal)}
+
+.swatch-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:var(--s3)}
+.swatch{display:flex;flex-direction:column;gap:var(--s1)}
+.swatch-block{height:52px;border-radius:var(--r2)}
+.swatch-name{font-size:12px;font-weight:500;color:var(--t1)}
+.swatch-hex{font-family:var(--mono);font-size:11px;color:var(--t3)}
+.swatch-role{font-size:11px;color:var(--t3);line-height:1.4}
+
+.entity-row{display:grid;grid-template-columns:4px 1fr auto auto;align-items:center;gap:var(--s4);padding:var(--s4) var(--s5);background:var(--bg-3);border:0.5px solid var(--border);border-radius:var(--r2);transition:border-color 120ms;}
+.entity-row:hover{border-color:var(--border-med)}
+.entity-bar{height:44px;border-radius:2px;flex-shrink:0}
+.entity-name{font-size:13px;font-weight:500;color:var(--t1)}
+.entity-count{font-family:var(--mono);font-size:11px;color:var(--t3);margin-top:2px}
+.entity-chips{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center}
+.entity-role{font-size:12px;color:var(--t2);line-height:1.5;max-width:200px}
+
+.badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:var(--r1);text-transform:uppercase;letter-spacing:0.06em;white-space:nowrap}
+.b-lim{background:var(--lim-bg);color:var(--lim);border:0.5px solid var(--lim-bd)}
+.b-cog{background:var(--cog-bg);color:var(--cog);border:0.5px solid var(--cog-bd)}
+.b-cv{background:var(--cv-bg);color:var(--cv);border:0.5px solid var(--cv-bd)}
+.b-pt{background:var(--pt-bg);color:var(--pt);border:0.5px solid var(--pt-bd)}
+.b-coral{background:var(--coral-bg);color:var(--coral);border:0.5px solid var(--coral-bd)}
+.b-neutral{background:var(--bg-4);color:var(--t2);border:0.5px solid var(--border-med)}
+.b-lim-dot::before,.b-cog-dot::before,.b-cv-dot::before,.b-pt-dot::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.b-lim-dot::before{background:var(--lim)}.b-cog-dot::before{background:var(--cog)}.b-cv-dot::before{background:var(--cv)}.b-pt-dot::before{background:var(--pt)}
+
+.eid{font-family:var(--mono);font-size:11px;color:var(--t3);background:var(--bg-3);padding:2px 7px;border-radius:var(--r1);border:0.5px solid var(--border)}
+
+.layer-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin-top:var(--s4)}
+.layer-card{padding:var(--s5);border-radius:var(--r2);border:0.5px solid var(--border);background:var(--bg-3)}
+.layer-code{font-family:var(--disp);font-size:28px;margin-bottom:var(--s2)}
+.layer-name{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:3px}
+.layer-desc{font-size:11px;color:var(--t2);line-height:1.6}
+
+.scale-table{display:flex;flex-direction:column}
+.scale-row{display:grid;grid-template-columns:80px 1fr;align-items:baseline;gap:var(--s6);padding:var(--s3) 0;border-bottom:0.5px solid var(--border)}
+.scale-row:last-child{border-bottom:none}
+.scale-meta{font-family:var(--mono);font-size:10px;color:var(--t4);white-space:nowrap}
+.scale-ex{color:var(--t1)}
+
+.comp-section{margin-top:var(--s8)}
+.comp-label{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--t3);margin-bottom:var(--s4);padding-bottom:var(--s2);border-bottom:0.5px solid var(--border)}
+.badge-row{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center}
+.id-row{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center}
+
+.reframe-block{background:var(--bg-3);border:0.5px solid var(--border);border-radius:var(--r3);padding:var(--s5) var(--s6);margin-top:var(--s4)}
+.reframe-kicker{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:var(--s3)}
+.reframe-text{font-size:14px;line-height:1.7;color:var(--t1);font-weight:300}
+.reframe-text strong{font-weight:500}
+
+.btn-row{display:flex;gap:var(--s2);flex-wrap:wrap;align-items:center;margin-top:var(--s4)}
+.btn{font-family:var(--ui);font-size:12px;font-weight:500;padding:7px 16px;border-radius:var(--r1);border:none;cursor:pointer;transition:all 120ms;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--t1);color:var(--bg)}.btn-primary:hover{background:#fff}
+.btn-secondary{background:var(--bg-4);color:var(--t1);border:0.5px solid var(--border-med)}.btn-secondary:hover{background:var(--bg-5)}
+.btn-ghost{background:transparent;color:var(--t2);border:0.5px solid var(--border-med)}.btn-ghost:hover{color:var(--t1);border-color:var(--border-hi)}
+.btn-lim{background:var(--lim-bg);color:var(--lim);border:0.5px solid var(--lim-bd)}
+.btn-cog{background:var(--cog-bg);color:var(--cog);border:0.5px solid var(--cog-bd)}
+.btn-cv{background:var(--cv-bg);color:var(--cv);border:0.5px solid var(--cv-bd)}
+.btn-pt{background:var(--pt-bg);color:var(--pt);border:0.5px solid var(--pt-bd)}
+
+.kbase-card{background:var(--bg-3);border:0.5px solid var(--border);border-radius:var(--r3);padding:var(--s5);display:flex;flex-direction:column;gap:var(--s3)}
+.kbase-footer{display:flex;justify-content:space-between;align-items:center;padding-top:var(--s3);border-top:0.5px solid var(--border);font-family:var(--mono);font-size:10px;color:var(--t3)}
+.breadcrumb{display:flex;align-items:center;gap:var(--s2);font-size:11px;color:var(--t3);letter-spacing:0.06em;text-transform:uppercase}
+.breadcrumb-sep{color:var(--t4);font-size:10px}
+.breadcrumb-cur{color:var(--t2)}
+
+.term-table{display:flex;flex-direction:column}
+.term-row{display:grid;grid-template-columns:200px 1fr;gap:var(--s6);padding:var(--s4) 0;border-bottom:0.5px solid var(--border);align-items:start}
+.term-row:last-child{border-bottom:none}
+.term-name{font-size:12px;font-weight:500;color:var(--t1)}
+.term-type{font-family:var(--mono);font-size:10px;color:var(--t4);margin-top:2px}
+.term-def{font-size:12px;color:var(--t2);line-height:1.65}
+.term-def em{color:var(--t3);font-style:italic}
+.term-def strong{color:var(--t1);font-weight:500}
+
+.voice-compare{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);margin-top:var(--s4)}
+.vc-block{padding:var(--s4);border-radius:var(--r2)}
+.vc-dont{background:rgba(216,90,48,0.06);border:0.5px solid rgba(216,90,48,0.18)}
+.vc-do{background:rgba(29,158,117,0.06);border:0.5px solid rgba(29,158,117,0.18)}
+.vc-label{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s2)}
+.vc-do .vc-label{color:var(--pt)}.vc-dont .vc-label{color:var(--coral)}
+.vc-text{font-size:12px;line-height:1.7;color:var(--t2)}
+.vc-text em{color:var(--t3);font-style:italic}
+
+.brand-voice-split{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin-top:var(--s4)}
+.bv-card{padding:var(--s5);border-radius:var(--r3);border:0.5px solid var(--border);background:var(--bg-3)}
+.bv-brand{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:var(--s3)}
+.bv-attrs{display:flex;flex-direction:column;gap:var(--s2)}
+.bv-attr{font-size:12px;color:var(--t2);display:flex;gap:var(--s2)}
+.bv-attr span{color:var(--t1);font-weight:500;min-width:80px}
+
+.mark-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin-top:var(--s4)}
+.mark-cell{border-radius:var(--r3);padding:var(--s6);display:flex;flex-direction:column;align-items:flex-start;gap:var(--s3)}
+.mark-dark{background:var(--bg-3);border:0.5px solid var(--border)}
+.mark-light{background:var(--ga-parch);border:0.5px solid rgba(31,27,23,0.12)}
+.mark-mid{background:var(--bg-4);border:0.5px solid var(--border-med)}
+.mark-label{font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3)}
+.mark-note{font-size:11px;color:var(--t3);line-height:1.5}
+.wordmark-dark{display:flex;align-items:center;gap:10px}
+.wm-name{font-size:13px;font-weight:500;color:var(--t1)}
+.wm-sub{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--t3)}
+
+.token-block{background:var(--bg-3);border:0.5px solid var(--border-med);border-radius:var(--r3);padding:var(--s5) var(--s6);font-family:var(--mono);font-size:11px;line-height:2;color:var(--t3);margin-top:var(--s4);overflow-x:auto;white-space:pre;}
+.tk-comment{color:var(--t4)}.tk-name{color:var(--pt)}.tk-val{color:var(--t2)}.tk-lim{color:var(--lim)}.tk-cog{color:var(--cog)}.tk-cv{color:var(--cv)}.tk-coral{color:var(--coral)}
+
+.copy-btn{font-family:var(--ui);font-size:10px;font-weight:500;padding:3px 10px;border-radius:var(--r1);background:var(--bg-4);border:0.5px solid var(--border-med);color:var(--t3);cursor:pointer;transition:all 120ms;letter-spacing:0.04em;}
+.copy-btn:hover{color:var(--t1);border-color:var(--border-hi)}
+.token-header{display:flex;justify-content:space-between;align-items:center;margin-top:var(--s6);margin-bottom:var(--s2)}
+
+.mockup{background:var(--bg-2);border:0.5px solid var(--border-med);border-radius:var(--r4);padding:var(--s6);margin-top:var(--s4);}
+.mockup-label{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--t3);margin-bottom:var(--s5);display:flex;align-items:center;gap:var(--s3)}
+.mockup-label::after{content:'';flex:1;height:0.5px;background:var(--border)}
+.entity-hero-title{font-size:28px;font-weight:300;letter-spacing:-0.02em;color:var(--t1);line-height:1.15;margin-bottom:var(--s3)}
+.entity-hero-lead{font-size:13px;color:var(--t2);line-height:1.75;font-weight:300;max-width:440px}
+.detail-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);padding-top:var(--s4);border-top:0.5px solid var(--border);margin-top:var(--s5)}
+.detail-meta-item .label{margin-bottom:4px}
+.detail-meta-val{font-size:12px;color:var(--t2)}
+
+.reveal{opacity:0;transform:translateY(10px);transition:opacity 400ms cubic-bezier(0.16,1,0.3,1),transform 400ms cubic-bezier(0.16,1,0.3,1)}
+.reveal.on{opacity:1;transform:none}
+
+@media print{.sidebar{display:none}.shell{grid-template-columns:1fr}main{padding:0}}
+@media(max-width:860px){.shell{grid-template-columns:1fr}.sidebar{display:none}.grid-2,.grid-3,.grid-4,.brand-voice-split,.voice-compare,.mark-grid{grid-template-columns:1fr}.term-row{grid-template-columns:1fr}.cover-arch{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-mark">
+      <svg viewBox="0 0 60 56" width="22" height="20" aria-hidden="true">
+        <path d="M0,0 L22,0 L22,20 L30,28 L22,36 L22,56 L0,56 Z" fill="#CB4A2B"/>
+        <path d="M38,0 L60,0 L60,56 L38,56 L38,36 L30,28 L38,20 Z" fill="#18B09A"/>
+      </svg>
+      <span class="sb-title">Good Assumptions</span>
+    </div>
+    <div class="sb-sub">Unified Design System</div>
+  </div>
+  <div class="sb-meta">v1.0 · April 2026 · Internal</div>
+  <div class="sb-nav">
+    <a href="#cover">Overview</a>
+    <div class="sb-group">
+      <div class="sb-group-label">Foundation</div>
+      <a href="#architecture">Brand Architecture</a>
+      <a href="#color">Color &amp; Surfaces</a>
+      <a href="#entity-language">Entity Language</a>
+      <a href="#saeo-system">SAEO System</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Style</div>
+      <a href="#typography">Typography</a>
+      <a href="#components">Components</a>
+      <a href="#patterns">Page Patterns</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Language</div>
+      <a href="#vocabulary">Vocabulary</a>
+      <a href="#voice">Voice &amp; Tone</a>
+    </div>
+    <div class="sb-group">
+      <div class="sb-group-label">Reference</div>
+      <a href="#logo">Logo &amp; Mark</a>
+      <a href="#tokens">Token Reference</a>
+    </div>
+  </div>
+  <div class="sb-footer">goodassumptions.com<br>saeo.ai<br><br>Internal — do not distribute</div>
+</nav>
+
+<main>
+
+<div class="cover" id="cover">
+  <div class="cover-bg"></div>
+  <div class="cover-kicker">Good Assumptions · SAEO.ai</div>
+  <h1 class="cover-h1">Unified Design<br><em>System</em></h1>
+  <p class="cover-sub">One shared token layer. Two distinct expressions. This document is the source of truth for visual language, component patterns, and editorial vocabulary across both properties.</p>
+  <div class="cover-arch">
+    <div class="arch-card" style="border-color:rgba(203,74,43,0.25)">
+      <div class="arch-card-label" style="color:var(--saeo-coral)">Good Assumptions</div>
+      <div class="arch-card-name">The Guy Behind<br>the System</div>
+      <div class="arch-card-def">The platform's voice. Editorial intelligence. The human layer — behavioral science explained for practitioners who build brands.</div>
+    </div>
+    <div class="arch-card" style="border-color:rgba(24,176,154,0.25)">
+      <div class="arch-card-label" style="color:var(--saeo-teal)">SAEO.ai</div>
+      <div class="arch-card-name">The System Behind<br>the Guy</div>
+      <div class="arch-card-def">The intelligence machine. Problem localization engine. The structural layer — 164 transitions, 201 biases, 343 vectors, 3,334 tactics wired for diagnostic use.</div>
+    </div>
+  </div>
+  <div class="cover-meta">
+    <div class="meta-item"><span class="meta-label">Version</span><span class="meta-val">v1.0</span></div>
+    <div class="meta-item"><span class="meta-label">Updated</span><span class="meta-val">April 2026</span></div>
+    <div class="meta-item"><span class="meta-label">Font stack</span><span class="meta-val">DM Sans · DM Serif Display · DM Mono</span></div>
+    <div class="meta-item"><span class="meta-label">Dark mode</span><span class="meta-val">Primary · always .dark on root</span></div>
+  </div>
+</div>
+
+<div class="section reveal" id="architecture">
+  <div class="s-eyebrow"><span class="s-num">01</span> Foundation</div>
+  <h2 class="s-title">Brand Architecture</h2>
+  <p class="s-lead">Two brands, one shared language. The split is conceptual — GA is the editorial voice, SAEO is the intelligence substrate. Neither exists fully without the other.</p>
+  <div class="grid-2 mt-6">
+    <div class="card">
+      <div class="card-title" style="color:var(--saeo-coral)">Good Assumptions</div>
+      <div class="card-body"><strong style="color:var(--t1)">Role:</strong> Publishing, education, credibility.<br><strong style="color:var(--t1)">Tone:</strong> Earned skepticism. Calm authority. The practitioner's colleague.<br><strong style="color:var(--t1)">Surface:</strong> Dark editorial UI + warm parchment for print.<br><strong style="color:var(--t1)">Audience:</strong> Marketers who want to understand the psychology behind their work.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--saeo-teal)">SAEO.ai</div>
+      <div class="card-body"><strong style="color:var(--t1)">Role:</strong> Intelligence platform, diagnostic engine, chat tool.<br><strong style="color:var(--t1)">Tone:</strong> Precise, structured, direct. The system talking.<br><strong style="color:var(--t1)">Surface:</strong> Dark UI, same token layer as GA.<br><strong style="color:var(--t1)">Audience:</strong> Marketers who need to locate and solve a specific problem.</div>
+    </div>
+  </div>
+  <div class="callout teal mt-6"><strong>The thin line:</strong> GA is the person who built the system explaining why it works. SAEO is the system itself working. A user might read GA to understand threshold moments — and then open SAEO to diagnose one. That journey should feel continuous, not like switching tools.</div>
+  <div class="mt-6">
+    <div class="label">What they share</div>
+    <div class="grid-3 mt-4">
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--t1)">Token layer</strong><br>Same CSS variables — bg surfaces, text tiers, entity colors, type stack.</div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--t1)">Entity language</strong><br>Amber/purple/blue/green means the same thing on both properties.</div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--t1)">Vocabulary</strong><br>Liminal transition, threshold moment, causal legibility — shared terms.</div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--t1)">Type stack</strong><br>DM Sans · DM Serif Display · DM Mono across both.</div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--t1)">Dark ground</strong><br>Warm near-black (#0f0f0e) is canonical digital treatment for both.</div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--t1)">Component logic</strong><br>Badges, cards, IDs, reframe blocks — same patterns, same rules.</div></div>
+    </div>
+  </div>
+  <div class="mt-6">
+    <div class="label">What's distinct</div>
+    <div class="grid-2 mt-4">
+      <div class="card">
+        <div class="card-title">GA-specific</div>
+        <div class="card-body">— Warm parchment editorial palette (#f7f4ee) for print/white papers<br>— GA teal primary (#275e63) for light mode CTA<br>— GA gold accent (#b98f5a) for editorial highlight<br>— Long-form editorial layout patterns<br>— DM Serif Display used more liberally</div>
+      </div>
+      <div class="card">
+        <div class="card-title">SAEO-specific</div>
+        <div class="card-body">— SAEO mark colors as brand tokens (--saeo-coral, --saeo-teal)<br>— Chat interface patterns and message treatments<br>— Diagnostic layer color system (S/A/E/O)<br>— Reasoning mode indicators in causal maps<br>— Frame classification badges (Diagnostic / Intervention / etc.)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section reveal" id="color">
+  <div class="s-eyebrow"><span class="s-num">02</span> Color</div>
+  <h2 class="s-title">Color &amp; Surfaces</h2>
+  <p class="s-lead">The dark ground is primary. Warm near-black, not navy. The blue-tinted backgrounds (#0C1124) that were in SAEO are replaced — everything lives on the same warm dark substrate.</p>
+  <div class="mt-6">
+    <div class="label">Dark UI — Surfaces (5 layers)</div>
+    <div class="swatch-row mt-4">
+      <div class="swatch"><div class="swatch-block" style="background:#0f0f0e;border:0.5px solid var(--border-med)"></div><div class="swatch-name">Canvas</div><div class="swatch-hex">--bg · #0f0f0e</div><div class="swatch-role">Page bg</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#141412;border:0.5px solid var(--border-med)"></div><div class="swatch-name">Surface 1</div><div class="swatch-hex">--bg-2 · #141412</div><div class="swatch-role">Sidebar, nav</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#1a1a17;border:0.5px solid var(--border-med)"></div><div class="swatch-name">Surface 2</div><div class="swatch-hex">--bg-3 · #1a1a17</div><div class="swatch-role">Cards, panels</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#222220;border:0.5px solid var(--border-med)"></div><div class="swatch-name">Surface 3</div><div class="swatch-hex">--bg-4 · #222220</div><div class="swatch-role">Hover / active</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#2a2a27;border:0.5px solid var(--border-med)"></div><div class="swatch-name">Surface 4</div><div class="swatch-hex">--bg-5 · #2a2a27</div><div class="swatch-role">Deeply inset</div></div>
+    </div>
+  </div>
+  <div class="mt-8">
+    <div class="label">Text Tiers — WCAG AA+ throughout</div>
+    <div class="swatch-row mt-4">
+      <div class="swatch"><div class="swatch-block" style="background:#eae8de"></div><div class="swatch-name">Primary</div><div class="swatch-hex">--t1 · #eae8de</div><div class="swatch-role">All info-bearing text. 14:1</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#a8a59a"></div><div class="swatch-name">Secondary</div><div class="swatch-hex">--t2 · #a8a59a</div><div class="swatch-role">Supporting copy. 5.8:1</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#6a6860"></div><div class="swatch-name">Tertiary</div><div class="swatch-hex">--t3 · #6a6860</div><div class="swatch-role">Eyebrows/chrome only. 3.1:1</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#3d3c38"></div><div class="swatch-name">Ghost</div><div class="swatch-hex">--t4 · #3d3c38</div><div class="swatch-role">Decorative separators</div></div>
+    </div>
+    <div class="callout mt-4"><strong>Rule:</strong> --t3 and --t4 are for chrome only. Any text carrying information must use --t1 or --t2. No exceptions.</div>
+  </div>
+  <div class="mt-8">
+    <div class="label">GA Editorial — Light Mode (print, white papers, brand book)</div>
+    <div style="background:var(--ga-parch);border-radius:var(--r3);padding:var(--s6);border:0.5px solid rgba(31,27,23,0.12);margin-top:var(--s4)">
+      <div class="swatch-row">
+        <div class="swatch"><div class="swatch-block" style="background:#f7f4ee;border:0.5px solid rgba(31,27,23,0.12)"></div><div class="swatch-name" style="color:#1f1b17">Parchment</div><div class="swatch-hex" style="color:#6f675d">#f7f4ee</div></div>
+        <div class="swatch"><div class="swatch-block" style="background:#1f1b17"></div><div class="swatch-name" style="color:#1f1b17">Deep Text</div><div class="swatch-hex" style="color:#6f675d">#1f1b17</div></div>
+        <div class="swatch"><div class="swatch-block" style="background:#275e63"></div><div class="swatch-name" style="color:#1f1b17">GA Teal</div><div class="swatch-hex" style="color:#6f675d">#275e63</div></div>
+        <div class="swatch"><div class="swatch-block" style="background:#b98f5a"></div><div class="swatch-name" style="color:#1f1b17">Gold</div><div class="swatch-hex" style="color:#6f675d">#b98f5a</div></div>
+        <div class="swatch"><div class="swatch-block" style="background:#9a6b52"></div><div class="swatch-name" style="color:#1f1b17">Clay</div><div class="swatch-hex" style="color:#6f675d">#9a6b52</div></div>
+      </div>
+      <div style="margin-top:12px;font-size:11px;color:#6f675d">Editorial light mode is for print, PDFs, and the GA brand book only. Not used in the live digital product.</div>
+    </div>
+  </div>
+  <div class="mt-8">
+    <div class="label">SAEO Brand Mark Colors (exempt from entity semantic mapping)</div>
+    <div class="swatch-row mt-4">
+      <div class="swatch"><div class="swatch-block" style="background:#CB4A2B"></div><div class="swatch-name">SAEO Coral</div><div class="swatch-hex">--saeo-coral · #CB4A2B</div><div class="swatch-role">Mark left-half. Brand only.</div></div>
+      <div class="swatch"><div class="swatch-block" style="background:#18B09A"></div><div class="swatch-name">SAEO Teal</div><div class="swatch-hex">--saeo-teal · #18B09A</div><div class="swatch-role">Mark right-half. Brand only.</div></div>
+    </div>
+    <div class="callout coral mt-4"><strong>Important:</strong> --saeo-coral and --saeo-teal are mark-level brand tokens. They are not the same as --coral (O-layer) or --pt (tactics). Do not use them as semantic entity colors.</div>
+  </div>
+</div>
+
+<div class="section reveal" id="entity-language">
+  <div class="s-eyebrow"><span class="s-num">03</span> Color</div>
+  <h2 class="s-title">Entity Color Language</h2>
+  <p class="s-lead">The semantic layer of the color system. Each knowledge base entity type carries a fixed color identity across both GA and SAEO. The mapping never changes.</p>
+  <div style="display:flex;flex-direction:column;gap:var(--s2);margin-top:var(--s6)">
+    <div class="entity-row">
+      <div class="entity-bar" style="background:var(--lim)"></div>
+      <div><div class="entity-name" style="color:var(--lim)">Liminal Transitions</div><div class="entity-count">164 active · LIM-001 — LIM-140</div></div>
+      <div class="entity-chips"><span class="badge b-lim">Amber</span><code class="mono" style="font-size:11px">#FAC775</code></div>
+      <div class="entity-role">Threshold moments. The "when" layer of marketing failure.</div>
+    </div>
+    <div class="entity-row">
+      <div class="entity-bar" style="background:var(--cog)"></div>
+      <div><div class="entity-name" style="color:var(--cog)">Cognitive Biases</div><div class="entity-count">201 biases · Cog-001 — Cog-201</div></div>
+      <div class="entity-chips"><span class="badge b-cog">Purple</span><code class="mono" style="font-size:11px">#AFA9EC</code></div>
+      <div class="entity-role">Psychological mechanisms, heuristics, reasoning patterns.</div>
+    </div>
+    <div class="entity-row">
+      <div class="entity-bar" style="background:var(--cv)"></div>
+      <div><div class="entity-name" style="color:var(--cv)">Choice Vectors</div><div class="entity-count">343 vectors · CV-001 — CV-343</div></div>
+      <div class="entity-chips"><span class="badge b-cv">Blue</span><code class="mono" style="font-size:11px">#87BEF0</code></div>
+      <div class="entity-role">Decision-shaping forces. Environmental and contextual factors.</div>
+    </div>
+    <div class="entity-row">
+      <div class="entity-bar" style="background:var(--pt)"></div>
+      <div><div class="entity-name" style="color:var(--pt)">Primary Tactics</div><div class="entity-count">3,334 tactics · PT-XXXX</div></div>
+      <div class="entity-chips"><span class="badge b-pt">Green</span><code class="mono" style="font-size:11px">#5DCAA5</code></div>
+      <div class="entity-role">Actionable executional tactics. The "do" layer.</div>
+    </div>
+    <div class="entity-row">
+      <div class="entity-bar" style="background:var(--coral)"></div>
+      <div><div class="entity-name" style="color:var(--coral)">Alert / O-Layer / Fragility</div><div class="entity-count">Warning states · Post-resolution fragility</div></div>
+      <div class="entity-chips"><span class="badge b-coral">Coral</span><code class="mono" style="font-size:11px">#F0997B</code></div>
+      <div class="entity-role">Operations layer, failure states, post-resolution signals.</div>
+    </div>
+  </div>
+  <div class="callout mt-6"><strong>Application rule:</strong> Body copy — entity name renders in its color inline. Cards — color drives left-border accent (2px) and badge. The mapping is fixed. Never assign these colors to other content types.</div>
+  <div class="mt-8">
+    <div class="label">Full CSS triplet per entity</div>
+    <div class="grid-3 mt-4">
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--lim)">Liminal</strong><br><code class="mono">--lim: #FAC775</code><br><code class="mono">--lim-bg: rgba(186,117,23,.10)</code><br><code class="mono">--lim-bd: rgba(186,117,23,.25)</code></div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--cog)">Bias</strong><br><code class="mono">--cog: #AFA9EC</code><br><code class="mono">--cog-bg: rgba(127,119,221,.10)</code><br><code class="mono">--cog-bd: rgba(127,119,221,.25)</code></div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--cv)">Vector</strong><br><code class="mono">--cv: #87BEF0</code><br><code class="mono">--cv-bg: rgba(74,143,212,.10)</code><br><code class="mono">--cv-bd: rgba(74,143,212,.25)</code></div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--pt)">Tactic</strong><br><code class="mono">--pt: #5DCAA5</code><br><code class="mono">--pt-bg: rgba(29,158,117,.10)</code><br><code class="mono">--pt-bd: rgba(29,158,117,.25)</code></div></div>
+      <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">Coral</strong><br><code class="mono">--coral: #F0997B</code><br><code class="mono">--coral-bg: rgba(216,90,48,.10)</code><br><code class="mono">--coral-bd: rgba(216,90,48,.25)</code></div></div>
+      <div class="card-sm" style="background:var(--bg-4)"><div class="card-body" style="color:var(--t3)">Usage:<br>text → --[x]<br>badge bg → --[x]-bg<br>border → --[x]-bd<br>card left accent → --[x]</div></div>
+    </div>
+  </div>
+  <div class="mt-8">
+    <div class="label">Inline color — mixed entity example</div>
+    <div class="reframe-block" style="margin-top:var(--s3)">
+      <div class="reframe-kicker">Inline entity references in body copy</div>
+      <div class="reframe-text">The <strong style="color:var(--lim)">Trust Threshold</strong> transition activates when a consumer encounters information that conflicts with their existing <strong style="color:var(--cog)">Confirmation Bias</strong>. The brand's response — governed by <strong style="color:var(--cv)">Social Proof</strong> and <strong style="color:var(--pt)">Transparency Signaling</strong> — determines whether the transition resolves forward or collapses.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section reveal" id="saeo-system">
+  <div class="s-eyebrow"><span class="s-num">04</span> System</div>
+  <h2 class="s-title">SAEO Diagnostic System</h2>
+  <p class="s-lead">Four operational layers. Three reasoning modes. Fixed color assignments throughout all diagnostic outputs, chat responses, and knowledge base content.</p>
+  <div class="label mt-6">Diagnostic Layers</div>
+  <div class="layer-grid">
+    <div class="layer-card" style="border-left:2px solid var(--pt)"><div class="layer-code" style="color:var(--pt)">S</div><div class="layer-name">Strategy</div><div class="layer-desc">Brand positioning, audience definition, value proposition. Failure here means everything downstream is solving the wrong problem.</div><div style="margin-top:10px"><span class="badge b-pt">Green · #5DCAA5</span></div></div>
+    <div class="layer-card" style="border-left:2px solid var(--lim)"><div class="layer-code" style="color:var(--lim)">A</div><div class="layer-name">Application</div><div class="layer-desc">Campaign design, messaging architecture, channel selection. How strategy becomes execution.</div><div style="margin-top:10px"><span class="badge b-lim">Amber · #FAC775</span></div></div>
+    <div class="layer-card" style="border-left:2px solid var(--cv)"><div class="layer-code" style="color:var(--cv)">E</div><div class="layer-name">Execution</div><div class="layer-desc">Creative production, copy, media deployment. Most common misdiagnosis — brands fix creative when the problem is upstream.</div><div style="margin-top:10px"><span class="badge b-cv">Blue · #87BEF0</span></div></div>
+    <div class="layer-card" style="border-left:2px solid var(--coral)"><div class="layer-code" style="color:var(--coral)">O</div><div class="layer-name">Operations</div><div class="layer-desc">Processes, tech stack, team structure. Often the actual failure point that no one wants to diagnose.</div><div style="margin-top:10px"><span class="badge b-coral">Coral · #F0997B</span></div></div>
+  </div>
+  <div class="label mt-8">Reasoning Modes</div>
+  <div class="grid-3 mt-4">
+    <div class="card" style="border-left:2px solid var(--cog)"><div class="card-title" style="color:var(--cog)">Abductive</div><div class="card-body">Inference to the best explanation. <strong style="color:var(--t1)">Universal at threshold moments.</strong> Brands must become the most causally legible option to win both the human and AI inference.</div><div style="margin-top:10px"><span class="badge b-cog">Purple</span></div></div>
+    <div class="card" style="border-left:2px solid var(--lim)"><div class="card-title" style="color:var(--lim)">Inductive</div><div class="card-body">Pattern-based generalization. Used in post-transition consolidation and behavioral pattern recognition.</div><div style="margin-top:10px"><span class="badge b-lim">Amber</span></div></div>
+    <div class="card" style="border-left:2px solid var(--pt)"><div class="card-title" style="color:var(--pt)">Deductive</div><div class="card-body">Rule-application from established principles. Used in tactical recommendation once the transition type is confirmed.</div><div style="margin-top:10px"><span class="badge b-pt">Green</span></div></div>
+  </div>
+  <div class="callout cog mt-6"><strong>Key insight:</strong> AI query behavior is increasingly state-resolution behavior (abductive) — consumers at psychological thresholds confessing uncertainty, not seeking destinations. SEO was deductive. SAEO's intelligence layer is architected around this shift.</div>
+</div>
+
+<div class="section reveal" id="typography">
+  <div class="s-eyebrow"><span class="s-num">05</span> Typography</div>
+  <h2 class="s-title">Typography</h2>
+  <p class="s-lead">Three typefaces. One family. Strict role separation. Weight is precise: 300 for display prose, 400 for body, 500 for labels and UI.</p>
+  <div class="grid-3 mt-6">
+    <div class="card">
+      <div class="label">DM Sans — UI &amp; Body</div>
+      <div style="font-size:28px;font-weight:300;letter-spacing:-0.02em;color:var(--t1);margin:10px 0 4px">Behavioral</div>
+      <div style="font-size:28px;font-weight:500;letter-spacing:-0.02em;color:var(--t1)">Marketing</div>
+      <div style="font-size:14px;font-style:italic;font-weight:300;color:var(--t2);margin-top:4px">The assumption behind the assumption</div>
+      <div class="card-body mt-4">All body copy, nav, labels, form fields, tables. Weights: 300, 400, 500. Italic: 300.</div>
+    </div>
+    <div class="card">
+      <div class="label">DM Serif Display — Editorial</div>
+      <div style="font-family:var(--disp);font-size:28px;color:var(--t1);margin:10px 0 4px">Liminal Space</div>
+      <div style="font-family:var(--disp);font-size:28px;font-style:italic;color:var(--t2)">The moment before</div>
+      <div class="card-body mt-4">Section titles, editorial H1, brand guide. Never in UI components or data displays.</div>
+    </div>
+    <div class="card">
+      <div class="label">DM Mono — IDs &amp; Code</div>
+      <div style="font-family:var(--mono);font-size:16px;color:var(--t2);margin:10px 0;line-height:2">LIM-047<br>--entity-lim<br>#FAC775<br>3072d</div>
+      <div class="card-body">Entity IDs, CSS vars, code, hex values. Never for body copy.</div>
+    </div>
+  </div>
+  <div class="callout coral mt-6"><strong>Not in use:</strong> Satoshi and Zodiak (from early GA brand doc drafts) are retired. DM family is the unified stack.</div>
+  <div class="label mt-8">Type Scale</div>
+  <div class="scale-table mt-4">
+    <div class="scale-row"><span class="scale-meta">Display</span><span class="scale-ex" style="font-family:var(--disp);font-size:40px;font-weight:400;letter-spacing:-0.03em;line-height:1">Behavioral</span></div>
+    <div class="scale-row"><span class="scale-meta">H1 · 32px · 300</span><span class="scale-ex" style="font-size:28px;font-weight:300;letter-spacing:-0.02em;line-height:1.1">The Trust Threshold</span></div>
+    <div class="scale-row"><span class="scale-meta">H2 · 24px · 300</span><span class="scale-ex" style="font-size:22px;font-weight:300;letter-spacing:-0.015em">Pre-Transition Signals</span></div>
+    <div class="scale-row"><span class="scale-meta">H3 · 18px · 500</span><span class="scale-ex" style="font-size:17px;font-weight:500">Observable Metrics</span></div>
+    <div class="scale-row"><span class="scale-meta">Body · 15px · 400</span><span class="scale-ex" style="font-size:14px;font-weight:400">Consumers entering this transition demonstrate measurable hesitation patterns before completing high-stakes decisions.</span></div>
+    <div class="scale-row"><span class="scale-meta">Small · 13px</span><span class="scale-ex" style="font-size:12px;color:var(--t2)">Supporting context, card descriptions, secondary metadata.</span></div>
+    <div class="scale-row"><span class="scale-meta">Label · 11px · 500</span><span class="scale-ex" style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3)">Category · Subcategory · Type</span></div>
+    <div class="scale-row"><span class="scale-meta">Mono ID · 11px</span><span class="scale-ex" style="font-family:var(--mono);font-size:11px;color:var(--t3)">LIM-047 · Cog-112 · CV-208 · --entity-lim</span></div>
+  </div>
+</div>
+
+<div class="section reveal" id="components">
+  <div class="s-eyebrow"><span class="s-num">06</span> Components</div>
+  <h2 class="s-title">Components</h2>
+  <p class="s-lead">Small, well-defined set. Every component: surface → border → hierarchy → optional color accent.</p>
+  <div class="comp-section">
+    <div class="comp-label">Badges — entity type tags and status indicators</div>
+    <div class="badge-row"><span class="badge b-lim b-lim-dot">Liminal</span><span class="badge b-cog b-cog-dot">Cognitive Bias</span><span class="badge b-cv b-cv-dot">Choice Vector</span><span class="badge b-pt b-pt-dot">Tactic</span><span class="badge b-coral">Alert</span><span class="badge b-neutral">Universal</span></div>
+    <div class="badge-row mt-4"><span class="badge b-lim">Forward</span><span class="badge b-coral">Regressive</span><span class="badge b-cog">Post-Resolution</span><span class="badge b-pt">Resolved</span><span class="badge b-neutral">Tier 1</span></div>
+    <div class="callout mt-4">10px uppercase · letter-spacing 0.06em · bg = 10% tint · border = 25% tint. Never solid fills.</div>
+  </div>
+  <div class="comp-section">
+    <div class="comp-label">Entity IDs</div>
+    <div class="id-row"><span class="eid">LIM-047</span><span class="eid">Cog-112</span><span class="eid">CV-208</span><span class="eid">PT-1024</span><span class="eid">VERT-012</span></div>
+  </div>
+  <div class="comp-section">
+    <div class="comp-label">Breadcrumb navigation</div>
+    <div class="breadcrumb"><span>Good Assumptions</span><span class="breadcrumb-sep">›</span><span>Liminal States</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-cur">Trust Threshold</span></div>
+  </div>
+  <div class="comp-section">
+    <div class="comp-label">Knowledge base cards</div>
+    <div class="grid-2 mt-4">
+      <div class="kbase-card" style="border-left:2px solid var(--lim)"><div style="display:flex;align-items:center;gap:8px"><span class="eid">LIM-047</span><span class="badge b-lim">Forward</span></div><div style="font-size:13px;font-weight:500;color:var(--t1)">Trust Threshold</div><div style="font-size:12px;color:var(--t2);line-height:1.6">The moment a consumer evaluates whether new brand information is sufficient to revise an existing trust assessment.</div><div class="kbase-footer"><span>liminal-transition</span><span style="color:var(--lim)">Tier 1 ↗</span></div></div>
+      <div class="kbase-card" style="border-left:2px solid var(--cog)"><div style="display:flex;align-items:center;gap:8px"><span class="eid">Cog-001</span><span class="badge b-cog">Bias</span></div><div style="font-size:13px;font-weight:500;color:var(--t1)">Loss Aversion</div><div style="font-size:12px;color:var(--t2);line-height:1.6">Losses feel approximately twice as significant as equivalent gains — a 2:1 pain/pleasure asymmetry.</div><div class="kbase-footer"><span>cognitive-bias</span><span style="color:var(--cog)">High impact ↗</span></div></div>
+    </div>
+  </div>
+  <div class="comp-section">
+    <div class="comp-label">Reframe block</div>
+    <div class="reframe-block"><div class="reframe-kicker">Reframe</div><div class="reframe-text">This isn't a funnel stage. It's a <strong style="color:var(--lim)">psychological inflection point</strong> — the moment your brand either gains or permanently loses the standing to speak to this consumer's decision.</div></div>
+    <div class="callout mt-4">Every entity detail page carries a reframe block. Always labeled "Reframe." Key term highlighted in entity's semantic color. Max 2 sentences.</div>
+  </div>
+  <div class="comp-section">
+    <div class="comp-label">Button system</div>
+    <div class="btn-row"><button class="btn btn-primary">Ask SAEO</button><button class="btn btn-secondary">Explore Related</button><button class="btn btn-ghost">View Evidence</button><button class="btn btn-lim">Liminal States ↗</button><button class="btn btn-cog">Biases ↗</button><button class="btn btn-pt">Tactics ↗</button></div>
+  </div>
+</div>
+
+<div class="section reveal" id="patterns">
+  <div class="s-eyebrow"><span class="s-num">07</span> Application</div>
+  <h2 class="s-title">Page Patterns</h2>
+  <p class="s-lead">Three canonical page types. Each: breadcrumb → eyebrow → hero → content → related. Entity color determines accent treatment throughout.</p>
+  <div class="mockup">
+    <div class="mockup-label">Pattern A — Entity Detail (Liminal State)</div>
+    <div class="breadcrumb" style="margin-bottom:20px"><span>Good Assumptions</span><span class="breadcrumb-sep">›</span><span>Liminal States</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-cur">Trust Threshold</span></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span class="eid">LIM-047</span><span class="badge b-lim">Forward</span><span class="badge b-neutral">Tier 1</span><span class="badge b-neutral">Universal</span></div>
+    <div style="font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--t3);margin-bottom:8px">Liminal Transition</div>
+    <div class="entity-hero-title">The Trust Threshold</div>
+    <div class="entity-hero-lead">A forward transition in which a consumer evaluates whether new brand information is sufficient to revise an existing trust assessment.</div>
+    <div class="detail-meta">
+      <div class="detail-meta-item"><div class="label">Key Signal</div><div class="detail-meta-val">Increased information-seeking before conversion</div></div>
+      <div class="detail-meta-item"><div class="label">Resolution Window</div><div class="detail-meta-val">2–7 days post-trigger</div></div>
+      <div class="detail-meta-item"><div class="label">Primary Mechanism</div><div class="detail-meta-val"><span style="color:var(--cog)">Confirmation Bias</span> + <span style="color:var(--cv)">Social Proof</span></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="section reveal" id="vocabulary">
+  <div class="s-eyebrow"><span class="s-num">08</span> Language</div>
+  <h2 class="s-title">Vocabulary</h2>
+  <p class="s-lead">The language library. Terms used across GA and SAEO with precise definitions. Use them accurately or not at all.</p>
+  <div class="label mt-6">Core Framework Terms</div>
+  <div class="term-table mt-4">
+    <div class="term-row"><div><div class="term-name">Liminal Transition</div><div class="term-type">noun · entity type</div></div><div class="term-def">A discrete psychological state a consumer moves through when making a significant behavioral change. Not a funnel stage — <strong>a threshold moment</strong> with pre-state, trigger, and post-state. Always "liminal transition" — never "stage" or "step."</div></div>
+    <div class="term-row"><div><div class="term-name">Threshold Moment</div><div class="term-type">noun · concept</div></div><div class="term-def">The precise point of behavioral inflection where the consumer's reasoning mode shifts. <strong>Where brands win or permanently lose standing.</strong> Interchangeable with "transition point" but "threshold" carries more editorial weight.</div></div>
+    <div class="term-row"><div><div class="term-name">Collision Intelligence</div><div class="term-type">noun · methodology</div></div><div class="term-def">Breakthrough insights from the systematic combination of behavioral concepts across unrelated domains. The core methodology behind SAEO. <em>"Ideas having sex"</em> — not retrieval, combinatorial. Never "AI-generated" as synonym.</div></div>
+    <div class="term-row"><div><div class="term-name">Causal Legibility</div><div class="term-type">noun · concept</div></div><div class="term-def">The degree to which a brand presents itself as the most causally convincing explanation for a consumer's uncertainty. <strong>At threshold moments, brands must become the most causally legible option</strong> to win both the human's inference and the AI's inference simultaneously.</div></div>
+    <div class="term-row"><div><div class="term-name">Brand Standing</div><div class="term-type">noun · concept</div></div><div class="term-def">A brand's earned right to speak to a consumer's decision at a specific threshold moment. Domain-specific and earned, not assumed. Never "brand equity" when standing is the more precise term.</div></div>
+    <div class="term-row"><div><div class="term-name">Problem Localization</div><div class="term-type">noun · function</div></div><div class="term-def">The SAEO diagnostic function — identifying which S/A/E/O layer a marketing failure lives in. <strong>SAEO is a problem localization engine first.</strong> Lead with this, not "intelligence platform."</div></div>
+    <div class="term-row"><div><div class="term-name">Post-Resolution Fragility</div><div class="term-type">noun · state</div></div><div class="term-def">The psychological vulnerability persisting after a consumer resolves a liminal transition. Seven named states (LIM-134–LIM-140): Hollow Compliance, Consolidation Abandonment, Advocate Betrayal, Second Failure Collapse, Suppressed Grievance, Trust Overextension, Hollow Retention.</div></div>
+    <div class="term-row"><div><div class="term-name">The Weight of Why</div><div class="term-type">phrase · brand concept</div></div><div class="term-def">The prior question neither production nor distribution answers: <em>what does the consumer need to move at this threshold, and does this brand have standing to provide it.</em> Use as a section header or editorial frame, not marketing copy.</div></div>
+    <div class="term-row"><div><div class="term-name">GEO</div><div class="term-type">acronym · strategy</div></div><div class="term-def">Generative Engine Optimization. Structuring content so AI systems surface it accurately in response to consumer queries. GA's content strategy is GEO-first. Never conflate with SEO — the underlying query behavior is fundamentally different (abductive vs. deductive).</div></div>
+  </div>
+  <div class="label mt-8">Words We Don't Use</div>
+  <div class="grid-3 mt-4">
+    <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">Journey</strong><br><span style="color:var(--t3)">→ transition or threshold</span></div></div>
+    <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">Funnel stage</strong><br><span style="color:var(--t3)">→ transition or behavioral state</span></div></div>
+    <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">Delight / connect</strong><br><span style="color:var(--t3)">→ name the specific mechanism</span></div></div>
+    <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">AI-generated</strong><br><span style="color:var(--t3)">→ collision intelligence</span></div></div>
+    <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">Empower / enable</strong><br><span style="color:var(--t3)">→ state what actually changes</span></div></div>
+    <div class="card-sm"><div class="card-body"><strong style="color:var(--coral)">Best practices</strong><br><span style="color:var(--t3)">→ evidence-grounded / cite research</span></div></div>
+  </div>
+</div>
+
+<div class="section reveal" id="voice">
+  <div class="s-eyebrow"><span class="s-num">09</span> Language</div>
+  <h2 class="s-title">Voice &amp; Tone</h2>
+  <p class="s-lead">Two voices, one epistemic foundation. GA is the author explaining the system. SAEO is the system speaking.</p>
+  <div class="brand-voice-split">
+    <div class="bv-card" style="border-left:2px solid var(--saeo-coral)">
+      <div class="bv-brand" style="color:var(--saeo-coral)">Good Assumptions — Editorial Voice</div>
+      <div class="bv-attrs">
+        <div class="bv-attr"><span>Precise</span>Names the mechanism. Doesn't hedge when evidence says otherwise.</div>
+        <div class="bv-attr"><span>Skeptical</span>GenX epistemic baseline. Show your work. Acknowledge limits.</div>
+        <div class="bv-attr"><span>Calm</span>Never urgent. Talking with — not at — a practitioner.</div>
+        <div class="bv-attr"><span>Direct</span>Claim first, evidence second. No preamble.</div>
+        <div class="bv-attr"><span>Reframing</span>Challenges received wisdom. Sets up the behavioral counter.</div>
+      </div>
+    </div>
+    <div class="bv-card" style="border-left:2px solid var(--saeo-teal)">
+      <div class="bv-brand" style="color:var(--saeo-teal)">SAEO.ai — System Voice</div>
+      <div class="bv-attrs">
+        <div class="bv-attr"><span>Diagnostic</span>Identifies which layer the problem lives in before offering solutions.</div>
+        <div class="bv-attr"><span>Structured</span>layer → transition → mechanism → tactic.</div>
+        <div class="bv-attr"><span>Evidence-cited</span>Names source biases and vectors. No vague "psychology."</div>
+        <div class="bv-attr"><span>Non-prescriptive</span>Surfaces what the consumer needs, not what client wants to hear.</div>
+        <div class="bv-attr"><span>Abductive</span>Frames answers as "most likely given these signals."</div>
+      </div>
+    </div>
+  </div>
+  <div class="voice-compare mt-6">
+    <div class="vc-block vc-dont"><div class="vc-label">✗ Don't</div><div class="vc-text"><em>It's really important that marketers understand how consumer psychology plays a role in the exciting journey through the funnel.</em></div></div>
+    <div class="vc-block vc-do"><div class="vc-label">✓ Do</div><div class="vc-text">Funnel stages don't exist as psychological states. Consumers transition between discrete behavioral modes — and the transition itself is where brands lose.</div></div>
+    <div class="vc-block vc-dont"><div class="vc-label">✗ Don't</div><div class="vc-text"><em>Understanding cognitive biases can help you better connect with customers on their journey.</em></div></div>
+    <div class="vc-block vc-do"><div class="vc-label">✓ Do</div><div class="vc-text">It's not about understanding your audience better. It's about understanding what your audience's nervous system is optimized to do — and whether your brand is working with it or against it.</div></div>
+  </div>
+</div>
+
+<div class="section reveal" id="logo">
+  <div class="s-eyebrow"><span class="s-num">10</span> Identity</div>
+  <h2 class="s-title">Logo &amp; Mark</h2>
+  <p class="s-lead">Two mirrored halves forming a diamond negative space at the collision point. The shape is the concept: two domains meeting, the insight lives in the gap.</p>
+  <div class="mark-grid">
+    <div class="mark-cell mark-dark">
+      <div class="mark-label">Primary — dark ground</div>
+      <div class="wordmark-dark"><svg viewBox="0 0 60 56" width="28" height="26"><path d="M0,0 L22,0 L22,20 L30,28 L22,36 L22,56 L0,56 Z" fill="#CB4A2B"/><path d="M38,0 L60,0 L60,56 L38,56 L38,36 L30,28 L38,20 Z" fill="#18B09A"/></svg><div><div class="wm-name">SAEO</div><div class="wm-sub">Intelligence</div></div></div>
+      <div class="mark-note">Default. Always on --bg or --bg-2.</div>
+    </div>
+    <div class="mark-cell mark-light">
+      <div class="mark-label" style="color:#6f675d">Light / print</div>
+      <div style="display:flex;align-items:center;gap:10px"><svg viewBox="0 0 60 56" width="28" height="26"><path d="M0,0 L22,0 L22,20 L30,28 L22,36 L22,56 L0,56 Z" fill="#CB4A2B"/><path d="M38,0 L60,0 L60,56 L38,56 L38,36 L30,28 L38,20 Z" fill="#18B09A"/></svg><div><div style="font-size:13px;font-weight:500;color:#1f1b17">SAEO</div><div style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#9a6b52">Intelligence</div></div></div>
+      <div class="mark-note" style="color:#6f675d">Both mark colors hold on parchment.</div>
+    </div>
+    <div class="mark-cell mark-mid">
+      <div class="mark-label">Mono fallback</div>
+      <div style="display:flex;align-items:center;gap:10px"><svg viewBox="0 0 60 56" width="28" height="26"><path d="M0,0 L22,0 L22,20 L30,28 L22,36 L22,56 L0,56 Z" fill="#70a8ae"/><path d="M38,0 L60,0 L60,56 L38,56 L38,36 L30,28 L38,20 Z" fill="#1f1b17" opacity="0.7"/></svg><div><div class="wm-name">SAEO</div><div class="wm-sub">Intelligence</div></div></div>
+      <div class="mark-note">Single-color print, emboss, engraving.</div>
+    </div>
+  </div>
+  <div class="callout mt-6"><strong>The mark as concept:</strong> Left-half (coral) = the problem, the crisis, the thing needing diagnosis. Right-half (teal) = the resolution, the intelligence, the forward motion. The diamond gap = the insight. This is the methodology made visual.</div>
+</div>
+
+<div class="section reveal" id="tokens">
+  <div class="s-eyebrow"><span class="s-num">11</span> Reference</div>
+  <h2 class="s-title">Token Reference</h2>
+  <p class="s-lead">Full CSS variable set. Copy the dark block into <code class="mono">:root</code>. Light editorial block is for GA print contexts only.</p>
+
+  <div class="token-header">
+    <span class="label" style="margin:0">Dark UI + Shared Tokens</span>
+    <button class="copy-btn" onclick="copyBlock('dark-tokens')">Copy</button>
+  </div>
+  <div class="token-block" id="dark-tokens"><span class="tk-comment">/* ── Surfaces ── */</span>
+<span class="tk-name">--bg</span>:    <span class="tk-val">#0f0f0e</span>;   <span class="tk-comment">/* canvas */</span>
+<span class="tk-name">--bg-2</span>:  <span class="tk-val">#141412</span>;   <span class="tk-comment">/* sidebar, nav */</span>
+<span class="tk-name">--bg-3</span>:  <span class="tk-val">#1a1a17</span>;   <span class="tk-comment">/* cards, panels */</span>
+<span class="tk-name">--bg-4</span>:  <span class="tk-val">#222220</span>;   <span class="tk-comment">/* hover, active */</span>
+<span class="tk-name">--bg-5</span>:  <span class="tk-val">#2a2a27</span>;   <span class="tk-comment">/* deeply inset */</span>
+
+<span class="tk-comment">/* ── Text — WCAG AA+ ── */</span>
+<span class="tk-name">--t1</span>:    <span class="tk-val">#eae8de</span>;   <span class="tk-comment">/* primary — 14:1 */</span>
+<span class="tk-name">--t2</span>:    <span class="tk-val">#a8a59a</span>;   <span class="tk-comment">/* secondary — 5.8:1 */</span>
+<span class="tk-name">--t3</span>:    <span class="tk-val">#6a6860</span>;   <span class="tk-comment">/* decorative chrome — 3.1:1 */</span>
+<span class="tk-name">--t4</span>:    <span class="tk-val">#3d3c38</span>;   <span class="tk-comment">/* ghost / disabled */</span>
+
+<span class="tk-comment">/* ── Borders ── */</span>
+<span class="tk-name">--border</span>:     <span class="tk-val">rgba(255,255,255,0.07)</span>;
+<span class="tk-name">--border-med</span>: <span class="tk-val">rgba(255,255,255,0.13)</span>;
+<span class="tk-name">--border-hi</span>:  <span class="tk-val">rgba(255,255,255,0.22)</span>;
+
+<span class="tk-comment">/* ── Entity Colors ── */</span>
+<span class="tk-lim">--lim</span>:       <span class="tk-val">#FAC775</span>;   <span class="tk-comment">/* amber — liminal transitions */</span>
+<span class="tk-lim">--lim-bg</span>:   <span class="tk-val">rgba(186,117,23,0.10)</span>;
+<span class="tk-lim">--lim-bd</span>:   <span class="tk-val">rgba(186,117,23,0.25)</span>;
+
+<span class="tk-cog">--cog</span>:       <span class="tk-val">#AFA9EC</span>;   <span class="tk-comment">/* purple — cognitive biases */</span>
+<span class="tk-cog">--cog-bg</span>:   <span class="tk-val">rgba(127,119,221,0.10)</span>;
+<span class="tk-cog">--cog-bd</span>:   <span class="tk-val">rgba(127,119,221,0.25)</span>;
+
+<span class="tk-cv">--cv</span>:        <span class="tk-val">#87BEF0</span>;   <span class="tk-comment">/* blue — choice vectors */</span>
+<span class="tk-cv">--cv-bg</span>:    <span class="tk-val">rgba(74,143,212,0.10)</span>;
+<span class="tk-cv">--cv-bd</span>:    <span class="tk-val">rgba(74,143,212,0.25)</span>;
+
+<span class="tk-name">--pt</span>:        <span class="tk-val">#5DCAA5</span>;   <span class="tk-comment">/* green — primary tactics */</span>
+<span class="tk-name">--pt-bg</span>:    <span class="tk-val">rgba(29,158,117,0.10)</span>;
+<span class="tk-name">--pt-bd</span>:    <span class="tk-val">rgba(29,158,117,0.25)</span>;
+
+<span class="tk-coral">--coral</span>:     <span class="tk-val">#F0997B</span>;   <span class="tk-comment">/* coral — alert, O-layer, fragility */</span>
+<span class="tk-coral">--coral-bg</span>: <span class="tk-val">rgba(216,90,48,0.10)</span>;
+<span class="tk-coral">--coral-bd</span>: <span class="tk-val">rgba(216,90,48,0.25)</span>;
+
+<span class="tk-comment">/* ── SAEO Mark (brand-level, not semantic) ── */</span>
+<span class="tk-name">--saeo-coral</span>: <span class="tk-val">#CB4A2B</span>;
+<span class="tk-name">--saeo-teal</span>:  <span class="tk-val">#18B09A</span>;
+
+<span class="tk-comment">/* ── Typography ── */</span>
+<span class="tk-name">--font-ui</span>:   <span class="tk-val">'DM Sans', system-ui, sans-serif</span>;
+<span class="tk-name">--font-disp</span>: <span class="tk-val">'DM Serif Display', Georgia, serif</span>;
+<span class="tk-name">--font-mono</span>: <span class="tk-val">'DM Mono', monospace</span>;</div>
+
+  <div class="token-header">
+    <span class="label" style="margin:0">GA Editorial Light (print only)</span>
+    <button class="copy-btn" onclick="copyBlock('light-tokens')">Copy</button>
+  </div>
+  <div class="token-block" id="light-tokens"><span class="tk-comment">/* ── GA Light Mode ── */</span>
+<span class="tk-name">--ga-parch</span>:    <span class="tk-val">#f7f4ee</span>;
+<span class="tk-name">--ga-surface</span>:  <span class="tk-val">#fcfaf6</span>;
+<span class="tk-name">--ga-border</span>:   <span class="tk-val">rgba(31,27,23,0.08)</span>;
+<span class="tk-name">--ga-text</span>:     <span class="tk-val">#1f1b17</span>;
+<span class="tk-name">--ga-muted</span>:    <span class="tk-val">#6f675d</span>;
+<span class="tk-name">--ga-teal</span>:     <span class="tk-val">#275e63</span>;
+<span class="tk-name">--ga-gold</span>:     <span class="tk-val">#b98f5a</span>;
+<span class="tk-name">--ga-clay</span>:     <span class="tk-val">#9a6b52</span>;
+
+<span class="tk-comment">/* Entity on light bg (dark text) */</span>
+<span class="tk-lim">--lim-light</span>:  <span class="tk-val">#8C5A0F</span>;
+<span class="tk-cog">--cog-light</span>:  <span class="tk-val">#3C3489</span>;
+<span class="tk-cv">--cv-light</span>:   <span class="tk-val">#0C447C</span>;
+<span class="tk-name">--pt-light</span>:   <span class="tk-val">#085041</span>;</div>
+
+  <div class="token-header">
+    <span class="label" style="margin:0">Tailwind shadcn dark HSL values</span>
+    <button class="copy-btn" onclick="copyBlock('tw-tokens')">Copy</button>
+  </div>
+  <div class="token-block" id="tw-tokens"><span class="tk-comment">/* .dark { in globals.css @layer base } */</span>
+<span class="tk-name">--background</span>:       <span class="tk-val">40 4% 6%</span>;       <span class="tk-comment">/* #0f0f0e warm */</span>
+<span class="tk-name">--foreground</span>:       <span class="tk-val">40 10% 91%</span>;     <span class="tk-comment">/* #eae8de */</span>
+<span class="tk-name">--card</span>:             <span class="tk-val">40 4% 8%</span>;
+<span class="tk-name">--muted</span>:            <span class="tk-val">40 4% 12%</span>;
+<span class="tk-name">--muted-foreground</span>: <span class="tk-val">40 6% 56%</span>;      <span class="tk-comment">/* #a8a59a */</span>
+<span class="tk-name">--primary</span>:          <span class="tk-val">174 72% 40%</span>;    <span class="tk-comment">/* SAEO teal */</span>
+<span class="tk-name">--ring</span>:             <span class="tk-val">174 72% 40%</span>;
+<span class="tk-name">--border</span>:           <span class="tk-val">40 5% 18%</span>;
+<span class="tk-name">--accent</span>:           <span class="tk-val">40 4% 14%</span>;</div>
+
+</div>
+
+</main>
+</div>
+
+<script>
+const obs = new IntersectionObserver(e => {
+  e.forEach(el => { if(el.isIntersecting){ el.target.classList.add('on'); obs.unobserve(el.target); } });
+}, {threshold:0.06});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+const links = document.querySelectorAll('.sb-nav a');
+const navMap = {};
+links.forEach(a => { const id = a.getAttribute('href')?.slice(1); if(id) navMap[id] = a; });
+const sectObs = new IntersectionObserver(e => {
+  e.forEach(el => {
+    if(el.isIntersecting){ links.forEach(l => l.classList.remove('active')); if(navMap[el.target.id]) navMap[el.target.id].classList.add('active'); }
+  });
+}, {rootMargin:'-15% 0px -75% 0px'});
+document.querySelectorAll('[id]').forEach(s => sectObs.observe(s));
+
+function copyBlock(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    const btn = el.previousElementSibling.querySelector('.copy-btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+</script>
+</body>
+</html>
