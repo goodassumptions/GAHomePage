@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAEO Diagnostic — Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0f0f0e;
+    --bg-2:       #161614;
+    --bg-3:       #1e1e1b;
+    --border:     rgba(255,255,255,0.08);
+    --border-med: rgba(255,255,255,0.14);
+    --text-1:     #e8e6dc;
+    --text-2:     #9c9a8e;
+    --text-3:     #5c5b54;
+
+    --green:      #1D9E75;
+    --green-bg:   rgba(29,158,117,0.12);
+    --green-text: #5DCAA5;
+    --amber:      #BA7517;
+    --amber-bg:   rgba(186,117,23,0.12);
+    --amber-text: #FAC775;
+    --red:        #D85A30;
+    --red-bg:     rgba(216,90,48,0.12);
+    --red-text:   #F0997B;
+    --purple:     #7F77DD;
+    --purple-bg:  rgba(127,119,221,0.12);
+    --purple-text:#AFA9EC;
+    --blue:       #4A8FD4;
+    --blue-bg:    rgba(74,143,212,0.12);
+    --blue-text:  #87BEF0;
+
+    --s-col: #5DCAA5; --s-bg: rgba(29,158,117,0.10);
+    --a-col: #FAC775; --a-bg: rgba(186,117,23,0.10);
+    --e-col: #87BEF0; --e-bg: rgba(74,143,212,0.10);
+    --o-col: #F0997B; --o-bg: rgba(216,90,48,0.10);
+
+    --abd-col: #AFA9EC; --abd-bg: rgba(127,119,221,0.10);
+    --ind-col: #FAC775; --ind-bg: rgba(186,117,23,0.10);
+    --ded-col: #5DCAA5; --ded-bg: rgba(29,158,117,0.10);
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+  /* ── Header ── */
+  .page-header {
+    padding: 64px 0 52px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .ga-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .page-title {
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+  }
+  .page-title em { font-style: italic; color: var(--text-2); }
+  .page-intro {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.75;
+    max-width: 580px;
+    font-weight: 300;
+    margin-bottom: 28px;
+  }
+  .page-intro strong { color: var(--text-1); font-weight: 500; }
+  .page-divider {
+    width: 32px;
+    height: 0.5px;
+    background: var(--border-med);
+    margin-bottom: 24px;
+  }
+  .page-secondary {
+    font-size: 14px;
+    color: var(--text-3);
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 520px;
+  }
+
+  /* ── What SAEO is ── */
+  .saeo-intro {
+    margin-bottom: 56px;
+  }
+  .saeo-letters {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .saeo-letter-card {
+    border-radius: 10px;
+    padding: 18px 14px;
+    border: 0.5px solid var(--border);
+  }
+  .slc-s { background: var(--s-bg); border-color: rgba(29,158,117,0.2); }
+  .slc-a { background: var(--a-bg); border-color: rgba(186,117,23,0.2); }
+  .slc-e { background: var(--e-bg); border-color: rgba(74,143,212,0.2); }
+  .slc-o { background: var(--o-bg); border-color: rgba(216,90,48,0.2); }
+  .sl-letter {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 5px;
+    line-height: 1;
+  }
+  .sl-s .sl-letter { color: var(--s-col); }
+  .sl-a .sl-letter { color: var(--a-col); }
+  .sl-e .sl-letter { color: var(--e-col); }
+  .sl-o .sl-letter { color: var(--o-col); }
+  .sl-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 5px;
+    display: block;
+  }
+  .sl-desc {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+
+  .saeo-what {
+    background: var(--bg-3);
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .saeo-what-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+  .saeo-what-text {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+  .saeo-what-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Sections ── */
+  .section {
+    padding-bottom: 60px;
+    margin-bottom: 56px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .section-eyebrow {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 10px;
+  }
+  .section-heading {
+    font-size: 30px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.2;
+    margin-bottom: 14px;
+    letter-spacing: -0.02em;
+  }
+  .section-hook {
+    font-size: 16px;
+    color: var(--text-2);
+    line-height: 1.7;
+    font-style: italic;
+    font-weight: 300;
+    margin-bottom: 24px;
+    max-width: 580px;
+  }
+  .prose {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.85;
+    font-weight: 300;
+    max-width: 600px;
+    margin-bottom: 24px;
+  }
+  .prose strong { color: var(--text-1); font-weight: 500; }
+  .prose:last-child { margin-bottom: 0; }
+
+  /* ── Insight panel ── */
+  .insight {
+    background: var(--bg-3);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-top: 20px;
+  }
+  .insight-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .insight-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    padding-top: 2px;
+  }
+  .itag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .itag-abd  { background: var(--abd-bg); color: var(--abd-col); }
+  .itag-key  { background: var(--red-bg); color: var(--red-text); }
+  .itag-lens { background: var(--blue-bg); color: var(--blue-text); }
+  .itag-green { background: var(--green-bg); color: var(--green-text); }
+
+  .insight-text {
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .insight-text strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Dimension cards ── */
+  .dim-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .dim-card {
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    background: var(--bg-2);
+    overflow: hidden;
+    display: flex;
+  }
+  .dim-stripe { width: 3px; flex-shrink: 0; }
+  .ds-s { background: var(--s-col); }
+  .ds-a { background: var(--a-col); }
+  .ds-e { background: var(--e-col); }
+  .ds-o { background: var(--o-col); }
+
+  .dim-inner { flex: 1; padding: 16px 18px; }
+  .dim-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .dim-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .db-s { background: var(--s-bg); color: var(--s-col); }
+  .db-a { background: var(--a-bg); color: var(--a-col); }
+  .db-e { background: var(--e-bg); color: var(--e-col); }
+  .db-o { background: var(--o-bg); color: var(--o-col); }
+
+  .dim-name { font-size: 13px; font-weight: 500; color: var(--text-1); }
+  .dim-def {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 12px;
+  }
+  .dim-rows { display: flex; flex-direction: column; gap: 6px; }
+  .dim-row { display: flex; gap: 10px; align-items: flex-start; }
+  .dr-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    flex-shrink: 0;
+    width: 64px;
+    padding-top: 1px;
+  }
+  .dr-text {
+    font-size: 11px;
+    color: var(--text-2);
+    line-height: 1.55;
+    font-weight: 300;
+    font-style: italic;
+  }
+  .dr-text.misroute { color: var(--amber-text); font-style: normal; }
+
+  /* ── Reasoning mode cards ── */
+  .mode-stack { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+  .mode-card {
+    border-radius: 10px;
+    border: 0.5px solid var(--border);
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+  .mode-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px 14px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .mode-pill {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 4px;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .mp-abd { background: var(--abd-bg); color: var(--abd-col); }
+  .mp-ind { background: var(--ind-bg); color: var(--ind-col); }
+  .mp-ded { background: var(--ded-bg); color: var(--ded-col); }
+
+  .mode-header-text { flex: 1; }
+  .mode-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 3px;
+    line-height: 1.35;
+  }
+  .mode-tagline {
+    font-size: 12px;
+    color: var(--text-3);
+    font-style: italic;
+    font-weight: 300;
+    font-family: var(--font-mono);
+  }
+
+  .mode-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  @media (max-width: 580px) {
+    .mode-body { grid-template-columns: 1fr; }
+    .m-cell + .m-cell { border-left: none !important; border-top: 0.5px solid var(--border); }
+  }
+  .m-cell { padding: 12px 16px; }
+  .m-cell + .m-cell { border-left: 0.5px solid var(--border); }
+  .m-cell-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .m-cell-text {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+  .m-cell-text.frame   { color: var(--green-text); }
+  .m-cell-text.caution { color: var(--amber-text); }
+
+  /* ── Routing visual ── */
+  .routing-diagram {
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .routing-header {
+    padding: 12px 18px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--bg-3);
+  }
+  .routing-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+  .routing-sub {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+  }
+  .routing-body {
+    background: var(--bg-2);
+    padding: 20px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rt-entry {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+  .rt-ball {
+    background: var(--bg-3);
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 12px;
+    color: var(--text-2);
+    font-style: italic;
+    text-align: center;
+    max-width: 380px;
+    line-height: 1.5;
+  }
+  .rt-ball strong { color: var(--text-1); font-style: normal; }
+
+  .rt-arrow {
+    text-align: center;
+    color: var(--text-3);
+    font-size: 16px;
+    margin: 6px 0;
+  }
+
+  .rt-step-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+    font-family: var(--font-mono);
+    text-align: center;
+  }
+
+  .rt-modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .rt-mode {
+    border-radius: 6px;
+    padding: 10px 10px;
+    text-align: center;
+    border: 0.5px solid var(--border);
+  }
+  .rt-mode-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .rt-mode-text { font-size: 10px; color: var(--text-3); line-height: 1.4; }
+  .rtm-abd { background: var(--abd-bg); }
+  .rtm-abd .rt-mode-label { color: var(--abd-col); }
+  .rtm-ind { background: var(--ind-bg); }
+  .rtm-ind .rt-mode-label { color: var(--ind-col); }
+  .rtm-ded { background: var(--ded-bg); }
+  .rtm-ded .rt-mode-label { color: var(--ded-col); }
+
+  .rt-check {
+    background: var(--bg-3);
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .rt-check-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--amber-text);
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    padding-top: 1px;
+  }
+  .rt-check-text {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.5;
+  }
+
+  .rt-frames {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+  .rt-frame {
+    border-radius: 4px;
+    padding: 8px 10px;
+    text-align: center;
+    background: var(--bg-3);
+    border: 0.5px solid var(--border);
+  }
+  .rt-frame-label {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-2);
+    display: block;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .rt-frame-sub { font-size: 10px; color: var(--text-3); font-family: var(--font-mono); }
+
+  .rt-saeo {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 6px;
+  }
+  .rt-dim {
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .rt-dim-letter {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .rt-dim-name { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .rtd-s { background: var(--s-bg); border: 0.5px solid rgba(29,158,117,0.2); }
+  .rtd-s .rt-dim-letter { color: var(--s-col); }
+  .rtd-a { background: var(--a-bg); border: 0.5px solid rgba(186,117,23,0.2); }
+  .rtd-a .rt-dim-letter { color: var(--a-col); }
+  .rtd-e { background: var(--e-bg); border: 0.5px solid rgba(74,143,212,0.2); }
+  .rtd-e .rt-dim-letter { color: var(--e-col); }
+  .rtd-o { background: var(--o-bg); border: 0.5px solid rgba(216,90,48,0.2); }
+  .rtd-o .rt-dim-letter { color: var(--o-col); }
+
+  /* ── Lens grid ── */
+  .lens-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  @media (max-width: 520px) { .lens-grid { grid-template-columns: 1fr; } }
+
+  .lens-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .lens-card.primary {
+    grid-column: 1 / -1;
+    background: var(--bg-3);
+    border-color: var(--border-med);
+  }
+  .lens-eyebrow {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+    margin-bottom: 5px;
+  }
+  .lens-eyebrow.strong { color: var(--purple-text); }
+  .lens-name { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 8px; }
+  .lens-text { font-size: 12px; color: var(--text-2); line-height: 1.65; font-weight: 300; margin-bottom: 10px; }
+  .lens-text strong { color: var(--text-1); font-weight: 500; }
+  .lens-example {
+    border-top: 0.5px solid var(--border);
+    padding-top: 10px;
+    margin-top: 2px;
+  }
+  .lens-ex-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .lens-ex-text {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.55;
+    font-style: italic;
+  }
+
+  /* ── Conversion footer ── */
+  .conversion-footer {
+    background: var(--bg-2);
+    border-top: 0.5px solid var(--border-med);
+    padding: 52px 24px 60px;
+    margin: 0 -24px;
+  }
+  .cf-inner { max-width: 760px; margin: 0 auto; }
+  .cf-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cf-dot { width: 4px; height: 4px; background: var(--red); border-radius: 50%; }
+  .cf-headline {
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text-1);
+    line-height: 1.3;
+    margin-bottom: 20px;
+    letter-spacing: -0.015em;
+    max-width: 540px;
+  }
+  .cf-gap {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.8;
+    max-width: 560px;
+    font-weight: 300;
+    margin-bottom: 16px;
+  }
+  .cf-gap strong { color: var(--text-1); font-weight: 500; }
+  .cf-positioning { font-size: 14px; color: var(--text-2); font-weight: 300; margin-bottom: 32px; }
+  .cf-positioning strong { color: var(--text-1); font-weight: 500; }
+  .cf-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .cf-stat { padding: 14px 12px; text-align: center; border-right: 0.5px solid var(--border); }
+  .cf-stat:last-child { border-right: none; }
+  .cf-stat-num {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text-1);
+    margin-bottom: 3px;
+  }
+  .cf-stat-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.4; }
+  .cf-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green-text);
+    text-decoration: none;
+    padding: 8px 0;
+    border-bottom: 0.5px solid rgba(29,158,117,0.3);
+    transition: border-color 0.15s;
+  }
+  .cf-cta:hover { border-color: var(--green); }
+
+  /* ═══════════════════════════════════════════════════════
+     RESPONSIVE
+     Breakpoints:
+       640px  —  large mobile / small tablet (primary)
+       480px  —  small mobile (secondary)
+  ═══════════════════════════════════════════════════════ */
+
+  @media (max-width: 640px) {
+
+    /* ── Page chrome ── */
+    .page { padding: 0 16px; }
+    .conversion-footer { padding: 40px 16px 48px; margin: 0 -16px; }
+
+    /* ── Header ── */
+    .page-header { padding: 40px 0 32px; margin-bottom: 36px; }
+    .page-title { font-size: 30px; }
+    .page-intro { font-size: 15px; }
+
+    /* ── SAEO intro ── */
+    .saeo-intro { margin-bottom: 36px; }
+    .saeo-letters { grid-template-columns: 1fr 1fr; }
+
+    /* ── Section rhythm ── */
+    .section { padding-bottom: 44px; margin-bottom: 40px; }
+    .section-heading { font-size: 24px; }
+    .section-hook { font-size: 15px; }
+
+    /* ── Routing diagram ── */
+    .routing-body { padding: 16px 12px; }
+    .routing-sub { font-size: 10px; line-height: 1.6; white-space: normal; }
+
+    /* Step 1 — reasoning mode cards: stack to 1 col */
+    .rt-modes { grid-template-columns: 1fr; }
+    .rt-mode { text-align: left; padding: 10px 12px; }
+
+    /* Step 3 — response type frames: stack to 1 col */
+    .rt-frames { grid-template-columns: 1fr; }
+    .rt-frame { text-align: left; padding: 8px 12px; }
+
+    /* Output — SAEO dims: 2×2 */
+    .rt-saeo { grid-template-columns: 1fr 1fr; }
+
+    /* Entry ball full width */
+    .rt-ball { max-width: 100%; padding: 10px 14px; }
+
+    /* ── Stats footer: 2×2 ── */
+    .cf-stats { grid-template-columns: 1fr 1fr; }
+    .cf-stat:nth-child(2n)   { border-right: none; }
+    .cf-stat:nth-child(n+3)  { border-top: 0.5px solid var(--border); }
+
+    /* ── Footer headline ── */
+    .cf-headline { font-size: 22px; }
+
+  }
+
+  @media (max-width: 480px) {
+
+    /* ── Typography ── */
+    .page-title { font-size: 26px; line-height: 1.2; }
+    .section-heading { font-size: 22px; }
+    .cf-headline { font-size: 20px; }
+    .page-intro { font-size: 14px; }
+    .section-hook { font-size: 14px; }
+
+    /* ── SAEO intro letter cards: compact on small screens ── */
+    .saeo-letter-card { padding: 14px 12px; }
+    .sl-letter { font-size: 18px; }
+    .sl-desc { display: none; } /* hide sub-desc on very small, name is enough */
+
+    /* ── Spacing ── */
+    .page-header { padding: 32px 0 28px; margin-bottom: 28px; }
+    .section { padding-bottom: 36px; margin-bottom: 32px; }
+    .saeo-intro { margin-bottom: 28px; }
+
+    /* ── Dim cards ── */
+    .dim-inner { padding: 14px; }
+    .dim-def { font-size: 12px; }
+
+    /* ── Mode cards ── */
+    .mode-header { padding: 12px 14px 10px; gap: 10px; }
+
+    /* ── Insight panels ── */
+    .insight { padding: 14px; }
+
+    /* ── Saeo-what panel ── */
+    .saeo-what { padding: 16px; }
+
+    /* ── Routing check row: stack label above text ── */
+    .rt-check { flex-direction: column; gap: 4px; }
+    .rt-check-label { padding-top: 0; }
+
+    /* ── Lens cards ── */
+    .lens-card { padding: 14px; }
+
+    /* ── Footer stats compact ── */
+    .cf-stat { padding: 12px 10px; }
+    .cf-stat-num { font-size: 18px; }
+
+    /* ── Footer padding ── */
+    .conversion-footer { padding: 32px 16px 40px; }
+
+  }
+
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ── Header ── -->
+  <header class="page-header">
+    <div class="ga-label">Good Assumptions · Problem Localization</div>
+    <h1 class="page-title">Most marketing problems<br><em>get fixed in the wrong place.</em></h1>
+    <p class="page-intro">
+      The symptom shows up in one layer. The cause lives in another.
+      <strong>SAEO is the diagnostic that finds which layer is actually broken</strong> —
+      before anyone reaches for a tactic, a channel, or a brief.
+    </p>
+    <div class="page-divider"></div>
+    <p class="page-secondary">
+      Not a campaign planning tool. Not a media framework. The question that should come
+      before both — and almost never does.
+    </p>
+  </header>
+
+  <!-- ── What SAEO is ── -->
+  <div class="saeo-intro">
+
+    <div class="saeo-letters">
+      <div class="saeo-letter-card slc-s sl-s">
+        <span class="sl-letter">S</span>
+        <span class="sl-name">Strategy</span>
+        <span class="sl-desc">Positioning, market role, and competitive context.</span>
+      </div>
+      <div class="saeo-letter-card slc-a sl-a">
+        <span class="sl-letter">A</span>
+        <span class="sl-name">Application</span>
+        <span class="sl-desc">Campaign design, channel selection, and creative direction.</span>
+      </div>
+      <div class="saeo-letter-card slc-e sl-e">
+        <span class="sl-letter">E</span>
+        <span class="sl-name">Execution</span>
+        <span class="sl-desc">Specific tactics, tools, and what's actually in-market.</span>
+      </div>
+      <div class="saeo-letter-card slc-o sl-o">
+        <span class="sl-letter">O</span>
+        <span class="sl-name">Operations</span>
+        <span class="sl-desc">Measurement, attribution, process, and team structure.</span>
+      </div>
+    </div>
+
+    <div class="saeo-what">
+      <div class="saeo-what-label">The core problem SAEO solves</div>
+      <p class="saeo-what-text">
+        A conversion rate drop is visible in <strong>Execution</strong>.
+        The cause is usually in <strong>Application</strong> — the wrong channel for this audience at this moment —
+        or in <strong>Strategy</strong> — a position that doesn't match what this customer actually needs to hear.
+        When teams reach for the most visible failure and start fixing there,
+        they can run a full optimization cycle on the landing page before discovering the brief was wrong the whole time.
+        <strong>The SAEO diagnostic identifies the source layer before the fix starts.</strong>
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 1 — THE FOUR DIMENSIONS
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-eyebrow">The output of the diagnostic</div>
+    <h2 class="section-heading">Four dimensions.<br>Each one a different kind of broken.</h2>
+    <p class="section-hook">
+      S · A · E · O aren't a starting point — they're what the diagnostic arrives at.
+      Each dimension has a characteristic failure signature, and a characteristic misroute
+      that sends teams spending time and budget in the wrong layer.
+    </p>
+
+    <div class="dim-grid">
+
+      <div class="dim-card">
+        <div class="dim-stripe ds-s"></div>
+        <div class="dim-inner">
+          <div class="dim-top">
+            <span class="dim-badge db-s">S</span>
+            <span class="dim-name">Strategy</span>
+          </div>
+          <p class="dim-def">
+            Who the brand is, where it competes, and what it's actually promising.
+            A Strategy failure means the foundation is wrong —
+            the right solution for the wrong audience, or the right audience
+            with the wrong value proposition. Everything built on top of it inherits the misalignment.
+          </p>
+          <div class="dim-rows">
+            <div class="dim-row">
+              <span class="dr-label">Signals</span>
+              <span class="dr-text">Brand confusion. Positioning questions. Losing to competitors you should beat. Market share erosion with no obvious execution failure underneath it.</span>
+            </div>
+            <div class="dim-row">
+              <span class="dr-label">Misroute</span>
+              <span class="dr-text misroute">Teams optimize creative when the brief itself is wrong. Run A/B tests when the value proposition needs fundamental rethinking. Fix the channel when the offer isn't compelling on any channel.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dim-card">
+        <div class="dim-stripe ds-a"></div>
+        <div class="dim-inner">
+          <div class="dim-top">
+            <span class="dim-badge db-a">A</span>
+            <span class="dim-name">Application</span>
+          </div>
+          <p class="dim-def">
+            How strategy gets translated into specific campaigns, channels, and creative.
+            An Application failure means the strategy is sound
+            but the campaign isn't expressing it in the right place,
+            at the right moment, or in the right form for the audience being reached.
+          </p>
+          <div class="dim-rows">
+            <div class="dim-row">
+              <span class="dr-label">Signals</span>
+              <span class="dr-text">Named campaign underperformance. Channel-specific failures. Creative that tests well internally but doesn't convert. "The message is right but it's not landing."</span>
+            </div>
+            <div class="dim-row">
+              <span class="dr-label">Misroute</span>
+              <span class="dr-text misroute">Fix the tactic when the channel is wrong for this audience. Rewrite the copy when the timing is wrong. Optimize a campaign that was never aimed at the right moment in the customer journey.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dim-card">
+        <div class="dim-stripe ds-e"></div>
+        <div class="dim-inner">
+          <div class="dim-top">
+            <span class="dim-badge db-e">E</span>
+            <span class="dim-name">Execution</span>
+          </div>
+          <p class="dim-def">
+            The specific tactics, tools, and implementations that make a campaign real.
+            An Execution failure means the tactic itself is wrong, broken, or misapplied —
+            even when strategy and channel are sound.
+            This is the layer that absorbs the most blame for problems it didn't cause.
+          </p>
+          <div class="dim-rows">
+            <div class="dim-row">
+              <span class="dr-label">Signals</span>
+              <span class="dr-text">Specific tactic questions. A/B test requests. Landing page performance issues. "This worked six months ago and now it doesn't." Debugging that stays at the implementation level.</span>
+            </div>
+            <div class="dim-row">
+              <span class="dr-label">Misroute</span>
+              <span class="dr-text misroute">The most common misroute: treating Strategy or Application failures as Execution problems. "Let's test a different CTA" when the product-market fit is the actual issue.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dim-card">
+        <div class="dim-stripe ds-o"></div>
+        <div class="dim-inner">
+          <div class="dim-top">
+            <span class="dim-badge db-o">O</span>
+            <span class="dim-name">Operations</span>
+          </div>
+          <p class="dim-def">
+            Measurement, attribution, process, and team structure.
+            An Operations failure is invisible in output — you can't see it in the creative —
+            but it corrupts every layer's ability to learn from what's happening.
+            Teams flying blind make avoidable decisions, then wonder why the fixes aren't holding.
+          </p>
+          <div class="dim-rows">
+            <div class="dim-row">
+              <span class="dr-label">Signals</span>
+              <span class="dr-text">Attribution gaps. "We can't tell what's working." Reporting inconsistencies. Team coordination failures. Breakdowns at handoff points between strategy and execution.</span>
+            </div>
+            <div class="dim-row">
+              <span class="dr-label">Misroute</span>
+              <span class="dr-text misroute">Operations failures produce bad output, so they look like Execution failures. The tactic isn't wrong — the measurement infrastructure that should have caught the problem earlier wasn't working.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">The core principle</span>
+        <span class="itag itag-key">Symptom ≠ Source</span>
+      </div>
+      <p class="insight-text">
+        In most marketing failures, the layer where the problem becomes visible
+        and the layer where it was produced are not the same.
+        <strong>The diagnostic job isn't to find where the failure is showing up — it's to find where it was made.</strong>
+        That's the difference between a fix that holds and one that buys you a quarter before the same issue resurfaces.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 2 — HOW SAEO READS A PROBLEM
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-eyebrow">Before the diagnosis</div>
+    <h2 class="section-heading">SAEO reads the problem<br>before it locates it.</h2>
+    <p class="section-hook">
+      The way a problem gets described tells you as much about what's broken
+      as the description itself. SAEO's first move is to read the shape of the question —
+      not just the content.
+    </p>
+    <p class="prose">
+      Every marketing problem arrives in one of three states.
+      Someone has a symptom they can't explain.
+      Someone has a pattern they can't name.
+      Or someone knows exactly what's wrong and just needs the next move.
+      <strong>These three states require completely different responses</strong> —
+      and the most common failure in AI marketing tools is treating them all the same way,
+      returning advice-shaped content regardless of whether the person is
+      ready to act on it.
+    </p>
+
+    <div class="mode-stack">
+
+      <div class="mode-card">
+        <div class="mode-header">
+          <span class="mode-pill mp-abd">Abductive</span>
+          <div class="mode-header-text">
+            <div class="mode-name">Something broke. I don't know why.</div>
+            <div class="mode-tagline">"Our trial-to-paid conversion dropped and I can't figure out why."</div>
+          </div>
+        </div>
+        <div class="mode-body">
+          <div class="m-cell">
+            <div class="m-cell-label">What it is</div>
+            <p class="m-cell-text">A symptom without a mechanism. The marketer can see the failure. They don't know what's producing it. They need the most plausible explanation — not a list of interventions to try.</p>
+          </div>
+          <div class="m-cell">
+            <div class="m-cell-label">What SAEO does</div>
+            <p class="m-cell-text frame">Runs diagnosis first. Pattern-matches the symptom against known failure signatures to surface the most likely causes. What layer produced this? What's the mechanism? Only then does it move toward intervention.</p>
+          </div>
+          <div class="m-cell">
+            <div class="m-cell-label">Worth knowing</div>
+            <p class="m-cell-text caution">This is the default state for almost every marketing problem — including ones that don't arrive looking like it. Uncertainty about cause is the starting condition, not the exception.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mode-card">
+        <div class="mode-header">
+          <span class="mode-pill mp-ind">Inductive</span>
+          <div class="mode-header-text">
+            <div class="mode-name">I keep seeing this pattern. What's the rule?</div>
+            <div class="mode-tagline">"We lose customers around 90 days across three different products."</div>
+          </div>
+        </div>
+        <div class="mode-body">
+          <div class="m-cell">
+            <div class="m-cell-label">What it is</div>
+            <p class="m-cell-text">Evidence without a principle. The marketer has accumulated observations but hasn't been able to name the underlying mechanism driving them. They have the data. They don't yet have the explanation.</p>
+          </div>
+          <div class="m-cell">
+            <div class="m-cell-label">What SAEO does</div>
+            <p class="m-cell-text frame">Names the mechanism before recommending the move. Which behavioral pattern produces this signature across all three instances? What's the cross-domain principle that connects them?</p>
+          </div>
+          <div class="m-cell">
+            <div class="m-cell-label">Posture</div>
+            <p class="m-cell-text">Explain, then act. Moving to recommendations before the rule is established produces a fix that works once — and fails when the context shifts even slightly.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mode-card">
+        <div class="mode-header">
+          <span class="mode-pill mp-ded">Deductive</span>
+          <div class="mode-header-text">
+            <div class="mode-name">I know what's wrong. What's the move?</div>
+            <div class="mode-tagline">"We're in post-purchase cognitive dissonance — what's the specific play here?"</div>
+          </div>
+        </div>
+        <div class="mode-body">
+          <div class="m-cell">
+            <div class="m-cell-label">What it is</div>
+            <p class="m-cell-text">A known mechanism being applied to a specific situation. The marketer has already done the diagnostic work and is ready to move to action. They need the tactic, not the explanation.</p>
+          </div>
+          <div class="m-cell">
+            <div class="m-cell-label">What SAEO does</div>
+            <p class="m-cell-text frame">Goes straight to the intervention. Tactic chain linked directly to this specific moment. No diagnosis step — because the marketer has already done it and there's enough context to verify.</p>
+          </div>
+          <div class="m-cell">
+            <div class="m-cell-label">Worth knowing</div>
+            <p class="m-cell-text caution">This state is rarer than it looks. "What tactic should I use for X" sounds like a ready-to-act question — but often the mechanism hasn't actually been verified. Context depth determines the difference.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">Why this matters for AI tools</span>
+        <span class="itag itag-abd">Abductive default</span>
+      </div>
+      <p class="insight-text">
+        Most AI marketing tools skip this step entirely — they take the phrasing at face value
+        and return advice-shaped content regardless of whether the person asking
+        has actually identified the problem or just described the symptom.
+        <strong>That's why AI marketing advice so often sounds right but doesn't apply to your specific situation.</strong>
+        It answered the right question for the wrong version of the problem.
+        SAEO checks which state the problem is actually in before deciding what kind of response to return.
+      </p>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 3 — THE ROUTING
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-eyebrow">How the intelligence routes</div>
+    <h2 class="section-heading">Reading the problem state<br>before returning a response.</h2>
+    <p class="section-hook">
+      The sequence below is what happens between a marketer typing a question
+      and SAEO returning a response. The routing is what makes the response
+      match the actual state of the problem — not just the confidence of the phrasing.
+    </p>
+    <p class="prose">
+      A question that names a mechanism isn't automatically a ready-to-act question.
+      <strong>"What's the tactic for post-purchase dissonance?"</strong> looks like someone who already knows what's wrong.
+      But if there's not enough context to verify that the diagnosis is correct,
+      SAEO treats it as a diagnostic problem — because giving a specific intervention for an unverified diagnosis
+      is exactly the misroute that sends teams down the wrong path.
+    </p>
+
+    <div class="routing-diagram">
+      <div class="routing-header">
+        <div class="routing-title">SAEO routing sequence</div>
+        <div class="routing-sub">query → problem state → context check → response type → dimension located</div>
+      </div>
+      <div class="routing-body">
+
+        <div class="rt-entry">
+          <div class="rt-ball">
+            <strong>The problem arrives.</strong><br>
+            A symptom, a pattern, or a ready-to-act question. SAEO doesn't assume which yet.
+          </div>
+        </div>
+        <div class="rt-arrow">↓</div>
+
+        <div class="rt-step-label">Step 1 — What state is this problem in?</div>
+        <div class="rt-modes">
+          <div class="rt-mode rtm-abd">
+            <span class="rt-mode-label">Symptom present</span>
+            <span class="rt-mode-text">Mechanism unknown. Needs diagnosis.</span>
+          </div>
+          <div class="rt-mode rtm-ind">
+            <span class="rt-mode-label">Pattern present</span>
+            <span class="rt-mode-text">Principle unknown. Needs naming.</span>
+          </div>
+          <div class="rt-mode rtm-ded">
+            <span class="rt-mode-label">Mechanism known</span>
+            <span class="rt-mode-text">Needs the specific move.</span>
+          </div>
+        </div>
+        <div class="rt-arrow">↓</div>
+
+        <div class="rt-step-label">Step 2 — Is there enough context to support that state?</div>
+        <div class="rt-check">
+          <span class="rt-check-label">Context check</span>
+          <span class="rt-check-text">Does the question include enough situational detail to support the problem state it's presenting? Confident phrasing without situational depth routes back to diagnosis — regardless of how the question was worded.</span>
+        </div>
+        <div class="rt-arrow">↓</div>
+
+        <div class="rt-step-label">Step 3 — Response type</div>
+        <div class="rt-frames">
+          <div class="rt-frame">
+            <span class="rt-frame-label">Diagnosis</span>
+            <span class="rt-frame-sub">what's producing this</span>
+          </div>
+          <div class="rt-frame">
+            <span class="rt-frame-label">Explanation</span>
+            <span class="rt-frame-sub">what this pattern means</span>
+          </div>
+          <div class="rt-frame">
+            <span class="rt-frame-label">Intervention</span>
+            <span class="rt-frame-sub">what to do next</span>
+          </div>
+        </div>
+        <div class="rt-arrow">↓</div>
+
+        <div class="rt-step-label">Output — Problem dimension located</div>
+        <div class="rt-saeo">
+          <div class="rt-dim rtd-s">
+            <span class="rt-dim-letter">S</span>
+            <span class="rt-dim-name">Strategy</span>
+          </div>
+          <div class="rt-dim rtd-a">
+            <span class="rt-dim-letter">A</span>
+            <span class="rt-dim-name">Application</span>
+          </div>
+          <div class="rt-dim rtd-e">
+            <span class="rt-dim-letter">E</span>
+            <span class="rt-dim-name">Execution</span>
+          </div>
+          <div class="rt-dim rtd-o">
+            <span class="rt-dim-letter">O</span>
+            <span class="rt-dim-name">Operations</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       SECTION 4 — THE LENSES
+  ═══════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-eyebrow">What sharpens the diagnosis</div>
+    <h2 class="section-heading">Locating the layer<br>is only the first half.</h2>
+    <p class="section-hook">
+      A correctly identified problem is still generic until it's filtered through
+      what's true about this brand, this audience, and this organization's
+      actual capacity to execute.
+    </p>
+    <p class="prose">
+      The four dimensions tell you <em>what kind</em> of problem it is.
+      The lenses tell you what it looks like <em>for you specifically.</em>
+      An Application failure for a brand with a clearly defined voice and a behaviorally-mapped audience
+      is a completely different problem — with a different fix —
+      than the same Application failure for a brand that hasn't done that foundational work.
+      <strong>The dimension locates the layer. The lenses make the answer actionable.</strong>
+    </p>
+
+    <div class="lens-grid">
+
+      <div class="lens-card primary">
+        <div class="lens-eyebrow strong">The strongest modifier</div>
+        <div class="lens-name">Audience</div>
+        <p class="lens-text">
+          The most powerful lens because it reshapes every dimension simultaneously.
+          Most teams believe they have audience defined. What they have is demographics —
+          age, income, geography. That's a description, not an insight.
+          <strong>SAEO requires behavioral resolution:</strong> what is this audience doing
+          at the moment the intervention fires? What psychological state are they in?
+          What does a person at this specific transition point need to hear — and from whom —
+          to actually move?
+          A Strategy problem <em>for this audience at this moment</em> is specific enough to fix.
+          A Strategy problem in the abstract is not.
+        </p>
+        <div class="lens-example">
+          <div class="lens-ex-label">Why it matters</div>
+          <div class="lens-ex-text">Two brands, same strategy failure, same symptom. One sells to first-time buyers actively evaluating options. One sells to existing customers facing a decision about renewal. The fix is completely different — because the audience isn't in the same place psychologically.</div>
+        </div>
+      </div>
+
+      <div class="lens-card">
+        <div class="lens-eyebrow">Brand voice</div>
+        <div class="lens-name">Tonality</div>
+        <p class="lens-text">
+          How the brand speaks — and what it can't say without breaking character.
+          Tonality constrains Application and Execution directly.
+          A tactic that requires urgency and scarcity framing is the wrong recommendation
+          for a brand whose relationship with customers is built on patience and trust.
+        </p>
+        <div class="lens-example">
+          <div class="lens-ex-label">The practical implication</div>
+          <div class="lens-ex-text">A correct tactic that violates brand tonality produces a campaign that works once and damages trust in the process. The fix isn't the tactic — it's finding the equivalent move that the brand can actually make credibly.</div>
+        </div>
+      </div>
+
+      <div class="lens-card">
+        <div class="lens-eyebrow">Org readiness</div>
+        <div class="lens-name">Capability</div>
+        <p class="lens-text">
+          What this team can actually run with the resources, tools, and skills they have today.
+          The most common source of advice that's technically correct but produces no results:
+          a recommendation that requires organizational capacity the team doesn't have.
+        </p>
+        <div class="lens-example">
+          <div class="lens-ex-label">The practical implication</div>
+          <div class="lens-ex-text">A five-touchpoint behavioral nurture sequence is the right Strategy fix for a brand that can execute it. For a three-person marketing team, it's a backlog item that never ships. Capability determines which correct answer is actually actionable.</div>
+        </div>
+      </div>
+
+      <div class="lens-card">
+        <div class="lens-eyebrow">Internal structure</div>
+        <div class="lens-name">Team &amp; Process</div>
+        <p class="lens-text">
+          How decisions get made, where approvals happen, and where handoffs break.
+          Many Execution failures are actually handoff failures — the tactic was right,
+          but the seam between strategy and execution is where it came apart.
+        </p>
+        <div class="lens-example">
+          <div class="lens-ex-label">The practical implication</div>
+          <div class="lens-ex-text">A campaign requiring coordination across brand, performance, and product teams will fail at the seam if the process doesn't support it. That shows up as Execution failure. It's a team structure problem sitting inside Operations.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight">
+      <div class="insight-top">
+        <span class="insight-label">The complete diagnostic</span>
+        <span class="itag itag-lens">Dimension + Lens = Specific enough to fix</span>
+      </div>
+      <p class="insight-text">
+        A correctly located problem filtered through audience, tonality, capability, and team structure
+        is what produces a diagnosis specific enough to act on.
+        Without the lenses, you have a correctly labeled problem that's still too general to fix well.
+        <strong>SAEO runs both simultaneously</strong> — because a correctly located but context-free diagnosis
+        produces the same outcome as a mislocated one:
+        advice that's right in general and wrong for you.
+      </p>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- ── Conversion footer ── -->
+<div class="conversion-footer">
+  <div class="cf-inner">
+    <div class="cf-eyebrow">
+      <div class="cf-dot"></div>
+      SAEO · The diagnosis before the fix
+    </div>
+
+    <h2 class="cf-headline">Find the right layer.<br>Before anyone reaches for a solution.</h2>
+
+    <p class="cf-gap">
+      The framework is here. The system that runs it —
+      reading problem state, checking context depth, routing to the right response type,
+      filtering through audience and capability —
+      <strong>is what SAEO.ai is built to do.</strong>
+      Not a smarter campaign tool. The diagnostic layer that should precede campaign planning
+      but almost never does.
+    </p>
+
+    <p class="cf-positioning">
+      <strong>Good Assumptions</strong> teaches the framework. <strong>SAEO</strong> runs the diagnosis.
+    </p>
+
+    <div class="cf-stats">
+      <div class="cf-stat">
+        <div class="cf-stat-num">4</div>
+        <div class="cf-stat-label">Problem dimensions</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">4</div>
+        <div class="cf-stat-label">Diagnostic lenses</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">3</div>
+        <div class="cf-stat-label">Problem states</div>
+      </div>
+      <div class="cf-stat">
+        <div class="cf-stat-num">164</div>
+        <div class="cf-stat-label">Behavioral transitions mapped</div>
+      </div>
+    </div>
+
+    <a href="https://saeo.ai" class="cf-cta">Start the diagnostic →</a>
+  </div>
+</div>
+
+</body>
+</html>
