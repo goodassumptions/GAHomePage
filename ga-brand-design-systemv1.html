@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good Assumptions — Brand Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+:root {
+  /* ── Foundation ── */
+  --bg:          #0f0f0e;
+  --bg-2:        #141412;
+  --bg-3:        #1a1a17;
+  --bg-4:        #222220;
+  --bg-5:        #2a2a27;
+
+  --border:      rgba(255,255,255,0.07);
+  --border-med:  rgba(255,255,255,0.13);
+  --border-hi:   rgba(255,255,255,0.22);
+
+  /* ── Text — all WCAG AA+ ── */
+  --text-1:      #eae8de;   /* Primary — 14:1 on bg */
+  --text-2:      #a8a59a;   /* Secondary — 5.8:1 on bg */
+  --text-3:      #6a6860;   /* Tertiary / decorative only — 3.1:1 */
+  --text-4:      #3d3c38;   /* Ghost / disabled chrome */
+
+  /* ── Element Color Language ── */
+  /* Liminal Transitions → Amber */
+  --amber:        #BA7517;
+  --amber-hi:     #FAC775;
+  --amber-bg:     rgba(186,117,23,0.10);
+  --amber-border: rgba(186,117,23,0.25);
+
+  /* Cognitive Biases → Purple */
+  --purple:       #7F77DD;
+  --purple-hi:    #AFA9EC;
+  --purple-bg:    rgba(127,119,221,0.10);
+  --purple-border:rgba(127,119,221,0.25);
+
+  /* Choice Vectors → Blue */
+  --blue:         #4A8FD4;
+  --blue-hi:      #87BEF0;
+  --blue-bg:      rgba(74,143,212,0.10);
+  --blue-border:  rgba(74,143,212,0.25);
+
+  /* Primary Tactics → Green */
+  --green:        #1D9E75;
+  --green-hi:     #5DCAA5;
+  --green-bg:     rgba(29,158,117,0.10);
+  --green-border: rgba(29,158,117,0.25);
+
+  /* Coral — alert/warning/SAEO brand accent */
+  --coral:        #D85A30;
+  --coral-hi:     #F0997B;
+  --coral-bg:     rgba(216,90,48,0.10);
+  --coral-border: rgba(216,90,48,0.25);
+
+  /* ── Editorial Light Mode palette (for light sections) ── */
+  --light-bg:        #f7f4ee;
+  --light-surface:   #fcfaf6;
+  --light-surface-2: #f1ece4;
+  --light-border:    #d7cdbf;
+  --light-text:      #1f1b17;
+  --light-muted:     #6f675d;
+  --light-primary:   #275e63;
+  --light-gold:      #b98f5a;
+  --light-clay:      #9a6b52;
+
+  /* ── Typography ── */
+  --font-ui:      'DM Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', monospace;
+  --font-display: 'DM Serif Display', Georgia, serif;
+
+  /* ── Spacing ── */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
+  --s12: 48px; --s16: 64px; --s20: 80px;
+
+  /* ── Radius ── */
+  --r-sm: 3px; --r-md: 6px; --r-lg: 10px; --r-xl: 16px;
+
+  /* ── Motion ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════
+   LAYOUT
+══════════════════════════════ */
+
+.shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100dvh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  background: var(--bg-2);
+  border-right: 0.5px solid var(--border-med);
+  padding: var(--s8) var(--s6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+  scrollbar-width: none;
+}
+.sidebar::-webkit-scrollbar { display: none; }
+
+.sidebar-brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.sidebar-mark {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-bottom: var(--s1);
+}
+.mark-diamond {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  flex-shrink: 0;
+}
+.sidebar-name {
+  font-family: var(--font-display);
+  font-size: 17px;
+  color: var(--text-1);
+  letter-spacing: -0.01em;
+}
+.sidebar-sub {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.sidebar-doc-label {
+  font-size: 11px;
+  color: var(--text-3);
+  padding: var(--s3) 0;
+  border-top: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  letter-spacing: 0.04em;
+}
+
+.sidebar-nav { display: flex; flex-direction: column; gap: var(--s1); }
+.sidebar-nav-group {
+  margin-top: var(--s4);
+}
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-4);
+  padding: 0 var(--s3);
+  margin-bottom: var(--s2);
+}
+.sidebar-nav a {
+  display: block;
+  padding: 6px var(--s3);
+  font-size: 13px;
+  color: var(--text-2);
+  text-decoration: none;
+  border-radius: var(--r-sm);
+  transition: color 140ms, background 140ms;
+}
+.sidebar-nav a:hover {
+  color: var(--text-1);
+  background: var(--bg-4);
+}
+.sidebar-nav a.active { color: var(--text-1); }
+
+.sidebar-version {
+  margin-top: auto;
+  font-size: 11px;
+  color: var(--text-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ── Main ── */
+main {
+  min-width: 0;
+  padding: 0 var(--s10) var(--s20);
+  max-width: 960px;
+}
+
+/* ══════════════════════════════
+   SECTION STRUCTURE
+══════════════════════════════ */
+
+.section {
+  padding: var(--s16) 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.section:last-child { border-bottom: none; }
+
+.section-header {
+  margin-bottom: var(--s10);
+}
+.section-eyebrow {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s3);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.section-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-4);
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  padding: 2px 6px;
+  border-radius: var(--r-sm);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+.section-lead {
+  margin-top: var(--s4);
+  font-size: 16px;
+  color: var(--text-2);
+  line-height: 1.75;
+  max-width: 560px;
+  font-weight: 300;
+}
+
+/* ══════════════════════════════
+   COVER / INTRO
+══════════════════════════════ */
+
+.cover {
+  padding: var(--s20) 0 var(--s16);
+  border-bottom: 0.5px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.cover-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 90% 20%, rgba(29,158,117,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 10% 80%, rgba(127,119,221,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cover-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s6);
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+.cover-label::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 0.5px;
+  background: var(--text-4);
+}
+
+.cover-title {
+  font-family: var(--font-display);
+  font-size: clamp(44px, 5vw, 72px);
+  font-weight: 400;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  color: var(--text-1);
+  margin-bottom: var(--s6);
+}
+.cover-title em {
+  font-style: italic;
+  color: var(--text-2);
+}
+
+.cover-intro {
+  font-size: 17px;
+  color: var(--text-2);
+  line-height: 1.75;
+  max-width: 520px;
+  font-weight: 300;
+  margin-bottom: var(--s10);
+}
+
+.cover-meta {
+  display: flex;
+  gap: var(--s6);
+  flex-wrap: wrap;
+}
+.cover-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.cover-meta-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.cover-meta-value {
+  font-size: 13px;
+  color: var(--text-2);
+  font-family: var(--font-mono);
+}
+
+/* ══════════════════════════════
+   PRINCIPLES
+══════════════════════════════ */
+
+.principles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s4);
+}
+.principle-card {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s6);
+}
+.principle-num {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-4);
+  margin-bottom: var(--s4);
+}
+.principle-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-1);
+  margin-bottom: var(--s3);
+}
+.principle-body {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+  font-weight: 300;
+}
+
+/* ══════════════════════════════
+   COLOR
+══════════════════════════════ */
+
+.color-system {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s10);
+}
+
+.color-group-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s2);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.color-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--s3);
+}
+
+.color-swatch {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.swatch-block {
+  height: 56px;
+  border-radius: var(--r-md);
+  border: 0.5px solid rgba(255,255,255,0.06);
+  position: relative;
+}
+.swatch-block.bordered {
+  border-color: var(--border-med);
+}
+.swatch-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-1);
+}
+.swatch-hex {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-3);
+}
+.swatch-role {
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.4;
+}
+
+/* Element Color Language */
+.element-language {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+.element-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: var(--s4) var(--s5);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  transition: border-color 140ms;
+}
+.element-row:hover { border-color: var(--border-med); }
+.element-color-bar {
+  width: 4px;
+  height: 48px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.element-info { flex: 1; }
+.element-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: 2px;
+}
+.element-count {
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+.element-chips {
+  display: flex;
+  gap: var(--s2);
+  flex-wrap: wrap;
+}
+.element-chip {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  border-radius: 3px;
+}
+.element-use-case {
+  font-size: 12px;
+  color: var(--text-2);
+  max-width: 220px;
+  line-height: 1.5;
+}
+
+/* Light palette showcase */
+.light-palette-card {
+  background: var(--light-bg);
+  border-radius: var(--r-xl);
+  padding: var(--s8);
+  border: 0.5px solid rgba(31,27,23,0.12);
+}
+.light-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--s3);
+}
+.light-swatch-block {
+  height: 48px;
+  border-radius: var(--r-md);
+  border: 0.5px solid rgba(31,27,23,0.1);
+}
+.light-swatch-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--light-text);
+  margin-top: var(--s2);
+}
+.light-swatch-hex {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--light-muted);
+}
+
+/* ══════════════════════════════
+   TYPOGRAPHY
+══════════════════════════════ */
+
+.type-specimens { display: flex; flex-direction: column; gap: var(--s8); }
+
+.type-specimen {
+  padding: var(--s6) 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.type-specimen:last-child { border-bottom: none; }
+
+.type-meta {
+  display: flex;
+  gap: var(--s8);
+  margin-top: var(--s3);
+  flex-wrap: wrap;
+}
+.type-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.type-meta-key {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-4);
+}
+.type-meta-val {
+  font-size: 12px;
+  font-family: var(--font-mono);
+  color: var(--text-3);
+}
+
+.font-showcase {
+  margin-top: var(--s8);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s6);
+}
+.font-card {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s6);
+}
+.font-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s4);
+}
+.font-alpha {
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.2;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+.font-alpha-display {
+  font-family: var(--font-display);
+  font-size: 32px;
+  line-height: 1.2;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+.font-alpha-mono {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+.font-use {
+  margin-top: var(--s3);
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.type-scale {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: var(--s6);
+}
+.scale-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s6);
+  padding: var(--s4) 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.scale-row:last-child { border-bottom: none; }
+.scale-label {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-4);
+  width: 80px;
+  flex-shrink: 0;
+}
+.scale-example { color: var(--text-1); }
+
+/* Text behavior rules */
+.text-rule-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s4);
+  margin-top: var(--s6);
+}
+.text-rule {
+  padding: var(--s5);
+  border-radius: var(--r-md);
+  border: 0.5px solid var(--border);
+  background: var(--bg-3);
+}
+.text-rule-do { border-color: var(--green-border); }
+.text-rule-dont { border-color: rgba(216,90,48,0.2); }
+.text-rule-tag {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: var(--s2);
+}
+.tag-do { color: var(--green-hi); }
+.tag-dont { color: var(--coral-hi); }
+.text-rule-example {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+/* ══════════════════════════════
+   COMPONENTS
+══════════════════════════════ */
+
+.component-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s10);
+}
+
+.component-section-title {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s5);
+  padding-bottom: var(--s3);
+  border-bottom: 0.5px solid var(--border);
+}
+
+/* Badges / Chips */
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+.badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.badge-amber { background: var(--amber-bg); color: var(--amber-hi); border: 0.5px solid var(--amber-border); }
+.badge-purple { background: var(--purple-bg); color: var(--purple-hi); border: 0.5px solid var(--purple-border); }
+.badge-blue { background: var(--blue-bg); color: var(--blue-hi); border: 0.5px solid var(--blue-border); }
+.badge-green { background: var(--green-bg); color: var(--green-hi); border: 0.5px solid var(--green-border); }
+.badge-coral { background: var(--coral-bg); color: var(--coral-hi); border: 0.5px solid var(--coral-border); }
+.badge-neutral { background: var(--bg-4); color: var(--text-2); border: 0.5px solid var(--border-med); }
+
+/* IDs */
+.id-row {
+  display: flex;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: var(--s4);
+}
+.entity-id {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-3);
+  background: var(--bg-3);
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  border: 0.5px solid var(--border);
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  font-size: 11px;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.breadcrumb-sep { color: var(--text-4); font-size: 10px; }
+.breadcrumb-current { color: var(--text-2); }
+
+/* Cards */
+.card-examples {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s4);
+  margin-top: var(--s4);
+}
+.card-base {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.card-accented-amber { border-left: 2px solid var(--amber); }
+.card-accented-purple { border-left: 2px solid var(--purple); }
+.card-accented-blue { border-left: 2px solid var(--blue); }
+.card-accented-green { border-left: 2px solid var(--green); }
+.card-title { font-size: 13px; font-weight: 500; color: var(--text-1); }
+.card-body { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: var(--s3);
+  border-top: 0.5px solid var(--border);
+  font-size: 11px;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+}
+
+/* Reframe block */
+.reframe-block {
+  background: var(--bg-3);
+  border-radius: var(--r-lg);
+  border: 0.5px solid var(--border);
+  padding: var(--s6) var(--s8);
+  margin-top: var(--s4);
+}
+.reframe-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s3);
+}
+.reframe-text {
+  font-size: 17px;
+  color: var(--text-1);
+  line-height: 1.65;
+  font-weight: 300;
+}
+.reframe-text strong {
+  font-weight: 500;
+  color: var(--amber-hi);
+}
+
+/* Inline highlights */
+.highlight-amber { color: var(--amber-hi); }
+.highlight-purple { color: var(--purple-hi); }
+.highlight-blue { color: var(--blue-hi); }
+.highlight-green { color: var(--green-hi); }
+.highlight-coral { color: var(--coral-hi); }
+
+/* Inline code / IDs in body */
+.inline-code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-4);
+  border: 0.5px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--text-2);
+}
+
+/* Buttons */
+.btn-showcase {
+  display: flex;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: var(--s4);
+}
+.btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 18px;
+  border-radius: var(--r-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 140ms var(--ease-out);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+}
+.btn-primary {
+  background: var(--text-1);
+  color: var(--bg);
+}
+.btn-primary:hover { background: #fff; }
+.btn-secondary {
+  background: var(--bg-4);
+  color: var(--text-1);
+  border: 0.5px solid var(--border-med);
+}
+.btn-secondary:hover { background: var(--bg-5); }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border: 0.5px solid var(--border-med);
+}
+.btn-ghost:hover { color: var(--text-1); border-color: var(--border-hi); }
+.btn-amber {
+  background: var(--amber-bg);
+  color: var(--amber-hi);
+  border: 0.5px solid var(--amber-border);
+}
+.btn-amber:hover { background: rgba(186,117,23,0.2); }
+
+/* Divider rules */
+.rule-subtle {
+  border: none;
+  border-top: 0.5px solid var(--border);
+  margin: var(--s6) 0;
+}
+
+/* ══════════════════════════════
+   SAEO LAYER SYSTEM
+══════════════════════════════ */
+
+.saeo-layers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+.saeo-layer {
+  padding: var(--s5);
+  border-radius: var(--r-md);
+  border: 0.5px solid var(--border);
+  background: var(--bg-3);
+}
+.layer-code {
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: var(--s2);
+}
+.layer-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: 4px;
+}
+.layer-desc {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+/* Reasoning modes */
+.reasoning-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+.reasoning-card {
+  padding: var(--s5);
+  border-radius: var(--r-md);
+  border: 0.5px solid var(--border);
+  background: var(--bg-3);
+}
+.reasoning-mode {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--s2);
+}
+.reasoning-desc {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+/* ══════════════════════════════
+   PATTERNS / EXAMPLES
+══════════════════════════════ */
+
+.page-example {
+  background: var(--bg-2);
+  border: 0.5px solid var(--border-med);
+  border-radius: var(--r-xl);
+  padding: var(--s8);
+  margin-top: var(--s6);
+}
+.page-example-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s6);
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+.page-example-label::after {
+  content: '';
+  flex: 1;
+  height: 0.5px;
+  background: var(--border);
+}
+
+/* Entity detail mockup */
+.entity-hero {
+  padding: var(--s6) 0 var(--s5);
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: var(--s5);
+}
+.entity-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-bottom: var(--s4);
+  flex-wrap: wrap;
+}
+.entity-title {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: var(--s3);
+}
+.entity-summary {
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.75;
+  font-weight: 300;
+  max-width: 480px;
+}
+
+/* ══════════════════════════════
+   VOICE / WRITING
+══════════════════════════════ */
+
+.voice-examples {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  margin-top: var(--s4);
+}
+.voice-example {
+  padding: var(--s5);
+  border-radius: var(--r-md);
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+}
+.voice-ex-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s3);
+}
+.voice-ex-text {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text-1);
+}
+.voice-ex-text em { color: var(--text-2); font-style: italic; }
+
+/* ══════════════════════════════
+   TOKEN REFERENCE
+══════════════════════════════ */
+
+.token-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--s4);
+  font-size: 12px;
+}
+.token-table th {
+  text-align: left;
+  padding: var(--s3) var(--s4);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border-bottom: 0.5px solid var(--border-med);
+}
+.token-table td {
+  padding: var(--s3) var(--s4);
+  border-bottom: 0.5px solid var(--border);
+  color: var(--text-2);
+  vertical-align: top;
+}
+.token-table tr:last-child td { border-bottom: none; }
+.token-table .token-name {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green-hi);
+  white-space: nowrap;
+}
+.token-table .token-value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-3);
+}
+.token-swatch-inline {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  vertical-align: middle;
+  margin-right: 6px;
+  border: 0.5px solid rgba(255,255,255,0.1);
+}
+
+/* ══════════════════════════════
+   PRINT / EXPORT
+══════════════════════════════ */
+
+.deliverables-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--s4);
+  margin-top: var(--s6);
+}
+.deliverable-card {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s5);
+}
+.deliverable-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-4);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-2);
+  margin-bottom: var(--s4);
+}
+.deliverable-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-1);
+  margin-bottom: var(--s2);
+}
+.deliverable-desc {
+  font-size: 12px;
+  color: var(--text-2);
+  line-height: 1.65;
+}
+
+/* ══════════════════════════════
+   UTILITIES
+══════════════════════════════ */
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s6); }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s4); }
+.mt-4 { margin-top: var(--s4); }
+.mt-6 { margin-top: var(--s6); }
+.mt-8 { margin-top: var(--s8); }
+.mt-10 { margin-top: var(--s10); }
+.label-sm {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: var(--s3);
+}
+.callout {
+  background: var(--bg-3);
+  border-left: 2px solid var(--amber);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  padding: var(--s4) var(--s5);
+  margin-top: var(--s4);
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.7;
+}
+.callout strong { color: var(--text-1); font-weight: 500; }
+
+/* ══════════════════════════════
+   DIAMOND MARK SVG
+══════════════════════════════ */
+
+.diamond-mark-sm {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+@media print {
+  .sidebar { display: none; }
+  .shell { grid-template-columns: 1fr; }
+  main { padding: 0; }
+  .section { page-break-inside: avoid; }
+}
+
+@media (max-width: 900px) {
+  .shell { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .font-showcase { grid-template-columns: 1fr; }
+  .card-examples { grid-template-columns: 1fr; }
+  .saeo-layers { grid-template-columns: 1fr; }
+  .reasoning-row { grid-template-columns: 1fr; }
+  .deliverables-row { grid-template-columns: 1fr; }
+  .two-col { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+  .text-rule-grid { grid-template-columns: 1fr; }
+}
+
+/* Scroll fade-in */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <nav class="sidebar" aria-label="Brand guide navigation">
+    <div class="sidebar-brand">
+      <div class="sidebar-mark">
+        <!-- Diamond logomark -->
+        <svg class="mark-diamond" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14 2 L26 14 L14 26 L2 14 Z" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.75"/>
+          <path d="M14 2 L26 14 L14 26" fill="none" stroke="#5DCAA5" stroke-width="1.5"/>
+          <path d="M14 26 L2 14 L14 2" fill="none" stroke="#F0997B" stroke-width="1.5"/>
+          <circle cx="14" cy="14" r="2" fill="rgba(255,255,255,0.4)"/>
+        </svg>
+        <span class="sidebar-name">Good Assumptions</span>
+      </div>
+      <div class="sidebar-sub">Brand Design System</div>
+    </div>
+
+    <div class="sidebar-doc-label">v1.0 · April 2026</div>
+
+    <div class="sidebar-nav">
+      <a href="#cover">Overview</a>
+      <div class="sidebar-nav-group">
+        <div class="nav-group-label">Foundation</div>
+        <a href="#principles">Principles</a>
+        <a href="#color">Color System</a>
+        <a href="#typography">Typography</a>
+      </div>
+      <div class="sidebar-nav-group">
+        <div class="nav-group-label">Elements</div>
+        <a href="#element-language">Element Language</a>
+        <a href="#saeo-system">SAEO System</a>
+        <a href="#components">Components</a>
+      </div>
+      <div class="sidebar-nav-group">
+        <div class="nav-group-label">Application</div>
+        <a href="#patterns">Page Patterns</a>
+        <a href="#voice">Voice &amp; Writing</a>
+        <a href="#tokens">Token Reference</a>
+      </div>
+    </div>
+
+    <div class="sidebar-version">
+      <span>Good Assumptions · Internal</span>
+    </div>
+  </nav>
+
+  <!-- ══ MAIN ══ -->
+  <main>
+
+    <!-- ── COVER ── -->
+    <div class="cover" id="cover">
+      <div class="cover-bg"></div>
+      <div class="cover-label">Good Assumptions</div>
+      <h1 class="cover-title">Brand Design<br><em>System</em></h1>
+      <p class="cover-intro">A unified visual and verbal language for Good Assumptions and its intelligence layer, SAEO.ai. This system defines how we express behavioral marketing intelligence — from color to component to copy.</p>
+      <div class="cover-meta">
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Version</span>
+          <span class="cover-meta-value">v1.0</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Updated</span>
+          <span class="cover-meta-value">April 2026</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Status</span>
+          <span class="cover-meta-value">Internal Draft</span>
+        </div>
+        <div class="cover-meta-item">
+          <span class="cover-meta-label">Scope</span>
+          <span class="cover-meta-value">Good Assumptions</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRINCIPLES ── -->
+    <div class="section reveal" id="principles">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">01</span> Foundation</div>
+        <h2 class="section-title">Principles</h2>
+        <p class="section-lead">Good Assumptions is a behavioral marketing intelligence brand. Every design decision earns the right to exist by serving comprehension — not performing credibility.</p>
+      </div>
+
+      <div class="principles-grid">
+        <div class="principle-card">
+          <div class="principle-num">01</div>
+          <div class="principle-title">Evidence before<br>elegance</div>
+          <p class="principle-body">Every claim is grounded in behavioral science. Design signals rigor — not aspiration. Skepticism is the default stance, earned confidence the target.</p>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">02</div>
+          <div class="principle-title">Precision over<br>decoration</div>
+          <p class="principle-body">Visual hierarchy communicates information structure. Accent colors carry semantic weight. Nothing is decorative — if it doesn't communicate, remove it.</p>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">03</div>
+          <div class="principle-title">Calm intelligence</div>
+          <p class="principle-body">The tone is never urgent, never alarmist, never sales-y. The reader is treated as a practitioner — someone doing real work, not a prospect to be converted.</p>
+        </div>
+        <div class="principle-card">
+          <div class="principle-num">04</div>
+          <div class="principle-title">Accessible at<br>every layer</div>
+          <p class="principle-body">Text contrast meets WCAG AA minimum throughout. Color is never the sole carrier of meaning — every color signal is paired with type or shape context.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COLOR ── -->
+    <div class="section reveal" id="color">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">02</span> Color</div>
+        <h2 class="section-title">Color System</h2>
+        <p class="section-lead">Good Assumptions operates in two modes: a dark editorial UI for the live product, and a warm parchment editorial palette for print and brand book contexts. The dark mode is primary.</p>
+      </div>
+
+      <div class="color-system">
+
+        <!-- Dark mode foundations -->
+        <div>
+          <div class="color-group-label">Dark UI — Surface Layers</div>
+          <div class="color-row">
+            <div class="color-swatch">
+              <div class="swatch-block bordered" style="background:#0f0f0e;"></div>
+              <div class="swatch-name">Canvas</div>
+              <div class="swatch-hex">--bg · #0f0f0e</div>
+              <div class="swatch-role">Page background</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block bordered" style="background:#141412;"></div>
+              <div class="swatch-name">Surface 1</div>
+              <div class="swatch-hex">--bg-2 · #141412</div>
+              <div class="swatch-role">Sidebar, nav</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block bordered" style="background:#1a1a17;"></div>
+              <div class="swatch-name">Surface 2</div>
+              <div class="swatch-hex">--bg-3 · #1a1a17</div>
+              <div class="swatch-role">Cards, panels</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block bordered" style="background:#222220;"></div>
+              <div class="swatch-name">Surface 3</div>
+              <div class="swatch-hex">--bg-4 · #222220</div>
+              <div class="swatch-role">Hover, active</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block bordered" style="background:#2a2a27;"></div>
+              <div class="swatch-name">Surface 4</div>
+              <div class="swatch-hex">--bg-5 · #2a2a27</div>
+              <div class="swatch-role">Deeply inset</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Text hierarchy -->
+        <div>
+          <div class="color-group-label">Dark UI — Text Hierarchy (WCAG AA+)</div>
+          <div class="color-row">
+            <div class="color-swatch">
+              <div class="swatch-block" style="background:#eae8de;"></div>
+              <div class="swatch-name">Text Primary</div>
+              <div class="swatch-hex">--text-1 · #eae8de</div>
+              <div class="swatch-role">All information-bearing text. 14:1 ratio.</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block" style="background:#a8a59a;"></div>
+              <div class="swatch-name">Text Secondary</div>
+              <div class="swatch-hex">--text-2 · #a8a59a</div>
+              <div class="swatch-role">Supporting copy, descriptions. 5.8:1.</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block" style="background:#6a6860;"></div>
+              <div class="swatch-name">Text Tertiary</div>
+              <div class="swatch-hex">--text-3 · #6a6860</div>
+              <div class="swatch-role">Eyebrows, labels, chrome only. 3.1:1.</div>
+            </div>
+            <div class="color-swatch">
+              <div class="swatch-block" style="background:#3d3c38;"></div>
+              <div class="swatch-name">Text Ghost</div>
+              <div class="swatch-hex">--text-4 · #3d3c38</div>
+              <div class="swatch-role">Decorative separators, disabled. Visual only.</div>
+            </div>
+          </div>
+          <div class="callout mt-6">
+            <strong>Rule:</strong> text-3 and text-4 are for purely decorative chrome — separators, breadcrumb chevrons, background IDs. Any text that carries information must use text-1 or text-2.
+          </div>
+        </div>
+
+        <!-- Light editorial -->
+        <div>
+          <div class="color-group-label">Editorial Light Mode — Print &amp; Brand Book</div>
+          <div class="light-palette-card">
+            <div class="light-row">
+              <div class="color-swatch">
+                <div class="light-swatch-block" style="background:#f7f4ee;"></div>
+                <div class="light-swatch-name">Parchment</div>
+                <div class="light-swatch-hex">#f7f4ee</div>
+              </div>
+              <div class="color-swatch">
+                <div class="light-swatch-block" style="background:#fcfaf6;"></div>
+                <div class="light-swatch-name">Surface</div>
+                <div class="light-swatch-hex">#fcfaf6</div>
+              </div>
+              <div class="color-swatch">
+                <div class="light-swatch-block" style="background:#1f1b17;"></div>
+                <div class="light-swatch-name">Deep Text</div>
+                <div class="light-swatch-hex">#1f1b17</div>
+              </div>
+              <div class="color-swatch">
+                <div class="light-swatch-block" style="background:#275e63;"></div>
+                <div class="light-swatch-name">Teal Primary</div>
+                <div class="light-swatch-hex">#275e63</div>
+              </div>
+              <div class="color-swatch">
+                <div class="light-swatch-block" style="background:#b98f5a;"></div>
+                <div class="light-swatch-name">Gold Accent</div>
+                <div class="light-swatch-hex">#b98f5a</div>
+              </div>
+              <div class="color-swatch">
+                <div class="light-swatch-block" style="background:#9a6b52;"></div>
+                <div class="light-swatch-name">Clay</div>
+                <div class="light-swatch-hex">#9a6b52</div>
+              </div>
+            </div>
+            <div style="margin-top: 16px; font-size: 12px; color: var(--light-muted);">
+              Editorial light mode is used for the Good Assumptions brand book, white papers, and print outputs only. The dark UI is the canonical digital presentation.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── ELEMENT LANGUAGE ── -->
+    <div class="section reveal" id="element-language">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">03</span> Color</div>
+        <h2 class="section-title">Element Color Language</h2>
+        <p class="section-lead">This is the semantic layer of our color system. Each major content type has a persistent color identity across all pages. These are not decorative — they are a navigation system at the visual layer.</p>
+      </div>
+
+      <div class="element-language">
+
+        <div class="element-row">
+          <div class="element-color-bar" style="background: var(--amber);"></div>
+          <div class="element-info">
+            <div class="element-name" style="color: var(--amber-hi);">Liminal Transitions</div>
+            <div class="element-count">164 active states · LIM-001 — LIM-140</div>
+          </div>
+          <div class="element-chips">
+            <span class="element-chip" style="background:var(--amber-bg); color:var(--amber-hi);">#FAC775</span>
+            <span class="element-chip badge badge-amber">Amber</span>
+          </div>
+          <div class="element-use-case">Threshold moments, behavioral transitions, the "when" layer of marketing failure.</div>
+        </div>
+
+        <div class="element-row">
+          <div class="element-color-bar" style="background: var(--purple);"></div>
+          <div class="element-info">
+            <div class="element-name" style="color: var(--purple-hi);">Cognitive Biases</div>
+            <div class="element-count">201 biases · Cog-001 — Cog-201</div>
+          </div>
+          <div class="element-chips">
+            <span class="element-chip" style="background:var(--purple-bg); color:var(--purple-hi);">#AFA9EC</span>
+            <span class="element-chip badge badge-purple">Purple</span>
+          </div>
+          <div class="element-use-case">Psychological mechanisms, heuristics, systematic reasoning patterns.</div>
+        </div>
+
+        <div class="element-row">
+          <div class="element-color-bar" style="background: var(--blue);"></div>
+          <div class="element-info">
+            <div class="element-name" style="color: var(--blue-hi);">Choice Vectors</div>
+            <div class="element-count">343 vectors · CV-001 — CV-343</div>
+          </div>
+          <div class="element-chips">
+            <span class="element-chip" style="background:var(--blue-bg); color:var(--blue-hi);">#87BEF0</span>
+            <span class="element-chip badge badge-blue">Blue</span>
+          </div>
+          <div class="element-use-case">Decision-shaping forces, environmental and contextual factors in choice architecture.</div>
+        </div>
+
+        <div class="element-row">
+          <div class="element-color-bar" style="background: var(--green);"></div>
+          <div class="element-info">
+            <div class="element-name" style="color: var(--green-hi);">Primary Tactics</div>
+            <div class="element-count">3,334 tactics · PT-XXXX</div>
+          </div>
+          <div class="element-chips">
+            <span class="element-chip" style="background:var(--green-bg); color:var(--green-hi);">#5DCAA5</span>
+            <span class="element-chip badge badge-green">Green</span>
+          </div>
+          <div class="element-use-case">Actionable executional tactics derived from behavioral science. The "do" layer.</div>
+        </div>
+
+        <div class="element-row">
+          <div class="element-color-bar" style="background: var(--coral);"></div>
+          <div class="element-info">
+            <div class="element-name" style="color: var(--coral-hi);">Alert / Warning / SAEO Brand</div>
+            <div class="element-count">Brand accent · Secondary signal</div>
+          </div>
+          <div class="element-chips">
+            <span class="element-chip" style="background:var(--coral-bg); color:var(--coral-hi);">#F0997B</span>
+            <span class="element-chip badge badge-coral">Coral</span>
+          </div>
+          <div class="element-use-case">SAEO logomark accent (left half), failure states, post-resolution fragility signals.</div>
+        </div>
+
+      </div>
+
+      <div class="callout mt-8">
+        <strong>Application rule:</strong> When an entity is mentioned in body copy, its color highlights the reference inline. When an entity appears in a card, badge, or chip, the color determines the border accent and label treatment. Never mix entity colors arbitrarily — the mapping is fixed.
+      </div>
+
+      <div class="mt-8">
+        <div class="label-sm">Color in context — inline entity references</div>
+        <div class="reframe-block">
+          <div class="reframe-label">Example — mixed entity copy</div>
+          <div class="reframe-text">
+            The <span class="highlight-amber">Trust Threshold</span> transition activates when a consumer encounters new brand information that conflicts with their <span class="highlight-purple">Confirmation Bias</span>. The brand's response — governed by <span class="highlight-blue">Social Proof</span> and <span class="highlight-green">Transparency Signaling</span> — determines whether the transition resolves forward or collapses.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SAEO SYSTEM ── -->
+    <div class="section reveal" id="saeo-system">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">04</span> System</div>
+        <h2 class="section-title">SAEO Layer System</h2>
+        <p class="section-lead">The SAEO diagnostic framework maps marketing failures to one of four operational layers. Each layer has a fixed color identity used consistently across diagnostic outputs, chat responses, and educational content.</p>
+      </div>
+
+      <div class="saeo-layers">
+        <div class="saeo-layer" style="border-left: 2px solid var(--green);">
+          <div class="layer-code highlight-green">S</div>
+          <div class="layer-name">Strategy</div>
+          <div class="layer-desc">Brand positioning, audience definition, value proposition. The "what we're trying to do" layer.</div>
+          <div style="margin-top: 12px;"><span class="badge badge-green">Green · #5DCAA5</span></div>
+        </div>
+        <div class="saeo-layer" style="border-left: 2px solid var(--amber);">
+          <div class="layer-code highlight-amber">A</div>
+          <div class="layer-name">Application</div>
+          <div class="layer-desc">Campaign design, messaging architecture, channel selection. How strategy becomes execution.</div>
+          <div style="margin-top: 12px;"><span class="badge badge-amber">Amber · #FAC775</span></div>
+        </div>
+        <div class="saeo-layer" style="border-left: 2px solid var(--blue);">
+          <div class="layer-code highlight-blue">E</div>
+          <div class="layer-name">Execution</div>
+          <div class="layer-desc">Creative production, copy, media deployment. The visible surface of the brand's behavior.</div>
+          <div style="margin-top: 12px;"><span class="badge badge-blue">Blue · #87BEF0</span></div>
+        </div>
+        <div class="saeo-layer" style="border-left: 2px solid var(--coral);">
+          <div class="layer-code highlight-coral">O</div>
+          <div class="layer-name">Operations</div>
+          <div class="layer-desc">Processes, tech stack, team structure. The infrastructure layer — often the actual failure point.</div>
+          <div style="margin-top: 12px;"><span class="badge badge-coral">Coral · #F0997B</span></div>
+        </div>
+      </div>
+
+      <div class="mt-10">
+        <div class="label-sm">Reasoning Modes</div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:var(--s4);">At every threshold moment, abductive reasoning dominates. These three modes are color-coded in SAEO's causal reasoning maps and chat responses.</p>
+        <div class="reasoning-row">
+          <div class="reasoning-card" style="border-left: 2px solid var(--purple);">
+            <div class="reasoning-mode highlight-purple">Abductive</div>
+            <div class="reasoning-desc">Inference to the best explanation. The universal mode at threshold moments — "what's the most likely cause of what I'm seeing?"</div>
+          </div>
+          <div class="reasoning-card" style="border-left: 2px solid var(--amber);">
+            <div class="reasoning-mode highlight-amber">Inductive</div>
+            <div class="reasoning-desc">Pattern-based generalization from observed data. Used in post-transition consolidation and behavioral pattern recognition.</div>
+          </div>
+          <div class="reasoning-card" style="border-left: 2px solid var(--green);">
+            <div class="reasoning-mode highlight-green">Deductive</div>
+            <div class="reasoning-desc">Rule-application from established principles. Used in tactical recommendation — once the transition type is confirmed.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TYPOGRAPHY ── -->
+    <div class="section reveal" id="typography">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">05</span> Typography</div>
+        <h2 class="section-title">Typography</h2>
+        <p class="section-lead">Three typefaces. Each has a defined role — no mixing outside its lane. Weight usage is precise: 300 for display prose, 400 for body, 500 for labels and UI.</p>
+      </div>
+
+      <div class="font-showcase">
+        <div class="font-card">
+          <div class="font-label">DM Sans — UI &amp; Body</div>
+          <div class="font-alpha">AaBbCc 0123</div>
+          <div class="font-alpha" style="font-weight:500; margin-top:4px;">AaBbCc 0123</div>
+          <div class="font-alpha" style="font-style:italic; font-weight:300; margin-top:4px; color: var(--text-2);">The assumption behind the assumption</div>
+          <div class="font-use">All body copy, navigation, labels, form fields, captions, data tables. Weights used: 300 (display prose), 400 (body), 500 (labels/emphasis).</div>
+        </div>
+        <div class="font-card">
+          <div class="font-label">DM Serif Display — Editorial</div>
+          <div class="font-alpha-display">Liminal Space</div>
+          <div class="font-alpha-display" style="font-style:italic; color:var(--text-2); margin-top:4px;">The moment before</div>
+          <div class="font-use">Section titles in the brand guide and editorial contexts only. Page-level H1s where editorial treatment is appropriate. Never in UI components or data displays.</div>
+        </div>
+        <div class="font-card">
+          <div class="font-label">DM Mono — Code &amp; IDs</div>
+          <div class="font-alpha-mono">LIM-047 · #0f0f0e<br>CV-001 · 3072d</div>
+          <div class="font-use">Entity IDs, color values, code snippets, version numbers, data labels, timestamps. Never for body copy.</div>
+        </div>
+        <div class="font-card">
+          <div class="font-label">❌ Not in use</div>
+          <div style="font-size:13px;color:var(--text-3);line-height:1.7;margin-top:8px;">
+            The original brand-doc draft used Satoshi and Zodiak. These are not in use in the live product. DM Sans/Serif Display/Mono is the unified stack. Do not introduce additional typefaces.
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10">
+        <div class="label-sm">Type Scale</div>
+        <div class="type-scale">
+          <div class="scale-row">
+            <span class="scale-label">Display</span>
+            <span class="scale-example" style="font-family:var(--font-display);font-size:44px;font-weight:400;letter-spacing:-0.03em;line-height:1;">Behavioral</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">H1 · 32px</span>
+            <span class="scale-example" style="font-size:32px;font-weight:300;letter-spacing:-0.02em;line-height:1.1;">The Trust Threshold</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">H2 · 24px</span>
+            <span class="scale-example" style="font-size:24px;font-weight:300;letter-spacing:-0.015em;">Pre-Transition Signals</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">H3 · 18px</span>
+            <span class="scale-example" style="font-size:18px;font-weight:500;letter-spacing:-0.01em;">Observable Metrics</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">Body · 15px</span>
+            <span class="scale-example" style="font-size:15px;font-weight:400;">Consumers entering this transition demonstrate measurable hesitation patterns before completing high-stakes decisions.</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">Small · 13px</span>
+            <span class="scale-example" style="font-size:13px;color:var(--text-2);">Supporting context, card descriptions, secondary labels.</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">Label · 11px</span>
+            <span class="scale-example" style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);">Category · Subcategory</span>
+          </div>
+          <div class="scale-row">
+            <span class="scale-label">Mono ID · 11px</span>
+            <span class="scale-example" style="font-family:var(--font-mono);font-size:11px;color:var(--text-3);">LIM-047 · Cog-112 · CV-208</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-rule-grid mt-8">
+        <div class="text-rule text-rule-do">
+          <div class="text-rule-tag tag-do">✓ Do</div>
+          <div class="text-rule-example">Use weight 300 for display prose and long-form body. It signals considered intelligence, not casualness. Let spacing and size carry hierarchy.</div>
+        </div>
+        <div class="text-rule text-rule-dont">
+          <div class="text-rule-tag tag-dont">✗ Don't</div>
+          <div class="text-rule-example">Don't bold headlines for visual impact. Don't use italic for anything other than genuine editorial emphasis or the display font's character style.</div>
+        </div>
+        <div class="text-rule text-rule-do">
+          <div class="text-rule-tag tag-do">✓ Do</div>
+          <div class="text-rule-example">Always use uppercase + letter-spacing for eyebrow labels and metadata. This is the only sanctioned use of all-caps — never in body copy.</div>
+        </div>
+        <div class="text-rule text-rule-dont">
+          <div class="text-rule-tag tag-dont">✗ Don't</div>
+          <div class="text-rule-example">Don't use text-3 color (#6a6860) for any text that carries meaning. Only decorative chrome, separators, and background label elements.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPONENTS ── -->
+    <div class="section reveal" id="components">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">06</span> Components</div>
+        <h2 class="section-title">Components</h2>
+        <p class="section-lead">A small, well-defined component set. Every component follows the same structure: surface → border → content hierarchy → optional color accent.</p>
+      </div>
+
+      <div class="component-grid">
+
+        <!-- Badges -->
+        <div>
+          <div class="component-section-title">Badges &amp; Status Tags</div>
+          <div class="badge-row">
+            <span class="badge badge-amber">Liminal</span>
+            <span class="badge badge-purple">Cognitive Bias</span>
+            <span class="badge badge-blue">Choice Vector</span>
+            <span class="badge badge-green">Tactic</span>
+            <span class="badge badge-coral">Alert</span>
+            <span class="badge badge-neutral">Universal</span>
+          </div>
+          <div class="badge-row mt-4">
+            <span class="badge badge-amber">Forward</span>
+            <span class="badge badge-coral">Regressive</span>
+            <span class="badge badge-neutral">Tier 1</span>
+            <span class="badge badge-green">Resolved</span>
+            <span class="badge badge-purple">Post-Resolution</span>
+          </div>
+          <div class="callout mt-4">Badges are 10px uppercase, letter-spacing 0.06em. Background is always the 10% opacity tint. Border is always the 25% opacity tint. Never use solid fills.</div>
+        </div>
+
+        <!-- Entity IDs -->
+        <div>
+          <div class="component-section-title">Entity IDs</div>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.7;">Every knowledge base entity carries a human-readable ID in DM Mono. IDs appear in breadcrumbs, card headers, and inline references.</p>
+          <div class="id-row">
+            <span class="entity-id">LIM-047</span>
+            <span class="entity-id">Cog-112</span>
+            <span class="entity-id">CV-208</span>
+            <span class="entity-id">PT-1024</span>
+            <span class="entity-id">VERT-012</span>
+          </div>
+        </div>
+
+        <!-- Breadcrumbs -->
+        <div>
+          <div class="component-section-title">Breadcrumb Navigation</div>
+          <div class="breadcrumb">
+            <span>Good Assumptions</span>
+            <span class="breadcrumb-sep">›</span>
+            <span>Liminal States</span>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">Trust Threshold</span>
+          </div>
+          <div class="breadcrumb mt-4">
+            <span>Good Assumptions</span>
+            <span class="breadcrumb-sep">›</span>
+            <span>Cognitive Biases</span>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-current">Loss Aversion</span>
+          </div>
+        </div>
+
+        <!-- Cards -->
+        <div>
+          <div class="component-section-title">Knowledge Base Cards</div>
+          <div class="card-examples">
+            <div class="card-base card-accented-amber">
+              <div class="entity-eyebrow" style="margin:0;">
+                <span class="entity-id">LIM-047</span>
+                <span class="badge badge-amber">Forward</span>
+              </div>
+              <div class="card-title">Trust Threshold</div>
+              <div class="card-body">The moment a consumer must decide whether new brand information changes their prior assessment.</div>
+              <div class="card-footer">
+                <span>liminal-transition</span>
+                <span class="highlight-amber">Tier 1 ↗</span>
+              </div>
+            </div>
+            <div class="card-base card-accented-purple">
+              <div class="entity-eyebrow" style="margin:0;">
+                <span class="entity-id">Cog-112</span>
+                <span class="badge badge-purple">Bias</span>
+              </div>
+              <div class="card-title">Confirmation Bias</div>
+              <div class="card-body">The tendency to search for, interpret, and recall information in a way that confirms prior beliefs.</div>
+              <div class="card-footer">
+                <span>cognitive-bias</span>
+                <span class="highlight-purple">High Impact ↗</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reframe block -->
+        <div>
+          <div class="component-section-title">Reframe Block</div>
+          <p style="font-size:13px;color:var(--text-2);line-height:1.7;margin-bottom:var(--s3);">Used on entity pages to restate the concept in plain, practitioner-facing language. The key term is highlighted in the entity's semantic color.</p>
+          <div class="reframe-block">
+            <div class="reframe-label">Reframe</div>
+            <div class="reframe-text">This isn't a funnel stage. It's a <strong>psychological inflection point</strong> — the moment your brand either gains or permanently loses standing to speak to this consumer's decision.</div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div>
+          <div class="component-section-title">Button System</div>
+          <div class="btn-showcase">
+            <button class="btn btn-primary">Ask SAEO</button>
+            <button class="btn btn-secondary">Explore Related</button>
+            <button class="btn btn-ghost">View Evidence</button>
+            <button class="btn btn-amber">Liminal States ↗</button>
+          </div>
+          <div class="callout mt-4">Three core button states. A fourth entity-colored variant for CTA buttons on entity pages. Never mix button types in the same button row.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── PAGE PATTERNS ── -->
+    <div class="section reveal" id="patterns">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">07</span> Application</div>
+        <h2 class="section-title">Page Patterns</h2>
+        <p class="section-lead">Three canonical page types govern the Good Assumptions content architecture. Each follows the same structural contract: breadcrumb → hero → content → related.</p>
+      </div>
+
+      <!-- Entity anatomy example -->
+      <div class="page-example">
+        <div class="page-example-label">Pattern A — Entity Detail Page (Liminal State example)</div>
+        <div class="entity-hero">
+          <div class="entity-eyebrow">
+            <span class="entity-id">LIM-047</span>
+            <span class="badge badge-amber">Forward</span>
+            <span class="badge badge-neutral">Tier 1</span>
+            <span class="badge badge-neutral">Universal</span>
+          </div>
+          <div style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px;">Liminal Transition</div>
+          <div class="entity-title">The Trust Threshold</div>
+          <div class="entity-summary">A forward transition in which a consumer evaluates whether new brand information is sufficient to revise an existing trust assessment. Resolution determines long-term brand standing.</div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:180px;">
+            <div class="label-sm">Key Signal</div>
+            <div style="font-size:13px;color:var(--text-2);">Increased information-seeking before conversion</div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <div class="label-sm">Resolution Window</div>
+            <div style="font-size:13px;color:var(--text-2);">2–7 days post-trigger event</div>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <div class="label-sm">Primary Mechanism</div>
+            <div style="font-size:13px;color:var(--text-2);"><span class="highlight-purple">Confirmation Bias</span> + <span class="highlight-blue">Social Proof</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Overview page pattern -->
+      <div class="page-example mt-6">
+        <div class="page-example-label">Pattern B — Category Overview Page</div>
+        <div style="padding:0 0 16px;">
+          <div style="font-size:11px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:10px;">Good Assumptions</div>
+          <div style="font-size:30px;font-weight:300;letter-spacing:-0.02em;color:var(--text-1);line-height:1.15;margin-bottom:10px;">Cognitive <em style="color:var(--text-2);">Biases</em></div>
+          <div style="font-size:14px;color:var(--text-2);line-height:1.75;max-width:480px;">201 documented cognitive biases mapped to marketing behavior. Each bias carries observable signals, tactical responses, and cross-references to liminal transitions where it activates.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;">
+          <div class="card-base card-accented-purple">
+            <span class="entity-id">Cog-001</span>
+            <div class="card-title" style="font-size:13px;">Loss Aversion</div>
+            <div class="card-body" style="font-size:11px;">2:1 pain-pleasure asymmetry in decision weighting.</div>
+          </div>
+          <div class="card-base card-accented-purple">
+            <span class="entity-id">Cog-047</span>
+            <div class="card-title" style="font-size:13px;">Anchoring Effect</div>
+            <div class="card-body" style="font-size:11px;">First information disproportionately weights final decision.</div>
+          </div>
+          <div class="card-base card-accented-purple">
+            <span class="entity-id">Cog-112</span>
+            <div class="card-title" style="font-size:13px;">Confirmation Bias</div>
+            <div class="card-body" style="font-size:11px;">Selective recall in service of prior belief.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── VOICE ── -->
+    <div class="section reveal" id="voice">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">08</span> Voice</div>
+        <h2 class="section-title">Voice &amp; Writing</h2>
+        <p class="section-lead">Good Assumptions writes for practitioners, not prospects. The voice is precise, earned, occasionally blunt. Never explanatory for its own sake. Never self-congratulatory.</p>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <div class="label-sm">Four voice attributes</div>
+          <div style="display:flex;flex-direction:column;gap:var(--s3);margin-top:var(--s3);">
+            <div class="card-base">
+              <div class="card-title">Precise</div>
+              <div class="card-body">Specific over general. Use behavioral science terms correctly. Name the mechanism. Don't hedge with "might" when the evidence says "does."</div>
+            </div>
+            <div class="card-base">
+              <div class="card-title">Earned skepticism</div>
+              <div class="card-body">We cite evidence or we stay quiet. Claims are grounded. GenX epistemic foundation — show your work, acknowledge limitations.</div>
+            </div>
+            <div class="card-base">
+              <div class="card-title">Calm authority</div>
+              <div class="card-body">Never urgent. Never alarmist. The intelligence should feel like talking to a very well-read colleague who has no reason to sell you anything.</div>
+            </div>
+            <div class="card-base">
+              <div class="card-title">Direct</div>
+              <div class="card-body">Shortest path to the insight. No preamble. No "great question." No "as we can see." Start with the claim, follow with the evidence.</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="label-sm">Writing examples</div>
+          <div class="voice-examples">
+            <div class="voice-example">
+              <div class="voice-ex-label" style="color:var(--coral-hi);">✗ Don't write this</div>
+              <div class="voice-ex-text" style="color:var(--text-3);">It's really important that marketers understand how consumer psychology plays a role in the exciting journey through the funnel.</div>
+            </div>
+            <div class="voice-example" style="border-color:var(--green-border);">
+              <div class="voice-ex-label" style="color:var(--green-hi);">✓ Write this instead</div>
+              <div class="voice-ex-text">Funnel stages don't exist as psychological states. Consumers transition between discrete behavioral modes — and the transition itself is where brands lose.</div>
+            </div>
+            <div class="voice-example">
+              <div class="voice-ex-label" style="color:var(--coral-hi);">✗ Reframe labels</div>
+              <div class="voice-ex-text" style="color:var(--text-3);">Understanding cognitive biases can help you better connect with customers.</div>
+            </div>
+            <div class="voice-example" style="border-color:var(--green-border);">
+              <div class="voice-ex-label" style="color:var(--green-hi);">✓ Reframe labels</div>
+              <div class="voice-ex-text"><em>This isn't about understanding your audience better.</em> It's about understanding what your audience's nervous system is optimized to do — and whether your brand is working with it or against it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <div class="label-sm">Headline formulas</div>
+        <div class="card-examples mt-4">
+          <div class="card-base">
+            <div class="card-title">The Naming Pattern</div>
+            <div class="card-body">"The [Named Concept]" — implies taxonomy, earned classification. Used for liminal states and defined phenomena.</div>
+            <div style="margin-top:8px;font-size:13px;color:var(--amber-hi);">"The Trust Threshold" · "The Sunk Cost Window"</div>
+          </div>
+          <div class="card-base">
+            <div class="card-title">The Reframe</div>
+            <div class="card-body">Challenges a received wisdom in the first sentence. Sets up the behavioral science counter-explanation.</div>
+            <div style="margin-top:8px;font-size:13px;color:var(--blue-hi);">"This isn't a loyalty problem. It's a consolidation failure."</div>
+          </div>
+          <div class="card-base">
+            <div class="card-title">The Precise Claim</div>
+            <div class="card-body">No hedge, no softening. States what the evidence says directly. The confidence signals credibility.</div>
+            <div style="margin-top:8px;font-size:13px;color:var(--green-hi);">"Funnel stages don't describe psychological states. They describe marketer preferences."</div>
+          </div>
+          <div class="card-base">
+            <div class="card-title">The Weight of Why</div>
+            <div class="card-body">Opens with the consumer's psychological state before the brand enters the picture. Establishes the prior question.</div>
+            <div style="margin-top:8px;font-size:13px;color:var(--purple-hi);">"What a consumer needs to move — and whether this brand has standing to provide it."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TOKEN REFERENCE ── -->
+    <div class="section reveal" id="tokens">
+      <div class="section-header">
+        <div class="section-eyebrow"><span class="section-num">09</span> Reference</div>
+        <h2 class="section-title">CSS Token Reference</h2>
+        <p class="section-lead">All design decisions expressed as CSS custom properties. These are the production tokens — copy directly into <span class="inline-code">:root</span> for any GA-branded surface.</p>
+      </div>
+
+      <div class="label-sm mt-4">Surface &amp; Text</div>
+      <table class="token-table mt-4">
+        <thead>
+          <tr>
+            <th>Token</th>
+            <th>Value</th>
+            <th>Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="token-name">--bg</td><td class="token-value"><span class="token-swatch-inline" style="background:#0f0f0e;"></span>#0f0f0e</td><td>Canvas background</td></tr>
+          <tr><td class="token-name">--bg-2</td><td class="token-value"><span class="token-swatch-inline" style="background:#141412;"></span>#141412</td><td>Sidebar, nav surfaces</td></tr>
+          <tr><td class="token-name">--bg-3</td><td class="token-value"><span class="token-swatch-inline" style="background:#1a1a17;"></span>#1a1a17</td><td>Cards, panels</td></tr>
+          <tr><td class="token-name">--bg-4</td><td class="token-value"><span class="token-swatch-inline" style="background:#222220;"></span>#222220</td><td>Hover / active state</td></tr>
+          <tr><td class="token-name">--text-1</td><td class="token-value"><span class="token-swatch-inline" style="background:#eae8de;"></span>#eae8de</td><td>Primary — all information text</td></tr>
+          <tr><td class="token-name">--text-2</td><td class="token-value"><span class="token-swatch-inline" style="background:#a8a59a;"></span>#a8a59a</td><td>Secondary — supporting copy</td></tr>
+          <tr><td class="token-name">--text-3</td><td class="token-value"><span class="token-swatch-inline" style="background:#6a6860;"></span>#6a6860</td><td>Tertiary — decorative chrome only</td></tr>
+          <tr><td class="token-name">--border</td><td class="token-value">rgba(255,255,255,0.07)</td><td>Subtle dividers</td></tr>
+          <tr><td class="token-name">--border-med</td><td class="token-value">rgba(255,255,255,0.13)</td><td>Card borders, inputs</td></tr>
+        </tbody>
+      </table>
+
+      <div class="label-sm mt-8">Element Colors</div>
+      <table class="token-table mt-4">
+        <thead>
+          <tr><th>Entity</th><th>Foreground</th><th>Background</th><th>Border</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-amber">Liminal</span></td>
+            <td class="token-value"><span class="token-swatch-inline" style="background:#FAC775;"></span>#FAC775</td>
+            <td class="token-value">rgba(186,117,23,0.10)</td>
+            <td class="token-value">rgba(186,117,23,0.25)</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-purple">Bias</span></td>
+            <td class="token-value"><span class="token-swatch-inline" style="background:#AFA9EC;"></span>#AFA9EC</td>
+            <td class="token-value">rgba(127,119,221,0.10)</td>
+            <td class="token-value">rgba(127,119,221,0.25)</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-blue">Vector</span></td>
+            <td class="token-value"><span class="token-swatch-inline" style="background:#87BEF0;"></span>#87BEF0</td>
+            <td class="token-value">rgba(74,143,212,0.10)</td>
+            <td class="token-value">rgba(74,143,212,0.25)</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-green">Tactic</span></td>
+            <td class="token-value"><span class="token-swatch-inline" style="background:#5DCAA5;"></span>#5DCAA5</td>
+            <td class="token-value">rgba(29,158,117,0.10)</td>
+            <td class="token-value">rgba(29,158,117,0.25)</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-coral">Alert / O-Layer</span></td>
+            <td class="token-value"><span class="token-swatch-inline" style="background:#F0997B;"></span>#F0997B</td>
+            <td class="token-value">rgba(216,90,48,0.10)</td>
+            <td class="token-value">rgba(216,90,48,0.25)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="label-sm mt-8">Typography</div>
+      <table class="token-table mt-4">
+        <thead><tr><th>Token</th><th>Value</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td class="token-name">--font-ui</td><td class="token-value">'DM Sans', system-ui</td><td>All body, labels, navigation</td></tr>
+          <tr><td class="token-name">--font-display</td><td class="token-value">'DM Serif Display', Georgia</td><td>Section titles, editorial H1</td></tr>
+          <tr><td class="token-name">--font-mono</td><td class="token-value">'DM Mono', monospace</td><td>IDs, code, data labels</td></tr>
+        </tbody>
+      </table>
+
+      <div class="mt-10">
+        <div class="deliverables-row">
+          <div class="deliverable-card">
+            <div class="deliverable-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div class="deliverable-title">CSS Variables</div>
+            <div class="deliverable-desc">Copy token block directly into <span class="inline-code">:root</span>. Maps 1:1 with production token names.</div>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><path d="M17 13v8M13 17h8"/></svg>
+            </div>
+            <div class="deliverable-title">Figma Tokens</div>
+            <div class="deliverable-desc">Set up color styles matching each token name. Text styles: DM Sans 300/400/500 + DM Serif Display.</div>
+          </div>
+          <div class="deliverable-card">
+            <div class="deliverable-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="deliverable-title">Brand Book</div>
+            <div class="deliverable-desc">This document's section order maps directly to the brand book chapter structure. Print via browser → Save as PDF.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /section tokens -->
+
+  </main>
+</div><!-- /shell -->
+
+<script>
+// Scroll-triggered reveals
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Active nav link
+const sections = document.querySelectorAll('[id]');
+const navLinks = document.querySelectorAll('.sidebar-nav a');
+const navMap = {};
+navLinks.forEach(a => {
+  const id = a.getAttribute('href')?.replace('#', '');
+  if (id) navMap[id] = a;
+});
+
+const navObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      if (navMap[e.target.id]) navMap[e.target.id].classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(s => navObs.observe(s));
+</script>
+
+</body>
+</html>
