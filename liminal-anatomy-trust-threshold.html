@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Trust Threshold — Liminal Anatomy · Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #0f0f0e;
+    --bg-2:       #161614;
+    --bg-3:       #1e1e1b;
+    --bg-4:       #252520;
+    --border:     rgba(255,255,255,0.07);
+    --border-med: rgba(255,255,255,0.13);
+    --text-1:     #e8e6dc;
+    --text-2:     #9c9a8e;
+    --text-3:     #5c5b54;
+    --text-4:     #3a3a35;
+
+    --green:      #1D9E75;
+    --green-bg:   rgba(29,158,117,0.1);
+    --green-text: #5DCAA5;
+
+    --amber:      #BA7517;
+    --amber-bg:   rgba(186,117,23,0.1);
+    --amber-text: #FAC775;
+
+    --red:        #D85A30;
+    --red-bg:     rgba(216,90,48,0.1);
+    --red-text:   #F0997B;
+
+    --purple:     #7F77DD;
+    --purple-bg:  rgba(127,119,221,0.1);
+    --purple-text:#AFA9EC;
+
+    --coral:      #D85A30;
+    --coral-bg:   rgba(216,90,48,0.08);
+    --coral-text: #F0997B;
+
+    --font: 'DM Sans', system-ui, sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page { max-width: 800px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ── breadcrumb ── */
+  .breadcrumb {
+    padding: 32px 0 0;
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .breadcrumb span { color: var(--text-4); }
+
+  /* ── hero ── */
+  .hero {
+    padding: 40px 0 48px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .lim-id {
+    font-size: 11px;
+    font-family: var(--mono);
+    color: var(--text-3);
+    background: var(--bg-3);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 0.5px solid var(--border);
+  }
+  .badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .badge-forward { background: var(--green-bg); color: var(--green-text); }
+  .badge-tier1   { background: var(--amber-bg);  color: var(--amber-text); }
+  .badge-universal { background: var(--bg-3); color: var(--text-2); border: 0.5px solid var(--border); }
+
+  .hero-concept {
+    font-size: 13px;
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hero-title {
+    font-size: 44px;
+    font-weight: 300;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: var(--text-2);
+  }
+  .hero-question {
+    font-size: 18px;
+    color: var(--text-2);
+    font-style: italic;
+    font-weight: 300;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    padding-left: 16px;
+    border-left: 2px solid var(--border-med);
+  }
+  .hero-desc {
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.8;
+    font-weight: 300;
+    max-width: 640px;
+  }
+
+  /* ── meta grid ── */
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 40px 0;
+  }
+  .meta-cell {
+    background: var(--bg-2);
+    padding: 14px 16px;
+  }
+  .meta-label {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--text-3);
+    margin-bottom: 5px;
+  }
+  .meta-value {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.3;
+  }
+  .meta-value.mono { font-family: var(--mono); font-weight: 400; }
+  .meta-value.green { color: var(--green-text); }
+  .meta-value.amber { color: var(--amber-text); }
+  .meta-value.red   { color: var(--red-text); }
+
+  /* ── section ── */
+  .section { margin: 56px 0; }
+  .section-header { margin-bottom: 24px; }
+  .section-num {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 6px;
+  }
+  .section-title {
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--text-1);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    font-size: 14px;
+    color: var(--text-2);
+    font-weight: 300;
+    line-height: 1.65;
+  }
+
+  /* ── bias cards ── */
+  .bias-list { display: flex; flex-direction: column; gap: 12px; }
+  .bias-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .bias-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px 10px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .bias-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .bias-relevance {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+  .rel-primary   { background: var(--red-bg);    color: var(--red-text); }
+  .rel-core      { background: var(--amber-bg);   color: var(--amber-text); }
+  .rel-supporting{ background: var(--bg-3);       color: var(--text-3); border: 0.5px solid var(--border); }
+
+  .bias-body { padding: 12px 18px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 560px) { .bias-body { grid-template-columns: 1fr; } }
+  .bias-col-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 5px;
+  }
+  .bias-col-text {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .bias-intervention {
+    padding: 10px 18px;
+    background: var(--bg-3);
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .interv-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+  .interv-text {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .sim-score {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-4);
+    margin-top: 2px;
+  }
+
+  /* ── vector cards ── */
+  .vector-list { display: flex; flex-direction: column; gap: 10px; }
+  .vector-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+  }
+  .vector-stripe {
+    width: 3px;
+    border-radius: 3px 0 0 3px;
+    flex-shrink: 0;
+  }
+  .vs-accelerate { background: var(--green); }
+  .vs-stabilize  { background: var(--purple); }
+  .vector-inner { padding: 14px 18px; flex: 1; }
+  .vector-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+  .vector-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .vector-role {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    flex-shrink: 0;
+  }
+  .role-acc { background: var(--green-bg); color: var(--green-text); }
+  .role-sta { background: var(--purple-bg); color: var(--purple-text); }
+  .vector-why {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.6;
+    font-weight: 300;
+    margin-bottom: 8px;
+  }
+  .vector-deploy-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding-top: 8px;
+    border-top: 0.5px solid var(--border);
+  }
+  @media (max-width: 540px) { .vector-deploy-row { grid-template-columns: 1fr; } }
+  .vd-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 4px;
+  }
+  .vd-text {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.55;
+    font-weight: 300;
+  }
+  .vd-text.warn { color: var(--red-text); }
+
+  /* ── tactic cards ── */
+  .tactic-list { display: flex; flex-direction: column; gap: 10px; }
+  .tactic-card {
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .tactic-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .tactic-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .tactic-id {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-3);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .tactic-via {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+  .tactic-via strong { color: var(--text-2); font-weight: 400; }
+  .tactic-outcome {
+    font-size: 12px;
+    color: var(--text-2);
+    line-height: 1.6;
+    font-weight: 300;
+    padding: 8px 12px;
+    background: var(--bg-3);
+    border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .tactic-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tactic-tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--bg-3);
+    color: var(--text-3);
+    border: 0.5px solid var(--border);
+    font-family: var(--mono);
+  }
+
+  /* ── connection graph ── */
+  .conn-graph { display: flex; flex-direction: column; gap: 8px; }
+  .conn-row {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .conn-type-bar {
+    width: 3px;
+    flex-shrink: 0;
+  }
+  .ct-inbound   { background: var(--green); }
+  .ct-outbound  { background: var(--amber); }
+  .ct-exit      { background: var(--red); }
+  .ct-post      { background: var(--purple); }
+  .ct-reentry   { background: var(--text-3); }
+
+  .conn-inner {
+    padding: 12px 16px;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+  .conn-transitions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .conn-node {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-1);
+  }
+  .conn-node.dim { color: var(--text-2); font-weight: 400; }
+  .conn-arrow { color: var(--text-3); font-size: 12px; }
+  .conn-rationale {
+    font-size: 11px;
+    color: var(--text-3);
+    line-height: 1.55;
+    margin-top: 4px;
+    font-weight: 300;
+  }
+  .conn-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .conn-type-label {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .ctl-inbound  { background: var(--green-bg);  color: var(--green-text); }
+  .ctl-outbound { background: var(--amber-bg);  color: var(--amber-text); }
+  .ctl-exit     { background: var(--red-bg);    color: var(--red-text); }
+  .ctl-post     { background: var(--purple-bg); color: var(--purple-text); }
+  .ctl-reentry  { background: var(--bg-3);      color: var(--text-2); border: 0.5px solid var(--border); }
+  .conn-prob {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--text-3);
+  }
+
+  /* ── insight panel ── */
+  .insight-panel {
+    background: var(--bg-3);
+    border: 0.5px solid var(--border-med);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin: 32px 0;
+  }
+  .insight-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .insight-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--coral);
+    flex-shrink: 0;
+  }
+  .insight-label-text {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+  }
+  .insight-body-text {
+    font-size: 14px;
+    color: var(--text-2);
+    line-height: 1.75;
+    font-weight: 300;
+  }
+  .insight-body-text strong { color: var(--text-1); font-weight: 500; }
+  .insight-body-text em { font-style: italic; }
+
+  /* ── divider ── */
+  .divider { border: none; border-top: 0.5px solid var(--border); margin: 48px 0; }
+  .divider-sm { border: none; border-top: 0.5px solid var(--border); margin: 24px 0; }
+
+  /* ── inline tags ── */
+  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 4px;
+    background: var(--bg-3);
+    color: var(--text-2);
+    border: 0.5px solid var(--border);
+    font-family: var(--mono);
+  }
+
+  /* ── footer note ── */
+  .footer-note {
+    padding-top: 48px;
+    border-top: 0.5px solid var(--border);
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .footer-note strong { color: var(--text-2); font-weight: 400; }
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    Good Assumptions <span>/</span> Liminal States <span>/</span> Validation <span>/</span> The Trust Threshold
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span class="lim-id">LIM-011</span>
+      <span class="badge badge-forward">Forward transition</span>
+      <span class="badge badge-tier1">Tier 1 Priority</span>
+      <span class="badge badge-universal">Universal</span>
+    </div>
+    <div class="hero-concept">Anatomy of a Liminal Transition</div>
+    <h1 class="hero-title">Skepticism <em>→</em> Trust<br>The Trust Threshold</h1>
+    <div class="hero-question">"When does skepticism transform into trust?"</div>
+    <p class="hero-desc">The psychological boundary where skepticism dissolves and customers commit emotional trust to a brand or product. This transition is rarely instant — it requires consistent evidence, social validation, or authority signals that override natural caution. Once crossed, trust creates switching costs that protect against competition.</p>
+  </div>
+
+  <!-- Meta grid -->
+  <div class="meta-grid">
+    <div class="meta-cell">
+      <div class="meta-label">Category</div>
+      <div class="meta-value">Validation</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">BIM Pillar</div>
+      <div class="meta-value green">Social Influence</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Journey Stage</div>
+      <div class="meta-value">Onboarding</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Gate Type</div>
+      <div class="meta-value mono">trust_floor</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Emotional Intensity</div>
+      <div class="meta-value amber">Medium</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Impact Magnitude</div>
+      <div class="meta-value">High</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">ROI Score</div>
+      <div class="meta-value green">8 / 10</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Intervention Role</div>
+      <div class="meta-value mono">arrest</div>
+    </div>
+    <div class="meta-cell">
+      <div class="meta-label">Complexity</div>
+      <div class="meta-value mono">3 / 5</div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: COGNITIVE BIASES ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">01 — Cognitive layer</div>
+      <h2 class="section-title">What's happening in the mind</h2>
+      <p class="section-sub">The biases active at this transition — the mental mechanisms that make skepticism hard to dissolve. Ranked by semantic similarity to the transition's diagnostic and conceptual embedding frames.</p>
+    </div>
+
+    <div class="bias-list">
+
+      <div class="bias-card">
+        <div class="bias-card-header">
+          <div>
+            <div class="bias-name">Naïve Cynicism</div>
+            <div class="sim-score">similarity 0.60 · rank 1</div>
+          </div>
+          <span class="bias-relevance rel-primary">Primary</span>
+        </div>
+        <div class="bias-body">
+          <div>
+            <div class="bias-col-label">Why it's active</div>
+            <div class="bias-col-text">Consumers assume self-interest behind every brand claim before they assume genuine intent. Marketing messages are filtered through a default cynicism that treats persuasion as proof of manipulation.</div>
+          </div>
+          <div>
+            <div class="bias-col-label">How it manifests</div>
+            <div class="bias-col-text">A brand's sustainability claim reads as a marketing ploy. A testimonial reads as paid. A case study reads as cherry-picked. The very act of trying to build trust activates more skepticism.</div>
+          </div>
+        </div>
+        <div class="bias-intervention">
+          <span class="interv-label">Intervention</span>
+          <span class="interv-text">Provide transparent, verifiable evidence that requires no interpretation. Third-party validation, not brand-authored content. The brand's voice is the problem — remove it from the proof.</span>
+        </div>
+      </div>
+
+      <div class="bias-card">
+        <div class="bias-card-header">
+          <div>
+            <div class="bias-name">Backfire Effect</div>
+            <div class="sim-score">similarity 0.54 · rank 4</div>
+          </div>
+          <span class="bias-relevance rel-core">Core</span>
+        </div>
+        <div class="bias-body">
+          <div>
+            <div class="bias-col-label">Why it's active</div>
+            <div class="bias-col-text">When disconfirming evidence is presented to a skeptic, they don't update their belief — they strengthen it. Each persuasion attempt the consumer consciously detects reinforces their original suspicion.</div>
+          </div>
+          <div>
+            <div class="bias-col-label">How it manifests</div>
+            <div class="bias-col-text">Counter-arguments, comparison tables, and "why us" content aimed at skeptics often produce the opposite of their intended effect. The harder the push, the harder the resistance.</div>
+          </div>
+        </div>
+        <div class="bias-intervention">
+          <span class="interv-label">Intervention</span>
+          <span class="interv-text">Address concerns with empathy first — never factual counter-arguments delivered at volume. Acknowledge the skepticism as reasonable before introducing any evidence.</span>
+        </div>
+      </div>
+
+      <div class="bias-card">
+        <div class="bias-card-header">
+          <div>
+            <div class="bias-name">Conservatism Bias</div>
+            <div class="sim-score">similarity 0.54 · rank 5</div>
+          </div>
+          <span class="bias-relevance rel-supporting">Supporting</span>
+        </div>
+        <div class="bias-body">
+          <div>
+            <div class="bias-col-label">Why it's active</div>
+            <div class="bias-col-text">Consumers revise beliefs more slowly than evidence warrants. New positive information about a brand is underweighted relative to the skeptical prior. Trust doesn't update in proportion to the evidence provided.</div>
+          </div>
+          <div>
+            <div class="bias-col-label">How it manifests</div>
+            <div class="bias-col-text">A consumer reads five positive reviews and one negative one — the negative carries disproportionate weight. Evidence accumulates slowly; trust lags behind it.</div>
+          </div>
+        </div>
+        <div class="bias-intervention">
+          <span class="interv-label">Intervention</span>
+          <span class="interv-text">Present evidence incrementally across multiple touchpoints rather than all at once. One strong signal at the right moment beats ten signals delivered simultaneously.</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight-panel">
+      <div class="insight-header">
+        <div class="insight-dot"></div>
+        <span class="insight-label-text">The pattern across all three</span>
+      </div>
+      <div class="insight-body-text">Naïve Cynicism makes every brand signal suspect. The Backfire Effect means pushing harder makes it worse. Conservatism Bias means evidence accumulates slowly even when the consumer wants to believe. These three biases don't just coexist at the Trust Threshold — <strong>they reinforce each other.</strong> The cynicism makes evidence feel manipulative; the backfire effect is triggered when you push through; the conservatism means the few signals that do land take time to compound into belief. This is why trust-building requires patience and indirection, not volume and persistence.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 2: CHOICE VECTORS ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">02 — Behavioral layer</div>
+      <h2 class="section-title">What shifts behavior here</h2>
+      <p class="section-sub">The choice vectors active at this transition — the psychological forces that, when correctly deployed, move the consumer across the trust threshold. Each has a deployment moment, an intervention role, and a specific failure mode.</p>
+    </div>
+
+    <div class="vector-list">
+
+      <div class="vector-card">
+        <div class="vector-stripe vs-accelerate"></div>
+        <div class="vector-inner">
+          <div class="vector-top">
+            <span class="vector-name">Trust &amp; Transparency</span>
+            <span class="vector-role role-acc">Accelerate · rank 1</span>
+          </div>
+          <p class="vector-why">Openly sharing information — including limitations — builds credibility precisely because it signals that the brand has nothing to hide. The act of disclosure is itself the evidence.</p>
+          <div class="vector-deploy-row">
+            <div>
+              <div class="vd-label">Deploy when</div>
+              <div class="vd-text">Initial customer interactions and throughout the first 90 days. Establish a foundation before the consumer encounters their first disappointment.</div>
+            </div>
+            <div>
+              <div class="vd-label">What not to do</div>
+              <div class="vd-text warn">Selective transparency. Hiding limitations or negative reviews while showcasing positives. The consumer will find the gaps — and when they do, the damage to trust is worse than if you'd never started.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vector-card">
+        <div class="vector-stripe vs-accelerate"></div>
+        <div class="vector-inner">
+          <div class="vector-top">
+            <span class="vector-name">Social Proof</span>
+            <span class="vector-role role-acc">Accelerate · rank 4</span>
+          </div>
+          <p class="vector-why">The skeptic doesn't trust the brand — but they might trust someone like them. Social proof routes around Naïve Cynicism by shifting the evidence source from brand-authored to consumer-authored.</p>
+          <div class="vector-deploy-row">
+            <div>
+              <div class="vd-label">Deploy when</div>
+              <div class="vd-text">Targeting skeptical consumers who have evaluated the product but haven't converted. Social validation at this moment provides the third-party credibility that brand messaging can't.</div>
+            </div>
+            <div>
+              <div class="vd-label">What not to do</div>
+              <div class="vd-text warn">Fake or incentivized testimonials without disclosure. If the skeptic detects inauthenticity in the social proof, it triggers the Backfire Effect — now they're more skeptical than before they saw it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vector-card">
+        <div class="vector-stripe vs-stabilize"></div>
+        <div class="vector-inner">
+          <div class="vector-top">
+            <span class="vector-name">Consistency Highlighting</span>
+            <span class="vector-role role-sta">Stabilize · rank 6</span>
+          </div>
+          <p class="vector-why">Trust forms across time, not events. Highlighting consistency of values and behavior across a long history gives the skeptic a pattern to evaluate rather than a claim to believe.</p>
+          <div class="vector-deploy-row">
+            <div>
+              <div class="vd-label">Deploy when</div>
+              <div class="vd-text">Branding and messaging layers — not at the moment of the objection, but as ambient context the consumer has absorbed before they even become a prospect.</div>
+            </div>
+            <div>
+              <div class="vd-label">What not to do</div>
+              <div class="vd-text warn">Claiming consistency while behaving inconsistently. The consumer will find the contradiction — and it becomes the data point they organize everything else around.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 3: TACTICS ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">03 — Execution layer</div>
+      <h2 class="section-title">What to actually do</h2>
+      <p class="section-sub">Tactics matched to this transition via the vector chain — not a list of trust-building tactics in general, but the specific tactics whose behavioral mechanism aligns with the active biases and vectors at this threshold moment.</p>
+    </div>
+
+    <div class="tactic-list">
+
+      <div class="tactic-card">
+        <div class="tactic-top">
+          <div class="tactic-name">Impact Transparency</div>
+          <span class="tactic-id">PT-1376</span>
+        </div>
+        <div class="tactic-via">Via <strong>Trust &amp; Transparency</strong> → <strong>Transparency</strong> vectors</div>
+        <div class="tactic-outcome">Expect: trust score +15%, 50% increase in customer feedback volume, 20% reduction in support tickets related to confusion. Brands like Buffer (public salary data) and Patagonia (supply chain disclosure) used this pattern to convert skeptics into advocates.</div>
+        <div class="tactic-tags">
+          <span class="tactic-tag">Cognitive Drivers</span>
+          <span class="tactic-tag">Engagement</span>
+          <span class="tactic-tag">application layer</span>
+        </div>
+      </div>
+
+      <div class="tactic-card">
+        <div class="tactic-top">
+          <div class="tactic-name">Trust Building</div>
+          <span class="tactic-id">PT-3044</span>
+        </div>
+        <div class="tactic-via">Via <strong>Automation Trust</strong> vector</div>
+        <div class="tactic-outcome">Expect: 20% increase in positive reviews, average response time under 2 hours, repeat customer rate +15%, satisfaction score above 4.5. Bosch Power Tools and Chisos used this to boost conversion rates among high-skepticism segments.</div>
+        <div class="tactic-tags">
+          <span class="tactic-tag">Cognitive Drivers</span>
+          <span class="tactic-tag">Acquisition</span>
+          <span class="tactic-tag">strategy layer</span>
+        </div>
+      </div>
+
+      <div class="tactic-card">
+        <div class="tactic-top">
+          <div class="tactic-name">Parent / Consumer Trust Messaging</div>
+          <span class="tactic-id">PT-1891</span>
+        </div>
+        <div class="tactic-via">Via <strong>Automation Trust</strong> vector</div>
+        <div class="tactic-outcome">Expect: trust score +15%, 25%+ engagement rate on credibility-building content, 10% lift in conversion from target segments. Authority-bias and confirmation-bias leverage — endorsements and testimonials that validate the consumer's existing inclination.</div>
+        <div class="tactic-tags">
+          <span class="tactic-tag">Cognitive Drivers</span>
+          <span class="tactic-tag">Activation</span>
+          <span class="tactic-tag">strategy layer</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight-panel">
+      <div class="insight-header">
+        <div class="insight-dot"></div>
+        <span class="insight-label-text">What the tactic layer reveals</span>
+      </div>
+      <div class="insight-body-text">All three tactics are classified as <strong>Cognitive Drivers</strong> at the execution level — even though the BIM pillar driving the transition is Social Influence. This is not a contradiction. <strong>The behavioral mechanism at the transition is social; the intervention tool is cognitive.</strong> You earn trust through social proof and consistency (Social Influence), then you operationalize it through transparent information architecture (Cognitive). Brands that apply only Social tactics without the cognitive scaffolding build trust that doesn't stick. Brands that apply only Cognitive tactics without Social proof can't get through the Naïve Cynicism filter in the first place.</div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 4: CONNECTION GRAPH ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">04 — Connection graph</div>
+      <h2 class="section-title">Where this transition sits in the network</h2>
+      <p class="section-sub">Liminal transitions don't occur in isolation. Each is connected to the transitions that precede it, the states it can produce, and the exit paths that branch from it when it fails. Understanding the graph tells you what's upstream, what's at stake downstream, and how hard re-entry is if the transition breaks.</p>
+    </div>
+
+    <div class="conn-graph">
+
+      <!-- Inbound: Referred → Trusting -->
+      <div class="conn-row">
+        <div class="conn-type-bar ct-inbound"></div>
+        <div class="conn-inner">
+          <div>
+            <div class="conn-transitions">
+              <span class="conn-node dim">Referred → Trusting</span>
+              <span class="conn-arrow">→</span>
+              <span class="conn-node">Skepticism → Trust</span>
+            </div>
+            <div class="conn-rationale">A referred consumer who forms personal trust converges on the same durable trust state via a different pathway. The referral gets them in the door — the direct experience has to close the gap from borrowed to owned trust.</div>
+          </div>
+          <div class="conn-meta">
+            <span class="conn-type-label ctl-inbound">Inbound</span>
+            <span class="conn-prob">p = 0.60</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inbound: Health Event -->
+      <div class="conn-row">
+        <div class="conn-type-bar ct-inbound"></div>
+        <div class="conn-inner">
+          <div>
+            <div class="conn-transitions">
+              <span class="conn-node dim">Health Event → Active Health Manager</span>
+              <span class="conn-arrow">→</span>
+              <span class="conn-node">Skepticism → Trust</span>
+            </div>
+            <div class="conn-rationale">A biographical disruption event creates heightened trust scrutiny across all health-adjacent brands. The consumer enters every new brand relationship with elevated skepticism — requiring a distinct and more patient trust-building journey.</div>
+          </div>
+          <div class="conn-meta">
+            <span class="conn-type-label ctl-inbound">Inbound</span>
+            <span class="conn-prob">p = 0.60</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider-sm"></div>
+
+      <!-- Outbound success: Transactional → Relational -->
+      <div class="conn-row">
+        <div class="conn-type-bar ct-outbound"></div>
+        <div class="conn-inner">
+          <div>
+            <div class="conn-transitions">
+              <span class="conn-node">Skepticism → Trust</span>
+              <span class="conn-arrow">→</span>
+              <span class="conn-node dim">Transactional → Relational</span>
+            </div>
+            <div class="conn-rationale">Crossed trust threshold is the gate that enables relational investment. Trust is necessary but not sufficient for relationship — without it, no consumer will invest in the relational dynamic.</div>
+          </div>
+          <div class="conn-meta">
+            <span class="conn-type-label ctl-outbound">Outbound</span>
+            <span class="conn-prob">p = 0.65</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exit gate: Trust Trap -->
+      <div class="conn-row">
+        <div class="conn-type-bar ct-exit"></div>
+        <div class="conn-inner">
+          <div>
+            <div class="conn-transitions">
+              <span class="conn-node">Skepticism → Trust</span>
+              <span class="conn-arrow">→</span>
+              <span class="conn-node dim">Skepticism Reinforcement · The Trust Trap</span>
+            </div>
+            <div class="conn-rationale">When trust-building fails, it doesn't just stall — each failed attempt trains the consumer to be more defensive. The Trust Trap is the exit gate from this transition. Once entered, re-entry probability drops significantly.</div>
+          </div>
+          <div class="conn-meta">
+            <span class="conn-type-label ctl-exit">Exit gate</span>
+            <span class="conn-prob">p = 0.50</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Post-resolution: Hollow Compliance -->
+      <div class="conn-row">
+        <div class="conn-type-bar ct-post"></div>
+        <div class="conn-inner">
+          <div>
+            <div class="conn-transitions">
+              <span class="conn-node">Skepticism → Trust</span>
+              <span class="conn-arrow">→</span>
+              <span class="conn-node dim">Hollow Compliance Persistence</span>
+            </div>
+            <div class="conn-rationale">A skeptic who performed trust-building behaviors without forming genuine conviction. The metrics say trust formed — the behavior pattern says compliance, not belief. Vulnerable at any point of friction or competitive alternative.</div>
+          </div>
+          <div class="conn-meta">
+            <span class="conn-type-label ctl-post">Post-res</span>
+            <span class="conn-prob">p = 0.20</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Re-entry from Trust Trap -->
+      <div class="conn-row">
+        <div class="conn-type-bar ct-reentry"></div>
+        <div class="conn-inner">
+          <div>
+            <div class="conn-transitions">
+              <span class="conn-node dim">Skepticism Reinforcement</span>
+              <span class="conn-arrow">→</span>
+              <span class="conn-node">Skepticism → Trust</span>
+            </div>
+            <div class="conn-rationale">Re-entry from reinforced skepticism. Brand-direct persuasion is ineffective at this point — only independent, credible third-party evidence has a realistic chance of reopening the transition. The hardest re-entry in the exit layer.</div>
+          </div>
+          <div class="conn-meta">
+            <span class="conn-type-label ctl-reentry">Re-entry</span>
+            <span class="conn-prob">p = 0.25</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="insight-panel">
+      <div class="insight-header">
+        <div class="insight-dot"></div>
+        <span class="insight-label-text">What the graph tells you</span>
+      </div>
+      <div class="insight-body-text">The Trust Threshold is a <strong>network node, not an isolated event.</strong> It's fed by Referred → Trusting and Health Event transitions — meaning the consumer's trust-building journey often starts before they've directly engaged with the brand. The exit gate to The Trust Trap (p=0.50) is the most important number in this graph: <em>half of all trust-building attempts that fail don't just stall — they actively make re-entry harder.</em> And the re-entry probability from The Trust Trap back to The Trust Threshold is only 0.25. The implication is direct: <strong>getting the trust-building sequence wrong the first time is expensive in a way that most brands don't account for.</strong></div>
+    </div>
+  </div>
+
+  <!-- Footer note -->
+  <div class="footer-note">
+    <strong>This is one of 160 liminal transitions in the SAEO database.</strong> Each carries the same depth of structure — cognitive biases ranked by semantic similarity, choice vectors with deployment logic, tactics matched via the behavioral chain, and a connection graph showing the network of transitions around it. The database doesn't tell you what to do. It tells you what's happening — and what the research says about why interventions at this specific psychological moment work or don't.
+    <div class="tag-row" style="margin-top: 14px;">
+      <span class="tag">Validation category</span>
+      <span class="tag">Social Influence BIM</span>
+      <span class="tag">6 biases linked</span>
+      <span class="tag">6 vectors linked</span>
+      <span class="tag">8 connections mapped</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
