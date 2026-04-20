@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instruction Design for Claude — Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+    --accent:      #c8f0d8;
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.10);
+    --green-text:  #5DCAA5;
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.10);
+    --amber-text:  #FAC775;
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.10);
+    --red-text:    #F0997B;
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.10);
+    --purple-text: #AFA9EC;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Nav ── */
+  .nav-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15,15,14,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+  }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--green-text); }
+  .nav-links { display: flex; align-items: center; gap: 22px; list-style: none; }
+  .nav-links a { font-size: 13px; color: var(--text-2); text-decoration: none; transition: color .15s; }
+  .nav-links a:hover { color: var(--text-1); }
+  .nav-cta {
+    font-size: 12px; font-weight: 500;
+    color: var(--bg) !important;
+    background: var(--green-text);
+    padding: 6px 14px; border-radius: 4px;
+    text-decoration: none; transition: opacity .15s;
+  }
+  .nav-cta:hover { opacity: .85; }
+
+  /* ── Layout ── */
+  .page { max-width: 760px; margin: 0 auto; padding: 0 32px 120px; }
+
+  /* ── Article header ── */
+  .article-header {
+    padding: 72px 0 64px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 80px;
+  }
+  .meta-row {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 9px; border-radius: 3px;
+  }
+  .badge-type   { background: var(--purple-bg); color: var(--purple-text); }
+  .badge-territory { background: var(--green-bg); color: var(--green-text); }
+  .badge-diff   { background: var(--bg-3); color: var(--text-2); border: 0.5px solid var(--border-med); }
+  .meta-dot     { width: 3px; height: 3px; border-radius: 50%; background: var(--text-3); }
+  .meta-text    { font-size: 12px; color: var(--text-3); font-family: var(--font-mono); }
+
+  .article-title {
+    font-size: 44px; font-weight: 300;
+    line-height: 1.1; letter-spacing: -0.025em;
+    color: var(--text-1); margin-bottom: 8px;
+  }
+  .article-subtitle {
+    font-size: 22px; font-weight: 300;
+    color: var(--text-2); font-style: italic;
+    line-height: 1.3; margin-bottom: 28px;
+    letter-spacing: -0.01em;
+  }
+  .article-deck {
+    font-size: 18px; font-weight: 300;
+    line-height: 1.8; color: var(--text-2);
+    max-width: 620px; margin-bottom: 0;
+  }
+
+  /* Edition note */
+  .edition-note {
+    padding: 18px 22px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-left: 2px solid var(--amber);
+    border-radius: 0 5px 5px 0;
+    margin-bottom: 36px;
+  }
+  .edition-note-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--amber-text); margin-bottom: 8px;
+  }
+  .edition-note p {
+    font-size: 13px; line-height: 1.7;
+    color: var(--text-2); font-weight: 300;
+  }
+  .edition-note p em { color: var(--text-3); }
+
+  .author-row { display: flex; align-items: center; gap: 10px; }
+  .author-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--green-bg); border: 1px solid var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; color: var(--green-text); flex-shrink: 0;
+  }
+  .author-info { font-size: 12px; }
+  .author-name { color: var(--text-1); font-weight: 500; }
+  .author-date { color: var(--text-3); margin-top: 1px; }
+
+  /* ── TOC ── */
+  .toc {
+    margin-bottom: 64px;
+    padding: 24px 28px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+  }
+  .toc-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 16px;
+  }
+  .toc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .toc-list li { display: flex; align-items: baseline; gap: 10px; }
+  .toc-num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); flex-shrink: 0; min-width: 18px;
+  }
+  .toc-list a {
+    font-size: 14px; color: var(--text-2); text-decoration: none;
+    line-height: 1.4; transition: color .15s;
+  }
+  .toc-list a:hover { color: var(--text-1); }
+
+  /* ── Body ── */
+  .article-body { font-size: 17px; line-height: 1.85; color: var(--text-1); }
+  .article-body p { margin-bottom: 28px; font-weight: 300; }
+  .article-body strong { font-weight: 500; }
+  .article-body em { font-style: italic; color: var(--text-2); }
+
+  /* ── Section headings ── */
+  .section-block { margin-top: 80px; }
+  .section-num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: .1em;
+    text-transform: uppercase; margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 28px; font-weight: 400;
+    letter-spacing: -0.02em; color: var(--text-1);
+    line-height: 1.2; margin-bottom: 8px;
+    padding-bottom: 16px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .section-subtitle {
+    font-size: 14px; font-weight: 300;
+    font-style: italic; color: var(--text-3);
+    margin-bottom: 32px; margin-top: -4px;
+  }
+
+  .subsection-title {
+    font-size: 18px; font-weight: 500;
+    color: var(--text-1); margin-top: 48px;
+    margin-bottom: 16px; letter-spacing: -0.01em;
+  }
+
+  /* ── Pull quote ── */
+  .pull-quote {
+    margin: 44px 0;
+    padding: 24px 28px;
+    border-left: 2px solid var(--green);
+    background: var(--bg-2);
+    border-radius: 0 6px 6px 0;
+  }
+  .pull-quote p {
+    font-size: 19px; font-weight: 300;
+    line-height: 1.55; color: var(--text-1);
+    font-style: italic; letter-spacing: -0.01em;
+    margin: 0;
+  }
+  .pull-quote strong { font-style: normal; font-weight: 500; color: var(--accent); }
+
+  /* ── Anthropic source box ── */
+  .source-box {
+    margin: 40px 0;
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px; overflow: hidden;
+  }
+  .source-box-header {
+    padding: 10px 20px;
+    background: var(--bg-3);
+    border-bottom: 0.5px solid var(--border);
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--green-text); letter-spacing: .08em; text-transform: uppercase;
+  }
+  .source-box-body {
+    padding: 20px 24px;
+    background: var(--bg-2);
+  }
+  .source-box-body p {
+    font-size: 14px; line-height: 1.75;
+    color: var(--text-2); font-weight: 300;
+    font-style: italic; margin: 0;
+  }
+
+  /* ── Code / example block ── */
+  .code-block {
+    margin: 32px 0;
+    padding: 20px 24px;
+    background: var(--bg-3);
+    border: 0.5px solid var(--border);
+    border-radius: 6px;
+    font-family: var(--font-mono); font-size: 13px;
+    color: var(--green-text); line-height: 1.7;
+    white-space: pre-wrap; word-break: break-word;
+  }
+
+  /* ── Comparison blocks ── */
+  .comparison-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2px; margin: 36px 0;
+  }
+  .comparison-card {
+    padding: 20px 22px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+  }
+  .comparison-card:first-child { border-radius: 6px 0 0 6px; }
+  .comparison-card:last-child  { border-radius: 0 6px 6px 0; }
+  .comparison-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .08em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .label-old  { color: var(--red-text); }
+  .label-new  { color: var(--green-text); }
+  .comparison-card p {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-2); font-weight: 300; margin: 0;
+  }
+  .comparison-card .hard-stop {
+    font-family: var(--font-mono); font-size: 13px;
+    color: var(--red-text);
+  }
+
+  /* ── Rule-type cards ── */
+  .rule-cards { display: flex; flex-direction: column; gap: 2px; margin: 36px 0; }
+  .rule-card {
+    padding: 22px 24px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    display: grid; grid-template-columns: 28px 1fr;
+    gap: 16px;
+  }
+  .rule-card:first-child { border-radius: 6px 6px 4px 4px; }
+  .rule-card:last-child  { border-radius: 4px 4px 6px 6px; }
+  .rule-card-num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); padding-top: 2px;
+  }
+  .rule-card-title {
+    font-size: 15px; font-weight: 500;
+    color: var(--text-1); margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .rule-card-body {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-2); font-weight: 300;
+  }
+
+  /* ── Session table ── */
+  .session-table {
+    margin: 40px 0;
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px; overflow: hidden;
+  }
+  .session-table-header {
+    padding: 12px 20px;
+    background: var(--bg-3);
+    border-bottom: 0.5px solid var(--border);
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-3); letter-spacing: .08em; text-transform: uppercase;
+  }
+  .session-row {
+    display: grid; grid-template-columns: 160px 1fr;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .session-row:last-child { border-bottom: none; }
+  .session-phase {
+    padding: 16px 20px;
+    font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+    border-right: 0.5px solid var(--border);
+    display: flex; align-items: center;
+  }
+  .phase-green  { color: var(--green-text); }
+  .phase-amber  { color: var(--amber-text); }
+  .phase-red    { color: var(--red-text); }
+  .session-desc {
+    padding: 16px 20px;
+    font-size: 13px; line-height: 1.65;
+    color: var(--text-2); font-weight: 300;
+  }
+  .session-desc strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Insight box ── */
+  .insight-box {
+    margin: 40px 0; padding: 22px 26px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+  }
+  .insight-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--amber-text); margin-bottom: 12px;
+  }
+  .insight-body {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-2); font-weight: 300;
+  }
+  .insight-body strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Test box ── */
+  .test-box {
+    margin: 40px 0;
+    padding: 22px 26px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-left: 2px solid var(--purple);
+    border-radius: 0 6px 6px 0;
+  }
+  .test-box p {
+    font-size: 15px; line-height: 1.75;
+    color: var(--text-2); font-weight: 300;
+    font-style: italic; margin: 0;
+  }
+  .test-box strong { color: var(--text-1); font-style: normal; font-weight: 500; }
+
+  /* ── Framework steps ── */
+  .steps { display: flex; flex-direction: column; gap: 2px; margin: 40px 0; }
+  .step-card {
+    padding: 20px 24px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+  }
+  .step-card:first-child { border-radius: 6px 6px 4px 4px; }
+  .step-card:last-child  { border-radius: 4px 4px 6px 6px; }
+  .step-head {
+    font-size: 14px; font-weight: 500;
+    color: var(--text-1); margin-bottom: 8px;
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .step-num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); flex-shrink: 0;
+  }
+  .step-body {
+    font-size: 14px; line-height: 1.7;
+    color: var(--text-2); font-weight: 300;
+    padding-left: 26px;
+  }
+
+  /* ── Section divider ── */
+  .divider {
+    display: flex; align-items: center;
+    gap: 16px; margin: 72px 0 0;
+  }
+  .divider-line { flex: 1; height: 0.5px; background: var(--border); }
+  .divider-mark { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); letter-spacing: .1em; }
+
+  /* ── Appendix / References ── */
+  .appendix {
+    margin-top: 96px;
+    padding-top: 48px;
+    border-top: 0.5px solid var(--border);
+  }
+  .appendix-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 24px;
+  }
+  .appendix h2 {
+    font-size: 22px; font-weight: 300;
+    color: var(--text-1); margin-bottom: 24px;
+    letter-spacing: -0.01em;
+  }
+  .ref-group { margin-bottom: 36px; }
+  .ref-group-title {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: .08em;
+    text-transform: uppercase; margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .ref-item {
+    display: grid; grid-template-columns: 32px 1fr;
+    gap: 10px; margin-bottom: 12px;
+    font-size: 13px; line-height: 1.65;
+  }
+  .ref-num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); padding-top: 1px;
+  }
+  .ref-cite { color: var(--text-2); font-weight: 300; }
+  .ref-cite strong { color: var(--text-1); font-weight: 500; }
+  .ref-cite a {
+    color: var(--green-text); text-decoration: none;
+    font-size: 12px; font-family: var(--font-mono);
+    display: inline-block; margin-top: 2px;
+    word-break: break-all;
+  }
+  .ref-cite a:hover { text-decoration: underline; }
+
+  /* ── CTA footer ── */
+  .article-footer {
+    margin-top: 80px; padding-top: 48px;
+    border-top: 0.5px solid var(--border);
+  }
+  .article-footer-label {
+    font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 16px;
+  }
+  .article-footer-text {
+    font-size: 15px; line-height: 1.75;
+    color: var(--text-2); font-weight: 300;
+    margin-bottom: 28px; max-width: 600px;
+  }
+  .article-footer-text strong { color: var(--text-1); font-weight: 500; }
+  .cta-block {
+    padding: 26px 30px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 24px; flex-wrap: wrap;
+  }
+  .cta-text { font-size: 14px; color: var(--text-2); font-weight: 300; line-height: 1.6; }
+  .cta-text strong { color: var(--text-1); font-weight: 500; display: block; font-size: 16px; margin-bottom: 3px; }
+  .cta-btn {
+    font-size: 13px; font-weight: 500;
+    color: var(--bg); background: var(--green-text);
+    padding: 10px 20px; border-radius: 4px;
+    text-decoration: none; white-space: nowrap; flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .cta-btn:hover { opacity: .85; }
+
+  /* ── Site footer ── */
+  .site-footer {
+    margin-top: 64px; padding: 32px 0 0;
+    border-top: 0.5px solid var(--border);
+    display: flex; align-items: center;
+    justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .site-footer-logo { font-size: 13px; font-weight: 500; color: var(--text-3); }
+  .site-footer-logo span { color: var(--green-text); }
+  .site-footer-links { display: flex; gap: 20px; }
+  .site-footer-links a { font-size: 12px; color: var(--text-3); text-decoration: none; font-family: var(--font-mono); }
+  .site-footer-links a:hover { color: var(--text-2); }
+
+  @media (max-width: 600px) {
+    .page { padding: 0 20px 80px; }
+    .article-title { font-size: 30px; }
+    .comparison-grid { grid-template-columns: 1fr; }
+    .comparison-card:first-child { border-radius: 6px 6px 0 0; }
+    .comparison-card:last-child  { border-radius: 0 0 6px 6px; }
+    .session-row { grid-template-columns: 1fr; }
+    .session-phase { border-right: none; border-bottom: 0.5px solid var(--border); padding-bottom: 10px; }
+    .nav-links { display: none; }
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<div class="nav-wrap">
+  <nav class="nav">
+    <a href="#" class="nav-logo">Good <span>Assumptions</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Concepts</a></li>
+      <li><a href="#">Research</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#" class="nav-cta">Try SAEO.ai →</a></li>
+    </ul>
+  </nav>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <header class="article-header">
+    <div class="meta-row">
+      <span class="badge badge-territory">T4 · SAEO</span>
+      <span class="badge badge-diff">Advanced</span>
+      <span class="meta-dot"></span>
+      <span class="meta-text">~30 min read</span>
+      <span class="meta-dot"></span>
+      <span class="meta-text">April 2026</span>
+    </div>
+
+    <h1 class="article-title">Instruction Design for Claude</h1>
+
+    <p class="article-deck">
+      Most teams debug instruction failures at the Strategy layer — rewording rules, tightening language, adding edge cases. Their failures are almost exclusively at the Application layer. The information was right. The delivery did not match how Claude actually makes decisions.
+    </p>
+
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc" aria-label="Contents">
+    <div class="toc-label">Contents</div>
+    <ol class="toc-list">
+      <li><span class="toc-num">01</span><a href="#s1">The threshold moment is not session start</a></li>
+      <li><span class="toc-num">02</span><a href="#s2">Calibrate the voice to the model generation</a></li>
+      <li><span class="toc-num">03</span><a href="#s3">Name the wrong action — in the right contexts</a></li>
+      <li><span class="toc-num">04</span><a href="#s4">Justify the rule, not only state it</a></li>
+      <li><span class="toc-num">05</span><a href="#s5">Three instruction types, three places they belong</a></li>
+      <li><span class="toc-num">06</span><a href="#s6">The compression problem</a></li>
+      <li><span class="toc-num">07</span><a href="#s7">Naming the architecture: Application and Strategy</a></li>
+      <li><span class="toc-num">08</span><a href="#s8">A framework for rewriting existing instructions</a></li>
+      <li><span class="toc-num">09</span><a href="#s9">What this means for collaborating with Claude at scale</a></li>
+    </ol>
+  </nav>
+
+  <!-- Opening scenario -->
+  <article class="article-body">
+
+    <p>A team builds a deployment protocol for a Claude-powered agent that manages a production pipeline. The document is careful. It specifies the order of operations. It warns against skipping version control steps. It includes a table showing which branches require review and which do not. It is, by every reasonable standard, a clear instruction. Three weeks later, Claude pushes to the wrong branch, overwrites a colleague's work in progress, and only notices after the fact that the first step — pulling the latest state — had been skipped entirely.</p>
+
+    <p>When the team looks at the session transcript, the relevant rule is right there, in the document Claude had access to. It was read. It was acknowledged. And it did not govern behavior at the moment that mattered.</p>
+
+    <p>This is the scenario that drives everything that follows. The frustration is legitimate, and the temptation is to conclude that Claude is unreliable, or that the instruction needs to be louder, bolder, more emphatic. Neither response addresses what actually went wrong. What went wrong is that the rule was written for a reader who decides forward in time from a clean slate. The rule was not written for the <strong>threshold moment</strong> — the narrow cognitive window in which Claude is about to take an action, and the only instructions that govern that action are the ones present in active context at that instant.</p>
+
+    <p>The gap between what was written and what governed behavior is not a defect in reading. It is a design problem in delivery.</p>
+
+    <div class="pull-quote">
+      <p>This document is about that gap. It distinguishes two layers at which instruction-writing can fail: the <strong>Strategy layer</strong>, which concerns whether the content of the rule is correct, and the <strong>Application layer</strong>, which concerns whether the rule reaches the decision point with enough force to hold.</p>
+    </div>
+
+    <p>Six working practices follow from this distinction. Each has a mechanism. Each has a weak version and a strong version. Each is calibrated to how current Claude models — Claude 4.6 and Claude Opus 4.7 — actually respond to instruction, based on behavior documented in Anthropic's official prompting guide and on observation at scale.</p>
+
+    <div class="insight-box">
+      <div class="insight-label">One framing shift up front</div>
+      <div class="insight-body">On current Claude models, <strong>normal prompting tends to outperform escalated prompting.</strong> Anthropic's own guidance for Claude Opus 4.5 and 4.6 explicitly says that aggressive language ("CRITICAL: You MUST...") now causes overtriggering where calmer language ("Use this tool when...") produces better results. The underlying insight of this document — that delivery, not content, is where most instruction failures live — still holds. The tactical expression of that insight has to be rebuilt for how current models actually respond.</div>
+    </div>
+
+    <!-- ── Section 1 ── -->
+    <div class="section-block" id="s1">
+      <div class="section-num">01</div>
+      <h2 class="section-title">The threshold moment is not session start</h2>
+      <p class="section-subtitle">What "active context" actually means</p>
+
+      <p>The single most consequential misconception in instruction design is that an instruction delivered at the beginning of a session is an instruction the model has. It is not. What the model has is an <strong>active context</strong> — a window of tokens over which attention is distributed — and instructions compete for weight in that window alongside everything else that has been said, retrieved, or generated since they were introduced.</p>
+
+      <p>The relevant frame is not "does the model know the rule?" but "at the moment the model is about to take an action, what is in the active context that shapes which action it takes?" That moment — the point at which a decision is made and a commitment is formed — is the <strong>threshold moment</strong>, and it is the only moment where instructions can govern behavior. Everything else is preparation.</p>
+
+      <div class="source-box">
+        <div class="source-box-header">From Anthropic's Prompting Best Practices</div>
+        <div class="source-box-body">
+          <p>Put longform data at the top. Place your long documents and inputs near the top of your prompt, above your query, instructions, and examples. This can significantly improve performance across all models. Queries at the end can improve response quality by up to 30% in tests, especially with complex, multi-document inputs.</p>
+        </div>
+      </div>
+
+      <p>This guidance is precisely the threshold moment insight in operational form. The text Claude acts on is most influenced by what sits near the decision point — the end of the prompt, where the current instruction lives — not by what was placed at the beginning. Anthropic's empirical finding (up to 30% response quality improvement when queries come last) is the measurable signature of the phenomenon.</p>
+
+      <p>The human-cognition parallel supports this. Gollwitzer's work on implementation intentions shows that goal intentions alone ("I will exercise more") produce medium-to-large gaps between stated intention and actual behavior, while implementation intentions with explicit if-then structure ("if it is 7 AM Monday, then I will put on my running shoes") close the gap with an effect size of d = 0.65 [1]. The difference is not motivational. It is architectural — the intention pre-binds a situational cue to an action so that when the cue arises, the action is triggered without fresh deliberation.</p>
+
+      <p>For Claude, the equivalent architectural move is placing the rule adjacent to the action it governs — in the tool description, in the immediate preamble to the request, near the end of the prompt — rather than in a distant section that must be retrieved by a separate cognitive step.</p>
+
+      <h3 class="subsection-title">Why "read once" is not "known"</h3>
+
+      <p>Laban and colleagues' 2025 study of multi-turn conversations across fifteen leading models found an average performance drop of <strong>thirty-nine percent</strong> between single-turn and multi-turn versions of the same task, with the degradation driven by a "loss of middle turns" in which models adjust only to the first and last turns of the conversation [2].</p>
+
+      <p>The implication: a rule that is read once and not reinforced by structure, position, or active retrieval is, at the threshold moment, functionally weaker than a rule placed at the end of the current context. This is not a claim about Claude's competence. It is a claim about how context windows work under load.</p>
+
+      <p>The practical move is to stop thinking about session start as the place your instructions live and start thinking about the decision point. What is Claude about to do when the rule needs to apply? Where in the context will that decision be formed? What can you place near that point — structurally, through tool framing, through end-of-prompt placement — so that the rule is in active attention when the commitment forms?</p>
+    </div>
+
+    <!-- ── Section 2 ── -->
+    <div class="section-block" id="s2">
+      <div class="section-num">02</div>
+      <h2 class="section-title">Calibrate the voice to the model generation</h2>
+      <p class="section-subtitle">What worked on older models does not work on current ones</p>
+
+      <p>Earlier generations of Claude, and most earlier LLMs, undertriggered on tools and instructions. They needed to be pushed. The conventional wisdom — reinforced by years of community practice — was that emphatic framing, all-caps imperatives, and interrupt-style language produced better compliance. "CRITICAL: You MUST use this tool." "ALWAYS pull before commit." These patterns worked on the models they were designed for.</p>
+
+      <div class="source-box">
+        <div class="source-box-header">From Anthropic's Prompting Best Practices</div>
+        <div class="source-box-body">
+          <p>Claude Opus 4.5 and Claude Opus 4.6 are more responsive to the system prompt than previous models. If your prompts were designed to reduce undertriggering on tools or skills, these models may now overtrigger. The fix is to dial back any aggressive language. Where you might have said "CRITICAL: You MUST use this tool when...", you can use more normal prompting like "Use this tool when..."</p>
+        </div>
+      </div>
+
+      <p>The shift is empirical, not stylistic. Current models take instructions seriously by default. Escalated framing, applied to instructions that would have been followed anyway, produces overtriggering — the model applies the rule too aggressively, in situations where a more calibrated response would have been correct.</p>
+
+      <p>This changes what "strong" instruction writing looks like on current models. The old strong version was loud. The new strong version is calibrated: specific about when the rule applies, specific about what action it governs, specific about the failure mode it prevents — but not louder than the content warrants.</p>
+
+      <h3 class="subsection-title">The contrast, then and now</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <div class="comparison-label label-old">Old strong version · pre-4.5</div>
+          <p class="hard-stop">⛔ HARD STOP — non-negotiable. CRITICAL: If you are about to commit and you have not pulled the latest state, you have already made an error. Stop. Pull first. Do not continue past this check.</p>
+        </div>
+        <div class="comparison-card">
+          <div class="comparison-label label-new">Current strong version · Claude 4.6</div>
+          <p>Before any commit, pull the latest state from the remote in the current session. This prevents overwriting work that was pushed between your last pull and your current edit — a failure mode that is not recoverable without manual reconciliation.</p>
+        </div>
+      </div>
+
+      <p>The current version still does the work the old version was trying to do: it names the action, specifies the condition, states the mechanism, and makes clear why the rule exists. What it stops doing is shouting. On current models, that shift measurably improves compliance — the rule is followed more reliably, not less, because the model reads it as instruction rather than as a threat to overtrigger on.</p>
+
+      <h3 class="subsection-title">When emphasis is still earned</h3>
+
+      <p>Emphasis has not disappeared — it has been repriced. Reserve it for cases where the downside is catastrophic and the model has been observed, in your specific harness, to undercomply. For the vast majority of rules, calibrated language works better than escalated language. Anthropic's own guidance repeatedly reinforces this: be clear, be specific, describe the reason, tell Claude what to do rather than what not to do.</p>
+    </div>
+
+    <!-- ── Section 3 ── -->
+    <div class="section-block" id="s3">
+      <div class="section-num">03</div>
+      <h2 class="section-title">Name the wrong action — in the right contexts</h2>
+      <p class="section-subtitle">Where this works and where it does not</p>
+
+      <p>There is a structural insight worth preserving from the older version of this document: rules that describe only the correct behavior leave the incorrect behavior unnamed, and unnamed wrong actions are harder for the model to recognize at the moment they are occurring. "Read the function before modifying it" specifies a preparatory step but does not label the inverse as a violation.</p>
+
+      <p>A rule that names the violation directly — "Modifying a function without first reading it is a protocol error" — creates a pattern the model can match against the current trajectory. This is correct for protocol violations, safety preconditions, and hard guardrails where the wrong action is discretely identifiable and the cost of the violation is high.</p>
+
+      <p>But this pattern has a firm boundary that Anthropic's guidance draws explicitly:</p>
+
+      <div class="source-box">
+        <div class="source-box-header">From Anthropic's Prompting Best Practices</div>
+        <div class="source-box-body">
+          <p>Tell Claude what to do instead of what not to do. Instead of: "Do not use markdown in your response" — Try: "Your response should be composed of smoothly flowing prose paragraphs."</p>
+        </div>
+      </div>
+
+      <p>This is not a contradiction of the wrong-action insight — it is a scope limit. For stylistic preferences, formatting, tone, and the ordinary flow of composition, describing the desired output is more effective than naming the undesired output. Formatting rules are usually not discrete violations; they are tendencies, and Claude generalizes better from a positive description of the target than from a prohibition on the alternative.</p>
+
+      <h3 class="subsection-title">The rule of thumb</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <div class="comparison-label label-old">Discrete violation → name the wrong action</div>
+          <p>Committing to main without a completed code review is a disqualifying protocol error. The review exists because single-author changes on this codebase have historically reintroduced regressions that the author could not see. A commit that bypasses review reintroduces that risk.</p>
+        </div>
+        <div class="comparison-card">
+          <div class="comparison-label label-new">Stylistic rule → describe desired behavior</div>
+          <p>When writing reports, use flowing prose with clear paragraph breaks. Reserve bullet points for genuinely enumerable items. Reserve bold emphasis for terms being defined or for the most load-bearing claims in a section.</p>
+        </div>
+      </div>
+
+      <p>Both rules are precise. Both rules are specific. They differ in whether the violation is discrete enough to be named, and the instruction form follows that difference. Applying the wrong form — naming every stylistic violation as a protocol error, or describing only desired behavior for discrete safety rules — produces either overtriggering or undertriggering.</p>
+    </div>
+
+    <!-- ── Section 4 ── -->
+    <div class="section-block" id="s4">
+      <div class="section-num">04</div>
+      <h2 class="section-title">Justify the rule, not only state it</h2>
+      <p class="section-subtitle">Rules with mechanism survive paraphrase and generalize</p>
+
+      <p>Unjustified prohibitions do not generalize. "Never use this regex pattern for email validation" holds only for cases identical in surface form to the one the rule writer had in mind. The moment the situation is paraphrased — a different regex, a different validation task, an adjacent concern — the rule's coverage ends.</p>
+
+      <p>A rule with mechanism, by contrast, generalizes to its mechanism's domain. "This pattern fails on addresses with Unicode in the local part, which your users have; any pattern with the same limitation will fail for the same reason" covers the original case, any functionally equivalent case, and the conceptual class of cases where the mechanism applies.</p>
+
+      <div class="source-box">
+        <div class="source-box-header">From Anthropic's Prompting Best Practices</div>
+        <div class="source-box-body">
+          <p>Providing context or motivation behind your instructions, such as explaining to Claude why such behavior is important, can help Claude better understand your goals and deliver more targeted responses. Claude is smart enough to generalize from the explanation.</p>
+        </div>
+      </div>
+
+      <p>The cognitive literature on this is old and convergent. Gick and Holyoak's 1983 work on schema induction remains the most-cited demonstration: transfer to novel problems depends on an abstracted schema preserving relational structure, not on surface features of the training example [3]. Chi and colleagues' 1989 work on self-explanation showed that students who spontaneously generated causal explanations while studying produced knowledge that transferred to novel problems [4]. Lampinen and colleagues' 2022 study is the direct LLM-specific test: adding explanations to few-shot examples significantly improved performance across forty challenging BIG-Bench tasks [5].</p>
+
+      <h3 class="subsection-title">The contrast</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <div class="comparison-label label-old">Weak version</div>
+          <p>Never merge directly to main without code review.</p>
+        </div>
+        <div class="comparison-card">
+          <div class="comparison-label label-new">Strong version</div>
+          <p>Unreviewed merges to main skip the second-pair-of-eyes check that catches logic errors not visible to the author. On this codebase, single-author commits have roughly double the defect rate of reviewed commits. Any merge without review reintroduces that risk — including hotfixes, because the mechanism applies regardless of urgency.</p>
+        </div>
+      </div>
+
+      <p>The first is a prohibition. The second is a prohibition with a mechanism. The mechanism gives Claude the material to recognize analogous situations. An exception ("we need to merge this hotfix quickly") does not automatically override the second version because the mechanism still applies. The rule has teeth in edge cases the first version cannot reach.</p>
+
+      <h3 class="subsection-title">Where mechanism can be too costly</h3>
+
+      <p>Mechanism is not free. Every sentence of justification is a sentence of context that competes for attention. For rules that are narrow and do not need to generalize — a specific API endpoint requirement, a format convention for a single artifact — the cost of a mechanism may exceed its benefit. The proportionate rule of thumb: the more a rule will have to generalize to cases not explicitly described, the more valuable its mechanism.</p>
+    </div>
+
+    <!-- ── Section 5 ── -->
+    <div class="section-block" id="s5">
+      <div class="section-num">05</div>
+      <h2 class="section-title">Three instruction types, three places they belong</h2>
+      <p class="section-subtitle">Memory, tool-adjacent framing, and documents</p>
+
+      <p>Not every instruction belongs in the same place. There are three functionally distinct categories of instruction, and they have three functionally distinct delivery channels. The failure mode most teams fall into is putting everything in documents and wondering why rules that belong in memory or at the tool interface fail to hold.</p>
+
+      <div class="rule-cards">
+        <div class="rule-card">
+          <div class="rule-card-num">01</div>
+          <div>
+            <div class="rule-card-title">Hard behavioral rules → System prompt / persistent memory</div>
+            <div class="rule-card-body">Rules that must hold every session — never commit credentials, always ask before destructive operations, always log a given event — constitute the integrity of the work. They must be present in active context from the first moment of every interaction. The appropriate channel is the system prompt or the equivalent persistent memory surface. Documents cannot do this reliably: documents are read once, at a moment that is not the threshold moment, and their influence decays with accumulating context.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-num">02</div>
+          <div>
+            <div class="rule-card-title">Action-specific rules → Tool-adjacent framing</div>
+            <div class="rule-card-body">Rules tied to a particular tool, output, or operation do not need to be present in every decision — only when Claude is about to invoke the specific action. The appropriate channel is tool-adjacent framing: the tool description itself, documentation embedded in the tool schema, a pre-tool-call preamble. A rule about database queries belongs on the database tool. A rule about deployment belongs on the deploy action. The tool description is active context at the moment the tool is selected.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-num">03</div>
+          <div>
+            <div class="rule-card-title">Reference material → Documents</div>
+            <div class="rule-card-body">Background context on system design, schemas, rationales, and glossaries exist to be retrieved when relevant — not to govern behavior continuously. They fail only when they are miscategorized as behavioral rules. A document explaining why the system is structured a certain way is not an instruction about how to behave; it is context that supports the behavioral instructions, which live elsewhere.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="source-box">
+        <div class="source-box-header">From Anthropic's Prompting Best Practices</div>
+        <div class="source-box-body">
+          <p>XML tags help Claude parse complex prompts unambiguously, especially when your prompt mixes instructions, context, examples, and variable inputs. Wrapping each type of content in its own tag — instructions, context, input — reduces misinterpretation.</p>
+        </div>
+      </div>
+
+      <p>The XML-tag guidance is the operational version of the three-channels principle. By marking different kinds of content with different tags, the prompt itself makes the categories legible to the model. Behavioral instructions in an <code style="font-family:var(--font-mono);font-size:13px;color:var(--green-text);background:var(--bg-3);padding:2px 6px;border-radius:3px;">&lt;instructions&gt;</code> block. Long reference material in <code style="font-family:var(--font-mono);font-size:13px;color:var(--green-text);background:var(--bg-3);padding:2px 6px;border-radius:3px;">&lt;documents&gt;</code>. Examples in <code style="font-family:var(--font-mono);font-size:13px;color:var(--green-text);background:var(--bg-3);padding:2px 6px;border-radius:3px;">&lt;examples&gt;</code>.</p>
+
+      <h3 class="subsection-title">The miscategorization problem</h3>
+
+      <p>The single most common error in large-scale Claude deployments is putting behavioral rules in reference documents. A project writes a fifteen-page technical playbook. Buried in chapter four, there is a rule: "Never touch the production database without a snapshot." The rule is correct. The placement is wrong. Claude reads the playbook at session start, generates responses for forty turns, and when the moment arrives to touch the production database, the rule is no longer in active context in any weight-bearing sense.</p>
+
+      <p>The redesign: lift the behavioral rule out of the document and place it in the system prompt, so it is present every session; mirror it in tool-adjacent framing on the database tool, so it is present at the threshold moment for that specific action. The document remains as reference. The rule is no longer relying on the document to carry its weight.</p>
+
+      <div class="test-box">
+        <p><strong>A test for categorization:</strong> What happens if Claude does not have this information in active context at the moment of decision? If the answer is "the work fails in a way that cannot be recovered," the instruction is a hard behavioral rule and belongs in the system prompt. If the answer is "the specific action goes wrong," it belongs in tool-adjacent framing. If the answer is "Claude may make a slightly less informed choice but the work continues correctly," it is reference material and belongs in a document.</p>
+      </div>
+    </div>
+
+    <!-- ── Section 6 ── -->
+    <div class="section-block" id="s6">
+      <div class="section-num">06</div>
+      <h2 class="section-title">The compression problem</h2>
+      <p class="section-subtitle">Why long sessions degrade rule fidelity</p>
+
+      <p>Claude does not forget. The mechanism by which long sessions degrade rule fidelity is not a lapse of memory but a shift in what dominates active context. Recent context has structural advantages — positional bias and attention sinks allocate disproportionate weight to recent and early tokens — and the middle, where most of a long session's substance ends up living, gets progressively less attention as the session extends.</p>
+
+      <p>The research is direct. Liu and colleagues' 2024 study found a U-shaped retrieval curve in which information at the beginning and end of a context window is recalled reliably while information in the middle drops by <strong>twenty to thirty absolute percentage points</strong> [6]. Glanzer and Cunitz's 1966 dissociation reports the same curve in humans: primacy and recency effects persist, middle content degrades [7]. The effect is architectural. It is not about model capability or human effort.</p>
+
+      <div class="session-table">
+        <div class="session-table-header">Where instruction fidelity breaks down — session lifecycle</div>
+        <div class="session-row">
+          <div class="session-phase phase-green">Messages 1–10</div>
+          <div class="session-desc"><strong>High fidelity.</strong> Instructions are recent. Context window is shallow. The gap between rule and decision is small. Everything looks like it's working.</div>
+        </div>
+        <div class="session-row">
+          <div class="session-phase phase-amber">Messages 11–30</div>
+          <div class="session-desc"><strong>Drift begins.</strong> Rules from session start are being outweighed by recent task context. The first violations appear — usually on rules that were stated but not justified, and rules not reinforced by structure.</div>
+        </div>
+        <div class="session-row">
+          <div class="session-phase phase-red">Messages 31+</div>
+          <div class="session-desc"><strong>Structural reliance required.</strong> Only rules in the system prompt, rules reinforced by tool-adjacent framing, or rules with justified mechanisms survive reliably. Everything else competes with a heavy tail of recent context — and loses.</div>
+        </div>
+      </div>
+
+      <div class="source-box">
+        <div class="source-box-header">From Anthropic's Prompting Best Practices</div>
+        <div class="source-box-body">
+          <p>Your context window will be automatically compacted as it approaches its limit, allowing you to continue working indefinitely from where you left off. As you approach your token budget limit, save your current progress and state to memory before the context window refreshes.</p>
+        </div>
+      </div>
+
+      <p>This Anthropic guidance is a direct acknowledgment that context compression is a real infrastructure problem requiring real infrastructure solutions. The memory tool, structured state files, git tracking: these exist because instructions and state that live only in the context window do not survive long enough to govern behavior reliably over extended work.</p>
+
+      <h3 class="subsection-title">Techniques for restoring weight to older rules</h3>
+
+      <div class="rule-cards">
+        <div class="rule-card">
+          <div class="rule-card-num">A</div>
+          <div>
+            <div class="rule-card-title">Structural position</div>
+            <div class="rule-card-body">Place rules in the system prompt or in persistent-memory surfaces that live in a different retrieval regime than mid-context content. The system prompt persists structurally regardless of session length.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-num">B</div>
+          <div>
+            <div class="rule-card-title">Tool-adjacent injection</div>
+            <div class="rule-card-body">Place rules in the tool description or pre-tool-call preamble so the rule arrives in active context immediately before the action. The rule enters the context window fresh at exactly the moment it needs to govern behavior.</div>
+          </div>
+        </div>
+        <div class="rule-card">
+          <div class="rule-card-num">C</div>
+          <div>
+            <div class="rule-card-title">Varied reinforcement</div>
+            <div class="rule-card-body">Place reminders at moments when the rule is about to apply, rephrased each time rather than repeated verbatim, so the rule re-enters active context without the habituation penalty that accompanies identical repetition. Roediger and Karpicke's 2006 work on retrieval practice — 68% versus 54% retention at two days — is the human analog [8].</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Section 7 ── -->
+    <div class="section-block" id="s7">
+      <div class="section-num">07</div>
+      <h2 class="section-title">Naming the architecture: Application and Strategy</h2>
+      <p class="section-subtitle">Where instruction design actually fails</p>
+
+      <p>Most instruction failures are not Strategy-layer failures. They are Application-layer failures. The rule is correct. The delivery does not match how decisions actually form.</p>
+
+      <p>When a team responds to a failure by rewording the rule — clarifying the prohibition, adding exceptions, tightening the language — they are debugging at the Strategy layer. This is almost always the wrong layer. The rule was typically already adequate as content; what failed was that it was in the wrong place, phrased in the wrong direction for the model's current sensitivity, unjustified, or compressed out by more recent context.</p>
+
+      <div class="pull-quote">
+        <p>When Claude makes a mistake, the first question is not "what did I fail to say?" but <strong>"where did my instruction lose weight?"</strong> That question points to a different set of corrections — structural, positional, calibrated to the current model — that are rarely the first instinct but are almost always the most productive.</p>
+      </div>
+
+      <p>Every practice in this document is an Application-layer intervention. Calibration of voice is Application. Naming the wrong action in the right contexts is Application. Placement in system prompt versus tool versus document is Application. Varied reinforcement is Application. Justification bridges both layers — it changes what the rule says (Strategy) and how it holds under paraphrase (Application) — but its practical benefit lands most heavily on the Application side.</p>
+    </div>
+
+    <!-- ── Section 8 ── -->
+    <div class="section-block" id="s8">
+      <div class="section-num">08</div>
+      <h2 class="section-title">A framework for rewriting existing instructions</h2>
+      <p class="section-subtitle">The practices above compose into a process</p>
+
+      <p>When a body of instructions is not holding reliably, the following sequence identifies and repairs the Application-layer failures.</p>
+
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-head"><span class="step-num">01</span>Map every instruction to its category</div>
+          <div class="step-body">Is it a hard behavioral rule that must hold every session? Is it a tool-action rule that governs a specific operation? Is it reference material? The categorization test — what happens if this is not in active context at the decision point? — is the operative question. Rules that must hold and are sitting in documents need to move to the system prompt.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-head"><span class="step-num">02</span>Calibrate the voice to the current model</div>
+          <div class="step-body">If your rules were written for pre-4.5 Claude, they are probably over-emphasized for current models. Remove all-caps imperatives where they are not earned by actual stakes. Replace "CRITICAL: You MUST" with direct, specific language. Reserve emphasis for the genuinely catastrophic.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-head"><span class="step-num">03</span>Audit framing against rule type</div>
+          <div class="step-body">For discrete protocol violations, name the wrong action so the model can recognize it at the threshold. For stylistic and compositional preferences, describe the desired behavior rather than prohibiting the alternative. Mismatches produce either overtriggering or undertriggering.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-head"><span class="step-num">04</span>Justify the rules that need to generalize</div>
+          <div class="step-body">Any rule that must cover edge cases the rule-writer could not anticipate needs a mechanism — the reason it holds, the class of failures it prevents, the structural feature that motivates it. Narrow, local rules can remain unjustified. The discipline is proportionate to the rule's scope.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-head"><span class="step-num">05</span>Identify threshold moments and design placement</div>
+          <div class="step-body">For each behavioral rule, ask: at what point will Claude be about to take an action this rule governs? What will be in active context at that point? If the rule is not reliably present there, design its delivery. Tool-adjacent framing, end-of-prompt placement, pre-commitment preambles, structured checkpoints.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-head"><span class="step-num">06</span>For long-session work, design reinforcement and externalize state</div>
+          <div class="step-body">Rules that must hold across a compression horizon need to be reinjected in varied form. Use the memory tool for persistent state. Use structured files (progress.json, tests.json) for state Claude must recover. Use git and structured commit messages to keep state legible across sessions. Do not rely on the context window to carry state it cannot carry.</div>
+        </div>
+      </div>
+
+      <h3 class="subsection-title">The contrast — before and after</h3>
+
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <div class="comparison-label label-old">Before · old strong version</div>
+          <p class="hard-stop">⛔ HARD STOP before deployment. CRITICAL: If you are about to deploy and there is no test result in this session, you have already made an error. Deploying untested output is a disqualifying failure. THERE IS NO CASE where this rule is bypassable. DO NOT PROCEED.</p>
+        </div>
+        <div class="comparison-card">
+          <div class="comparison-label label-new">After · calibrated for Claude 4.6</div>
+          <p>Before any deploy, verify that a test result exists for the code being deployed in this session. Production has no fallback pipeline — a regression becomes a live incident until manual rollback, which typically takes 20–45 minutes. Deploying without a test result introduces this risk. If you believe a deploy is urgent enough to skip tests, surface that judgment rather than proceeding.</p>
+        </div>
+      </div>
+
+      <p>What changed. The rule still names the specific action (deploy), the specific precondition (test result in session), and the specific failure mechanism (no fallback pipeline, incident cost). What it stops doing is shouting. On Claude 4.6 and Opus 4.7, the second version is measurably more likely to produce the correct behavior: it gives the model the information needed to apply the rule precisely, without the over-emphasis that now triggers over-compliance. <strong>The instruction is strong because it is precise. It does not need to be loud.</strong></p>
+    </div>
+
+    <!-- ── Section 9 ── -->
+    <div class="section-block" id="s9">
+      <div class="section-num">09</div>
+      <h2 class="section-title">What this means for collaborating with Claude at scale</h2>
+
+      <p>Building seriously with Claude means accepting that instruction design is not writing and forgetting. It is architecture. The rules of a project are not a document; they are a system of delivery channels, framings, and reinforcements that keep the right constraints present at the moments that matter.</p>
+
+      <p>This is not a deficiency of the model. It is a feature of how any agent — human or otherwise — operates under load. The same architecture is implicit in how experienced professionals structure their own work: checklists at the threshold of high-stakes actions, pre-commitment gates on irreversible operations, safety rules reinforced in varied form, a consistent discipline of distinguishing reference knowledge from governing policy.</p>
+
+      <p>The specific affordances of current language models make this architecture both more tractable and more demanding than on earlier generations. More tractable, because the channels are legible and controllable: the system prompt is a specific surface, tool framing is a specific surface, reference documents are a specific surface, and the designer has precise authority over what goes where. More demanding, because the models shift, and techniques that worked a generation ago can now produce worse results.</p>
+
+      <p>The insight that delivery matters is stable. The tactics for achieving good delivery have a half-life.</p>
+
+      <div class="pull-quote">
+        <p>The practical shift for teams serious about this work is to stop treating instruction-writing as a writing task and start treating it as a delivery-design task. The question is not "did I say it clearly?" but <strong>"at the moment the decision forms, will what I wrote be in active context with enough force to hold, in the voice the current model actually responds to?"</strong></p>
+      </div>
+
+      <p>None of this requires the model to be other than it is. It requires the instruction designer to be aware of how decisions form inside a context window, and to write with that mechanism in mind. What you wrote is not what governs behavior. What is in active context at the threshold moment governs behavior — in the voice and at the calibration the current model actually responds to. The distance between those two things is where this work lives, and where the discipline of building reliably with Claude begins.</p>
+    </div>
+
+  </article>
+
+  <!-- Appendix / References -->
+  <section class="appendix">
+    <div class="appendix-label">Appendix</div>
+    <h2>Research &amp; References</h2>
+
+    <div class="ref-group">
+      <div class="ref-group-title">Anthropic — Primary Operational Reference</div>
+      <div class="ref-item">
+        <span class="ref-num">A</span>
+        <div class="ref-cite"><strong>Anthropic (2026).</strong> Prompting best practices for Claude Opus 4.7, Claude Opus 4.6, Claude Sonnet 4.6, and Claude Haiku 4.5. <em>Claude API Documentation.</em><br><a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices">platform.claude.com/docs/…/claude-prompting-best-practices</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">B</span>
+        <div class="ref-cite"><strong>Anthropic (2026).</strong> Context windows and context awareness. <em>Claude API Documentation.</em><br><a href="https://platform.claude.com/docs/en/build-with-claude/context-windows">platform.claude.com/docs/…/context-windows</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">C</span>
+        <div class="ref-cite"><strong>Anthropic (2026).</strong> Memory tool for persistent context management. <em>Claude API Documentation.</em><br><a href="https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool">platform.claude.com/docs/…/memory-tool</a></div>
+      </div>
+    </div>
+
+    <div class="ref-group">
+      <div class="ref-group-title">Implementation Intentions &amp; The Threshold Moment</div>
+      <div class="ref-item">
+        <span class="ref-num">1</span>
+        <div class="ref-cite"><strong>Gollwitzer, P. M., &amp; Sheeran, P. (2006).</strong> Implementation intentions and goal achievement: A meta-analysis of effects and processes. <em>Advances in Experimental Social Psychology, 38.</em><br><a href="https://www.academia.edu/55735607/Implementation_intentions_Strong_effects_of_simple_plans">academia.edu/…/Implementation_intentions</a></div>
+      </div>
+    </div>
+
+    <div class="ref-group">
+      <div class="ref-group-title">Context Position &amp; Multi-Turn Degradation</div>
+      <div class="ref-item">
+        <span class="ref-num">2</span>
+        <div class="ref-cite"><strong>Laban, P., et al. (2025).</strong> LLMs Get Lost in Multi-Turn Conversation. <em>arXiv.</em><br><a href="https://arxiv.org/abs/2505.06120">arxiv.org/abs/2505.06120</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">6</span>
+        <div class="ref-cite"><strong>Liu, N. F., et al. (2024).</strong> Lost in the Middle: How Language Models Use Long Contexts. <em>TACL / arXiv.</em><br><a href="https://arxiv.org/abs/2307.03172">arxiv.org/abs/2307.03172</a></div>
+      </div>
+    </div>
+
+    <div class="ref-group">
+      <div class="ref-group-title">Justification, Self-Explanation &amp; Generalization</div>
+      <div class="ref-item">
+        <span class="ref-num">3</span>
+        <div class="ref-cite"><strong>Gick, M. L., &amp; Holyoak, K. J. (1983).</strong> Schema induction and analogical transfer. <em>Cognitive Psychology, 15(1).</em><br><a href="https://www.sciencedirect.com/science/article/abs/pii/0010028583900026">sciencedirect.com/…/0010028583900026</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">4</span>
+        <div class="ref-cite"><strong>Chi, M. T. H., et al. (1989).</strong> Self-explanations: How students study and use examples in learning to solve problems. <em>Cognitive Science, 13(2).</em><br><a href="https://onlinelibrary.wiley.com/doi/10.1207/s15516709cog1302_1">onlinelibrary.wiley.com/…/s15516709cog1302_1</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">5</span>
+        <div class="ref-cite"><strong>Lampinen, A. K., et al. (2022).</strong> Can language models learn from explanations in context? <em>EMNLP Findings / arXiv.</em><br><a href="https://arxiv.org/abs/2204.02329">arxiv.org/abs/2204.02329</a></div>
+      </div>
+    </div>
+
+    <div class="ref-group">
+      <div class="ref-group-title">Memory, Compression &amp; Retrieval Practice</div>
+      <div class="ref-item">
+        <span class="ref-num">7</span>
+        <div class="ref-cite"><strong>Glanzer, M., &amp; Cunitz, A. R. (1966).</strong> Two storage mechanisms in free recall. <em>Journal of Verbal Learning and Verbal Behavior, 5(4).</em><br><a href="https://www.sciencedirect.com/science/article/abs/pii/S0022537166800442">sciencedirect.com/…/S0022537166800442</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">8</span>
+        <div class="ref-cite"><strong>Roediger, H. L., &amp; Karpicke, J. D. (2006).</strong> Test-enhanced learning: Taking memory tests improves long-term retention. <em>Psychological Science, 17(3).</em><br><a href="https://journals.sagepub.com/doi/10.1111/j.1467-9280.2006.01693.x">journals.sagepub.com/…/01693.x</a></div>
+      </div>
+    </div>
+
+    <div class="ref-group">
+      <div class="ref-group-title">Instruction Hierarchy in LLMs</div>
+      <div class="ref-item">
+        <span class="ref-num">9</span>
+        <div class="ref-cite"><strong>Wallace, E., et al. (2024).</strong> The Instruction Hierarchy: Training LLMs to Prioritize Privileged Instructions. <em>arXiv.</em><br><a href="https://arxiv.org/abs/2404.13208">arxiv.org/abs/2404.13208</a></div>
+      </div>
+      <div class="ref-item">
+        <span class="ref-num">10</span>
+        <div class="ref-cite"><strong>Geng, Y., et al. (2025).</strong> Control Illusion: The Failure of Instruction Hierarchies in Large Language Models. <em>arXiv.</em><br><a href="https://arxiv.org/abs/2502.15851">arxiv.org/abs/2502.15851</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <footer class="article-footer">
+    <div class="article-footer-label">Intelligence Signal</div>
+    <p class="article-footer-text">
+      The SAEO diagnostic maps <strong>Application-layer failures</strong> across marketing systems, AI deployments, and campaign operations. The same framework that localizes a broken funnel localizes a broken instruction architecture. If your team is building seriously with Claude, it's worth taking a look.
+    </p>
+    <div class="cta-block">
+      <div class="cta-text">
+        <strong>Explore the SAEO Diagnostic</strong>
+        Problem localization for teams building with behavioral intelligence.
+      </div>
+      <a href="#" class="cta-btn">Try SAEO.ai →</a>
+    </div>
+  </footer>
+
+  <!-- Site footer -->
+  <div class="site-footer">
+    <span class="site-footer-logo">Good <span>Assumptions</span> · Behavioral Intelligence for Builders</span>
+    <div class="site-footer-links">
+      <a href="mailto:ask@saeo.ai">ask@saeo.ai</a>
+      <a href="#">goodassumptions.com</a>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
