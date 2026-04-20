@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Using Claude Wrong — Good Assumptions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Tokens ── */
+  :root {
+    --bg:          #0f0f0e;
+    --bg-2:        #161614;
+    --bg-3:        #1e1e1b;
+    --border:      rgba(255,255,255,0.08);
+    --border-med:  rgba(255,255,255,0.14);
+    --text-1:      #e8e6dc;
+    --text-2:      #9c9a8e;
+    --text-3:      #5c5b54;
+    --accent:      #c8f0d8;
+
+    --green:       #1D9E75;
+    --green-bg:    rgba(29,158,117,0.12);
+    --green-text:  #5DCAA5;
+
+    --amber:       #BA7517;
+    --amber-bg:    rgba(186,117,23,0.12);
+    --amber-text:  #FAC775;
+
+    --red:         #D85A30;
+    --red-bg:      rgba(216,90,48,0.12);
+    --red-text:    #F0997B;
+
+    --purple:      #7F77DD;
+    --purple-bg:   rgba(127,119,221,0.12);
+    --purple-text: #AFA9EC;
+
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text-1);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 760px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ── Nav ── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .nav-logo {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: 0.04em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--green-text); }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text-1); }
+  .nav-cta {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--bg) !important;
+    background: var(--green-text);
+    padding: 7px 14px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ── Article header ── */
+  .article-header {
+    padding: 72px 0 56px;
+    border-bottom: 0.5px solid var(--border);
+    margin-bottom: 64px;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 3px;
+  }
+  .badge-type { background: var(--purple-bg); color: var(--purple-text); }
+  .badge-territory { background: var(--green-bg); color: var(--green-text); }
+  .badge-difficulty { background: var(--bg-3); color: var(--text-2); border: 0.5px solid var(--border-med); }
+  .meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--text-3); }
+  .meta-text {
+    font-size: 12px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+
+  .article-title {
+    font-size: 42px;
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--text-1);
+    margin-bottom: 20px;
+  }
+  .article-title em {
+    font-style: italic;
+    color: var(--text-2);
+  }
+
+  .article-deck {
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--text-2);
+    max-width: 640px;
+    margin-bottom: 32px;
+  }
+
+  .author-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .author-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--green-bg);
+    border: 1px solid var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--green-text);
+    flex-shrink: 0;
+  }
+  .author-info { font-size: 12px; }
+  .author-name { color: var(--text-1); font-weight: 500; }
+  .author-date { color: var(--text-3); margin-top: 1px; }
+
+  /* ── Body copy ── */
+  .article-body { font-size: 17px; line-height: 1.8; color: var(--text-1); }
+
+  .article-body p { margin-bottom: 28px; font-weight: 300; }
+
+  .article-body h2 {
+    font-size: 26px;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    color: var(--text-1);
+    margin-top: 72px;
+    margin-bottom: 20px;
+    line-height: 1.25;
+  }
+
+  .article-body h3 {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-top: 48px;
+    margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Callout / pull quote ── */
+  .callout {
+    margin: 48px 0;
+    padding: 28px 32px;
+    background: var(--bg-2);
+    border-left: 2px solid var(--green);
+    border-radius: 0 6px 6px 0;
+  }
+  .callout-text {
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1.5;
+    color: var(--text-1);
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+  .callout-text strong { font-style: normal; font-weight: 500; color: var(--accent); }
+
+  /* ── Insight box ── */
+  .insight-box {
+    margin: 48px 0;
+    padding: 24px 28px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+  }
+  .insight-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--amber-text);
+    margin-bottom: 12px;
+  }
+  .insight-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-2);
+    font-weight: 300;
+  }
+  .insight-body strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Principle cards ── */
+  .principles-grid {
+    display: grid;
+    gap: 2px;
+    margin: 48px 0;
+  }
+  .principle-card {
+    padding: 24px 28px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .principle-card:first-child { border-radius: 6px 6px 4px 4px; }
+  .principle-card:last-child { border-radius: 4px 4px 6px 6px; }
+  .principle-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    padding-top: 3px;
+  }
+  .principle-head {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+  .principle-body {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text-2);
+    font-weight: 300;
+  }
+  .principle-body code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    background: var(--bg-3);
+    color: var(--green-text);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ── Divider ── */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 64px 0;
+  }
+  .divider-line { flex: 1; height: 0.5px; background: var(--border); }
+  .divider-mark {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── SAEO diagnostic callout ── */
+  .layer-map {
+    margin: 48px 0;
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .layer-map-header {
+    padding: 16px 24px;
+    background: var(--bg-3);
+    border-bottom: 0.5px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .layer-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .layer-row:last-child { border-bottom: none; }
+  .layer-label {
+    padding: 16px 24px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    border-right: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+  .layer-label.active { color: var(--red-text); }
+  .layer-label.passive { color: var(--text-3); }
+  .layer-desc {
+    padding: 16px 24px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-2);
+    font-weight: 300;
+  }
+  .layer-desc strong { color: var(--text-1); font-weight: 500; }
+
+  /* ── Conclusion / CTA ── */
+  .article-footer {
+    margin-top: 80px;
+    padding-top: 48px;
+    border-top: 0.5px solid var(--border);
+  }
+  .article-footer-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .article-footer-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-2);
+    font-weight: 300;
+    margin-bottom: 28px;
+    max-width: 580px;
+  }
+  .article-footer-text strong { color: var(--text-1); font-weight: 500; }
+
+  .cta-block {
+    padding: 28px 32px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border-med);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cta-text { font-size: 14px; color: var(--text-2); font-weight: 300; line-height: 1.6; }
+  .cta-text strong { color: var(--text-1); font-weight: 500; display: block; font-size: 16px; margin-bottom: 4px; }
+  .cta-btn {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--bg);
+    background: var(--green-text);
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: opacity 0.15s;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+
+  /* ── Related concepts ── */
+  .related-section { margin-top: 64px; }
+  .related-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 16px;
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .related-card {
+    padding: 18px 20px;
+    background: var(--bg-2);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+  .related-card:hover { border-color: var(--border-med); }
+  .related-card-type {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-3);
+    margin-bottom: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .related-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.4;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 600px) {
+    .article-title { font-size: 30px; }
+    .article-deck { font-size: 16px; }
+    .related-grid { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .layer-row { grid-template-columns: 1fr; }
+    .layer-label { border-right: none; border-bottom: 0.5px solid var(--border); }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="#" class="nav-logo">Good <span>Assumptions</span></a>
+    <ul class="nav-links">
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Concepts</a></li>
+      <li><a href="#">Research</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#" class="nav-cta">Try SAEO.ai →</a></li>
+    </ul>
+  </nav>
+
+  <!-- Article Header -->
+  <header class="article-header">
+    <div class="meta-row">
+      <span class="badge badge-type">Pillar Article</span>
+      <span class="badge badge-territory">T4 · SAEO</span>
+      <span class="badge badge-difficulty">Advanced</span>
+      <span class="meta-dot"></span>
+      <span class="meta-text">14 min read</span>
+      <span class="meta-dot"></span>
+      <span class="meta-text">April 2026</span>
+    </div>
+
+    <h1 class="article-title">
+      You're Using Claude Wrong.<br>
+      <em>(And It's Not a Prompt Problem.)</em>
+    </h1>
+
+    <p class="article-deck">
+      Most people building seriously with Claude are stuck at the Execution layer. They're focused on what to tell Claude — not on how instruction actually governs behavior at the moment it matters. That's a different problem entirely.
+    </p>
+
+    <div class="author-row">
+      <div class="author-avatar">D</div>
+      <div class="author-info">
+        <div class="author-name">Dwayne</div>
+        <div class="author-date">Good Assumptions · April 2026</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <article class="article-body">
+
+    <p>
+      I want to tell you something that most Claude guides will never say, because most Claude guides are written by people who are optimizing single-turn output quality and calling it prompt engineering.
+    </p>
+
+    <p>
+      The document that would actually help someone building serious, stateful, multi-session work with Claude doesn't exist yet. Not the "write better prompts" document. Not the "be specific and clear" document. Those have been written to death, and they're mostly wrong — they treat Claude like a search engine you keyword-optimize.
+    </p>
+
+    <p>
+      What doesn't exist is the operations manual. The one that explains why your carefully written instructions are being violated consistently, not because Claude is ignoring them, but because of how instruction actually works at the moment decisions get made.
+    </p>
+
+    <div class="callout">
+      <p class="callout-text">
+        The real problem isn't what you wrote. It's the gap between <strong>what you wrote and what governs behavior</strong> at the threshold moment — which is an Application-layer problem every single time.
+      </p>
+    </div>
+
+    <p>
+      You can have perfect Strategy — correct rules, right architecture, complete information — and still see consistent protocol violations, because the message design doesn't match how decisions actually get made. Strategy failure is rare. Application failure is almost everything.
+    </p>
+
+    <h2>The Threshold Moment Is Not Session Start</h2>
+
+    <p>
+      Here's the first thing most people get wrong. They front-load all their instructions — a long system prompt, detailed behavioral rules, careful architecture. Then they wonder why, forty messages deep, Claude does the exact thing they told it never to do.
+    </p>
+
+    <p>
+      The mistake is treating session start as the moment of instruction. Instructions read once and filed are not instructions. They're orientation. There is a meaningful and consequential distinction between what Claude reads at the start of a session and what Claude has in active context at decision time.
+    </p>
+
+    <p>
+      This is the central problem the entire document addresses. Not "how do I write better prompts" but "how do I ensure the right constraints are active when the decision is actually happening."
+    </p>
+
+    <div class="insight-box">
+      <div class="insight-label">Application Layer Failure</div>
+      <div class="insight-body">
+        <strong>What you observe:</strong> Claude violates a rule you clearly specified. The rule is in your system prompt. You can see it. Claude has seen it. But it still gets violated at action time.<br><br>
+        <strong>What's actually happening:</strong> The rule was read during orientation and filed. Recent context — the specific task at hand, the flow of the last several messages — is dominating the decision. The rule hasn't been reinforced by structure, position, or mechanism. It lost weight. This is not a memory failure. It is a context-dominance problem.
+      </div>
+    </div>
+
+    <h2>Three Instruction Types. Three Places They Belong.</h2>
+
+    <p>
+      The single most practical insight I can give you is this: not all instructions belong in the same place. Most people write everything as documents and wonder why Claude keeps doing the same wrong thing.
+    </p>
+
+    <p>
+      There are three instruction types and each has a correct home.
+    </p>
+
+    <div class="principles-grid">
+      <div class="principle-card">
+        <div class="principle-num">01</div>
+        <div>
+          <div class="principle-head">Behavioral Rules → Memory</div>
+          <div class="principle-body">
+            Rules that must hold every session, without exception, belong in memory. Not in a document Claude might read. Not in a system prompt that competes with eighty other lines. In memory — the only durable, session-persistent instruction layer. If it's a rule that applies to every action Claude will ever take in this project, it lives in memory. No exceptions.
+          </div>
+        </div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">02</div>
+        <div>
+          <div class="principle-head">Action-Adjacent Rules → Tool-Adjacent Framing</div>
+          <div class="principle-body">
+            Rules that govern specific actions belong as close to those actions as possible. If a rule applies to database writes, it should appear in the context immediately before a database write is happening — not buried in a preamble from session start. The principle is proximity to decision. The further a rule is from the moment it needs to govern, the less it governs.
+          </div>
+        </div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">03</div>
+        <div>
+          <div class="principle-head">Reference and Architecture → Documents</div>
+          <div class="principle-body">
+            Schema references, architecture notes, process documentation — these belong in documents, searched on demand. Not because they're less important, but because they're reference material, not behavioral governors. The mistake is treating behavioral rules as if they're reference material. They have different jobs and need different homes.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-mark">§</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <h2>The Error-Already-Committed Frame</h2>
+
+    <p>
+      This is the most psychologically interesting piece of the puzzle, and it's the part that most people discover by accident, if they discover it at all.
+    </p>
+
+    <p>
+      There is a meaningful behavioral difference between these two instruction styles:
+    </p>
+
+    <p>
+      <em>Style A:</em> "Always read the current edge function before modifying it."
+    </p>
+
+    <p>
+      <em>Style B:</em> "If you have not read the current edge function, you have already made an error. Stop. Read it now."
+    </p>
+
+    <p>
+      Style B consistently outperforms Style A in compliance, and the mechanism is abductive reasoning. Claude at action time is not recalling instructions the way a human might try to remember a rule they read. Claude is inferring — constructing the most coherent interpretation of what should happen given everything in context. Style B changes what the inference has to be. It names the error-already-occurring frame. It makes the wrong action recognizable at the moment it's happening, rather than presenting only the correct behavior and hoping the wrong behavior gets implicitly excluded.
+    </p>
+
+    <div class="callout">
+      <p class="callout-text">
+        Instructions that describe only the correct behavior leave the wrong behavior <strong>unnamed and therefore unrecognized</strong> at the moment it's occurring.
+      </p>
+    </div>
+
+    <h2>Justify the Rule. Don't Just State It.</h2>
+
+    <p>
+      I have a rule in my own SAEO configuration that says never use pgmq as a progress signal. If I had written it as just that — a rule — compliance would be inconsistent. What I wrote instead was:
+    </p>
+
+    <p style="font-family: var(--font-mono); font-size: 13px; color: var(--green-text); background: var(--bg-3); padding: 20px 24px; border-radius: 6px; line-height: 1.7; margin-bottom: 28px;">
+      Never use pgmq visibility state as a progress signal — pgmq visibility timeouts cause recycling loops. Rows become visible again after the timeout expires and get processed twice. This corrupts pipeline counts and creates silent duplicate writes.
+    </p>
+
+    <p>
+      Same rule. Completely different compliance rate. The reason is that a justified rule survives paraphrase. When Claude understands <em>why</em> a rule exists, it can apply the principle to edge cases the rule doesn't explicitly cover. When Claude only knows <em>what</em> the rule is, it can only apply it when the exact scenario matches the exact wording. That match is never as reliable as understanding the mechanism.
+    </p>
+
+    <p>
+      This is not a prompt trick. It is a direct consequence of how reasoning works at inference time. The rule with the mechanism is not just a rule — it's a model of the underlying system that Claude can use to reason about new situations.
+    </p>
+
+    <h2>The Compression Problem</h2>
+
+    <p>
+      Long sessions degrade instruction fidelity. This surprises people who expect that since Claude "read" the instructions, they remain equally active throughout the session.
+    </p>
+
+    <p>
+      They don't. Not because Claude forgets — there is no forgetting in the technical sense — but because recent context dominates. The most recent messages carry more inferential weight than earlier ones. As a session grows, the gap between where your instructions were and where active decision-making is happening expands. Rules that aren't reinforced by structure, position, or repetition lose weight over time.
+    </p>
+
+    <div class="layer-map">
+      <div class="layer-map-header">Where Instruction Fidelity Breaks Down — Session Lifecycle</div>
+      <div class="layer-row">
+        <div class="layer-label active">Messages 1–10</div>
+        <div class="layer-desc"><strong>High fidelity.</strong> Instructions are recent. Context window is shallow. The gap between rule and decision is small. Everything looks like it's working.</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label" style="color: var(--amber-text);">Messages 11–30</div>
+        <div class="layer-desc"><strong>Drift begins.</strong> Rules from session start are being outweighed by recent task context. The first violations appear — usually on the rules that were stated but not justified.</div>
+      </div>
+      <div class="layer-row">
+        <div class="layer-label active">Messages 31+</div>
+        <div class="layer-desc"><strong>Structural reliance required.</strong> Only rules in memory, rules reinforced by tool-adjacent framing, or rules with justified mechanisms survive reliably. Everything else is competing with a heavy tail of recent context and losing.</div>
+      </div>
+    </div>
+
+    <p>
+      Memory is the only durable solution. Not longer system prompts. Not reminders buried in documents. Memory — the persistent behavioral layer that doesn't decay with session length.
+    </p>
+
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-mark">§</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <h2>Why This Is an Application Problem, Not a Strategy Problem</h2>
+
+    <p>
+      I want to put this in the language I use for everything else I diagnose, because it's clarifying.
+    </p>
+
+    <p>
+      If you've worked with the SAEO framework, you know the five layers: Strategy, Application, Execution, Operations, and the Audience the whole thing is built for. Most marketing failures aren't Strategy failures — the strategy is often correct. They're Application failures: the correct strategy doesn't make it into the design of the actual thing going out the door.
+    </p>
+
+    <p>
+      The same diagnostic applies to Claude collaboration. The failure is almost never "I didn't know what rules I needed." The failure is "my rules didn't make it into the design of how Claude was actually operating at decision time." Strategy layer is usually fine. Application layer is almost everything.
+    </p>
+
+    <div class="insight-box">
+      <div class="insight-label">SAEO Diagnostic — Claude Instruction Failures</div>
+      <div class="insight-body">
+        <strong>Strategy:</strong> Wrong rules, wrong architecture, missing information. Rare.<br><br>
+        <strong>Application:</strong> Correct rules not reaching decision time. Rule stated but not positioned. Rule justified inadequately. Wrong instruction type in wrong home. Almost everything.<br><br>
+        <strong>Execution:</strong> Correctly positioned rules misapplied in implementation. Occasional.<br><br>
+        <strong>Operations:</strong> Rules degrading over long sessions due to context weight. Common in stateful work.
+      </div>
+    </div>
+
+    <h2>The Document That Doesn't Exist Yet</h2>
+
+    <p>
+      The Claude prompting guides that exist are mostly about single-turn quality — how to get a better answer to a one-shot question. Nobody has written the operations manual for multi-session, tool-using, stateful Claude collaboration.
+    </p>
+
+    <p>
+      That document — if it were organized from what we've just covered — would look something like this:
+    </p>
+
+    <div class="principles-grid">
+      <div class="principle-card">
+        <div class="principle-num">I</div>
+        <div>
+          <div class="principle-head">The Threshold Moment</div>
+          <div class="principle-body">The distinction between what Claude reads and what governs behavior at decision time. How context window dynamics actually work during long sessions. Why session start isn't instruction time.</div>
+        </div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">II</div>
+        <div>
+          <div class="principle-head">Instruction Taxonomy</div>
+          <div class="principle-body">Memory for behavioral rules. Tool-adjacent framing for action-specific rules. Documents for reference architecture. One type in the wrong place is the whole failure mode.</div>
+        </div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">III</div>
+        <div>
+          <div class="principle-head">The Error-Already-Committed Frame</div>
+          <div class="principle-body">Why abductive framing outperforms prescriptive framing. How to name the wrong action explicitly so it becomes recognizable at the moment it's occurring, not just described as something to avoid.</div>
+        </div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">IV</div>
+        <div>
+          <div class="principle-head">Mechanism Over Rule</div>
+          <div class="principle-body">Justified rules survive paraphrase. Bare rules don't. The mechanism gives Claude a model it can reason from, not a constraint it has to match pattern-exactly to apply.</div>
+        </div>
+      </div>
+      <div class="principle-card">
+        <div class="principle-num">V</div>
+        <div>
+          <div class="principle-head">Compression and Recovery</div>
+          <div class="principle-body">How to design for session degradation rather than assuming uniform fidelity across session length. Memory architecture. Structure-based reinforcement. What breaks first and why.</div>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      The audience for this document isn't just people building with Claude. It's everyone treating AI collaboration as a serious operational layer rather than a chat feature. The gap between "I have written instructions" and "those instructions govern behavior at the right moments" is the entire problem space. That gap has a structure. It can be closed.
+    </p>
+
+  </article>
+
+  <!-- Article Footer / CTA -->
+  <footer class="article-footer">
+    <div class="article-footer-label">Intelligence Signal</div>
+    <p class="article-footer-text">
+      The SAEO framework has a dedicated <strong>Application layer diagnostic</strong> — built specifically for identifying where correct strategy fails to reach execution. This article describes one instance of that failure in the context of AI collaboration. The pattern is identical across every domain we've mapped it to: the problem is almost never what you decided. It's how the decision made it into the design.
+    </p>
+
+    <div class="cta-block">
+      <div class="cta-text">
+        <strong>Explore the SAEO Diagnostic</strong>
+        The full problem localization engine. Which layer is actually failing — and what to fix first.
+      </div>
+      <a href="#" class="cta-btn">Try SAEO.ai →</a>
+    </div>
+  </footer>
+
+  <!-- Related -->
+  <section class="related-section">
+    <div class="related-label">Related Concepts</div>
+    <div class="related-grid">
+      <a href="#" class="related-card">
+        <div class="related-card-type">SAEO Layer</div>
+        <div class="related-card-title">Application Failure: When Correct Strategy Doesn't Reach Execution</div>
+      </a>
+      <a href="#" class="related-card">
+        <div class="related-card-type">Cognitive Driver</div>
+        <div class="related-card-title">Abductive Reasoning and the Inference-First Decision Frame</div>
+      </a>
+      <a href="#" class="related-card">
+        <div class="related-card-type">Concept</div>
+        <div class="related-card-title">Context Dominance: Why Recency Outweighs Instruction</div>
+      </a>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
