@@ -11,6 +11,7 @@ decisions:
   mix: 70/20/10 authority-dominant
   reader: planner-primary · vp/founder halo
   positioning: wall-with-a-door
+  saeo_cta_verb: ask-not-try
 source: cms.ga_content (Supabase, project vfnspmpwcmgrcditcwpr) — historical drafting record only; this file is canonical
 ---
 
@@ -33,7 +34,7 @@ source: cms.ga_content (Supabase, project vfnspmpwcmgrcditcwpr) — historical d
 - Articles
 - About
 
-**CTA:** Try SAEO.ai →
+**CTA:** Ask SAEO.ai →
 
 ---
 
@@ -130,7 +131,7 @@ The brief-level diagnostic that separates marketing that works from marketing yo
 
 The framework is the map. SAEO walks it.
 
-**CTA:** Try SAEO.ai → → https://saeo.ai *(new tab)*
+**CTA:** Ask SAEO.ai → → https://saeo.ai *(new tab)*
 
 ---
 
@@ -142,4 +143,4 @@ The framework is the map. SAEO walks it.
 
 **Column 3 — More:** Articles · About · Contact · RSS
 
-**Bottom row:** © 2026 Good Assumptions. Built by Dwayne Hill. Try SAEO.ai →
+**Bottom row:** © 2026 Good Assumptions · SAEO.ai →
