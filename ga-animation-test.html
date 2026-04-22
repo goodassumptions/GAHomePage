@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GA · Animation Debug Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+/* ── GA Design Tokens ── */
+:root {
+  --bg:    #0f0f0e;
+  --bg-2:  #141412;
+  --bg-3:  #1a1a17;
+  --bg-4:  #222220;
+  --bg-5:  #2a2a27;
+  --t1: #eae8de;
+  --t2: #a8a59a;
+  --t3: #6a6860;
+  --t4: #3d3c38;
+  --border:     rgba(255,255,255,0.07);
+  --border-med: rgba(255,255,255,0.13);
+  --border-hi:  rgba(255,255,255,0.22);
+  --lim:    #FAC775; --lim-bg: rgba(186,117,23,0.10); --lim-bd: rgba(186,117,23,0.25);
+  --cog:    #AFA9EC; --cog-bg: rgba(127,119,221,0.10); --cog-bd: rgba(127,119,221,0.25);
+  --cv:     #87BEF0; --cv-bg:  rgba(74,143,212,0.10);  --cv-bd:  rgba(74,143,212,0.25);
+  --pt:     #5DCAA5; --pt-bg:  rgba(29,158,117,0.10);  --pt-bd:  rgba(29,158,117,0.25);
+  --coral:  #F0997B; --coral-bg:rgba(216,90,48,0.10);  --coral-bd:rgba(216,90,48,0.25);
+  --ui:   'DM Sans', system-ui, sans-serif;
+  --disp: 'DM Serif Display', Georgia, serif;
+  --mono: 'DM Mono', monospace;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:20px;
+  --s6:24px;--s8:32px;--s10:40px;--s12:48px;--s16:64px;
+  --r1:3px;--r2:6px;--r3:10px;--r4:16px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+  background: var(--bg);
+  color: var(--t1);
+  font-family: var(--ui);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Fixed Progress Bar (top) ── */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--pt), var(--cv));
+  z-index: 1000;
+  transition: width 0.1s linear;
+}
+
+/* ── Fixed Side Panel — scroll % + active zone ── */
+#side-panel {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.sp-scroll-pct {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+  background: var(--bg-2);
+  border: 0.5px solid var(--border-med);
+  border-radius: var(--r2);
+  padding: 4px 8px;
+  min-width: 48px;
+  text-align: center;
+}
+
+.sp-zone-dots {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-end;
+}
+
+.sp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--bg-4);
+  border: 0.5px solid var(--border-med);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.sp-dot.active {
+  background: var(--pt);
+  border-color: var(--pt);
+  width: 8px;
+  height: 8px;
+}
+
+.sp-dot::before {
+  content: attr(data-label);
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-family: var(--mono);
+  color: var(--t3);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.sp-dot:hover::before,
+.sp-dot.active::before {
+  opacity: 1;
+  color: var(--t2);
+}
+
+/* ── Fixed Debug Overlay ── */
+#debug-panel {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  z-index: 999;
+  background: var(--bg-2);
+  border: 0.5px solid var(--lim-bd);
+  border-radius: var(--r2);
+  padding: 12px 16px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t2);
+  min-width: 240px;
+  max-width: 300px;
+  transition: opacity 0.2s ease;
+}
+
+#debug-panel .dp-title {
+  color: var(--lim);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dp-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pt);
+  animation: dp-blink 1.2s ease infinite;
+  flex-shrink: 0;
+}
+
+@keyframes dp-blink {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.dp-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 2px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.dp-row:last-child { border-bottom: none; }
+.dp-key { color: var(--t3); }
+.dp-val { color: var(--t1); text-align: right; }
+.dp-val.fired { color: var(--pt); }
+.dp-val.pending { color: var(--t3); }
+
+/* ── Layout ── */
+.page { max-width: 800px; margin: 0 auto; padding: 0 var(--s8) var(--s16); }
+
+/* ── Test Zone wrapper ── */
+.test-zone {
+  min-height: 100vh;
+  padding: 120px 0;
+  border-bottom: 0.5px solid var(--border);
+  position: relative;
+}
+
+.test-zone:last-of-type { border-bottom: none; }
+
+.zone-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t4);
+  margin-bottom: var(--s3);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+}
+
+.zone-label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--t4);
+  flex-shrink: 0;
+  transition: background 0.3s ease;
+}
+
+.zone-label.triggered::before {
+  background: var(--pt);
+}
+
+.zone-title {
+  font-family: var(--disp);
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  color: var(--t1);
+  margin-bottom: var(--s4);
+}
+
+.zone-desc {
+  font-size: 14px;
+  color: var(--t3);
+  margin-bottom: var(--s8);
+  max-width: 480px;
+  line-height: 1.6;
+}
+
+/* ── Spacer between zones ── */
+.zone-spacer {
+  height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 0.5px dashed var(--border);
+}
+
+.zone-spacer-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--t4);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   ANIMATION DEFINITIONS
+   ============================================================ */
+
+/* 1. REVEAL — basic fade+lift (current live animation) */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+}
+.reveal.on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 2. STAGGER — children fire sequentially */
+.stagger-parent .stagger-child {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+}
+.stagger-parent.on .stagger-child:nth-child(1) { opacity:1; transform:translateY(0); transition-delay: 0ms; }
+.stagger-parent.on .stagger-child:nth-child(2) { opacity:1; transform:translateY(0); transition-delay: 90ms; }
+.stagger-parent.on .stagger-child:nth-child(3) { opacity:1; transform:translateY(0); transition-delay: 180ms; }
+.stagger-parent.on .stagger-child:nth-child(4) { opacity:1; transform:translateY(0); transition-delay: 270ms; }
+.stagger-parent.on .stagger-child:nth-child(5) { opacity:1; transform:translateY(0); transition-delay: 360ms; }
+.stagger-parent.on .stagger-child:nth-child(6) { opacity:1; transform:translateY(0); transition-delay: 450ms; }
+
+/* 3. SLIDE-IN LEFT */
+.slide-left {
+  opacity: 0;
+  transform: translateX(-32px);
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+}
+.slide-left.on {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 4. SLIDE-IN RIGHT */
+.slide-right {
+  opacity: 0;
+  transform: translateX(32px);
+  transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+}
+.slide-right.on {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 5. SCALE-IN */
+.scale-in {
+  opacity: 0;
+  transform: scale(0.93);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+.scale-in.on {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* 6. COUNT-UP — JS handles value, CSS handles fade */
+.count-up-wrap {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.count-up-wrap.on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 7. LINE-REVEAL — text clips up */
+.line-reveal {
+  overflow: hidden;
+}
+.line-reveal span {
+  display: block;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 0.6s var(--ease-out), opacity 0.4s ease;
+}
+.line-reveal.on span {
+  transform: translateY(0);
+  opacity: 1;
+}
+.line-reveal.on span:nth-child(2) { transition-delay: 80ms; }
+.line-reveal.on span:nth-child(3) { transition-delay: 160ms; }
+
+/* 8. BORDER-DRAW — border width grows */
+.border-draw {
+  opacity: 0;
+  border-left: 0px solid var(--pt);
+  padding-left: 0;
+  transition: opacity 0.4s ease, border-left-width 0.5s var(--ease-out), padding-left 0.5s var(--ease-out);
+}
+.border-draw.on {
+  opacity: 1;
+  border-left-width: 2px;
+  padding-left: 20px;
+}
+
+/* 9. NAV ACTIVE — handled by JS scroll tracking */
+
+/* ── UI Components ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s4);
+  margin-top: var(--s6);
+}
+
+.card {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r3);
+  padding: var(--s5);
+}
+
+.card-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: var(--s2);
+  font-family: var(--mono);
+}
+
+.card-body {
+  font-size: 14px;
+  color: var(--t2);
+  line-height: 1.6;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  border: 0.5px solid var(--border);
+  border-radius: var(--r3);
+  overflow: hidden;
+  margin-top: var(--s6);
+}
+
+.stat-cell {
+  padding: var(--s6) var(--s5);
+  border-right: 0.5px solid var(--border);
+  background: var(--bg-3);
+}
+.stat-cell:last-child { border-right: none; }
+
+.stat-num {
+  font-family: var(--disp);
+  font-size: 36px;
+  color: var(--t1);
+  line-height: 1;
+  margin-bottom: var(--s2);
+}
+
+.stat-num .prefix,
+.stat-num .suffix {
+  font-size: 20px;
+  color: var(--t3);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--t3);
+  font-family: var(--mono);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.badge-lim { background: var(--lim-bg); color: var(--lim); border: 0.5px solid var(--lim-bd); }
+.badge-cog { background: var(--cog-bg); color: var(--cog); border: 0.5px solid var(--cog-bd); }
+.badge-cv  { background: var(--cv-bg);  color: var(--cv);  border: 0.5px solid var(--cv-bd); }
+.badge-pt  { background: var(--pt-bg);  color: var(--pt);  border: 0.5px solid var(--pt-bd); }
+
+.reframe {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border-med);
+  border-left: 2px solid var(--pt);
+  border-radius: var(--r2);
+  padding: var(--s5) var(--s6);
+  margin: var(--s6) 0;
+}
+
+.reframe-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--pt);
+  margin-bottom: var(--s2);
+  font-family: var(--mono);
+}
+
+.reframe-body {
+  font-size: 14px;
+  color: var(--t2);
+  line-height: 1.8;
+}
+
+/* Anchor nav pills */
+.anchor-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-bottom: var(--s10);
+  position: sticky;
+  top: 0;
+  background: rgba(15,15,14,0.9);
+  backdrop-filter: blur(12px);
+  padding: var(--s3) 0;
+  z-index: 100;
+  border-bottom: 0.5px solid var(--border);
+}
+
+.anchor-pill {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  color: var(--t3);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: var(--ui);
+  letter-spacing: 0.02em;
+}
+
+.anchor-pill:hover { background: var(--bg-3); border-color: var(--border-med); color: var(--t2); }
+.anchor-pill.active { background: var(--bg-4); border-color: var(--border-hi); color: var(--t1); }
+
+/* Reset / replay button */
+.reset-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--coral);
+  background: var(--coral-bg);
+  border: 0.5px solid var(--coral-bd);
+  border-radius: var(--r2);
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.reset-btn:hover { background: rgba(216,90,48,0.2); }
+
+/* Threshold slider */
+.threshold-control {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: var(--s4);
+  padding: var(--s4) var(--s5);
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r2);
+}
+.threshold-control label {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--t3);
+  white-space: nowrap;
+}
+.threshold-control input[type=range] {
+  flex: 1;
+  accent-color: var(--pt);
+}
+#threshold-val {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--cv);
+  min-width: 36px;
+  text-align: right;
+}
+
+/* Parallax container */
+.parallax-zone {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r3);
+  height: 300px;
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--s6);
+}
+
+.parallax-bg {
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(ellipse at 60% 50%, rgba(29,158,117,0.12) 0%, transparent 60%),
+              radial-gradient(ellipse at 20% 80%, rgba(127,119,221,0.08) 0%, transparent 50%);
+  will-change: transform;
+}
+
+.parallax-text {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.parallax-text h3 {
+  font-family: var(--disp);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--t1);
+  margin-bottom: var(--s2);
+}
+
+.parallax-text p {
+  font-size: 13px;
+  color: var(--t3);
+  font-family: var(--mono);
+}
+
+/* Horizontal slide demo */
+.slide-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s6);
+  margin-top: var(--s6);
+}
+
+.slide-card {
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r3);
+  padding: var(--s6);
+}
+
+/* Status indicator on zone header */
+.zone-status {
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 20px;
+  border: 0.5px solid var(--border);
+  color: var(--t4);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.zone-status::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--t4);
+  transition: background 0.3s ease;
+}
+.zone-status.fired {
+  color: var(--pt);
+  border-color: var(--pt-bd);
+  background: var(--pt-bg);
+}
+.zone-status.fired::before {
+  background: var(--pt);
+}
+
+/* Hero bar */
+.hero {
+  padding: 80px 0 60px;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lim);
+  margin-bottom: var(--s4);
+}
+
+.hero-title {
+  font-family: var(--disp);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--t1);
+  margin-bottom: var(--s5);
+}
+
+.hero-sub {
+  font-size: 14px;
+  color: var(--t3);
+  max-width: 520px;
+  line-height: 1.8;
+  margin-bottom: var(--s6);
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .card-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2,1fr); }
+  .slide-row { grid-template-columns: 1fr; }
+  #side-panel { display: none; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- Progress bar -->
+<div id="progress-bar"></div>
+
+<!-- Side panel: scroll % + zone dots -->
+<div id="side-panel">
+  <div class="sp-scroll-pct" id="scroll-pct">0%</div>
+  <div class="sp-zone-dots" id="zone-dots"></div>
+</div>
+
+<!-- Debug overlay -->
+<div id="debug-panel">
+  <div class="dp-title"><span class="dp-pulse"></span>Animation Debug</div>
+  <div class="dp-row"><span class="dp-key">scroll</span><span class="dp-val" id="dp-scroll">0px</span></div>
+  <div class="dp-row"><span class="dp-key">active zone</span><span class="dp-val" id="dp-zone">—</span></div>
+  <div class="dp-row"><span class="dp-key">threshold</span><span class="dp-val" id="dp-threshold">0.06</span></div>
+  <div class="dp-row"><span class="dp-key">triggered</span><span class="dp-val" id="dp-triggered">0</span></div>
+  <div class="dp-row"><span class="dp-key">pending</span><span class="dp-val" id="dp-pending">—</span></div>
+  <div class="dp-row"><span class="dp-key">last fired</span><span class="dp-val fired" id="dp-last">—</span></div>
+</div>
+
+<!-- Page -->
+<div class="page">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Good Assumptions · Animation Debug Lab</div>
+    <h1 class="hero-title">Scroll Debug<br><em>Test Environment</em></h1>
+    <p class="hero-sub">Each zone below tests one animation type. The side panel tracks scroll progress. The debug overlay shows IntersectionObserver state in real time. Use the threshold slider in Zone 1 to tune trigger sensitivity.</p>
+    <div class="hero-meta">
+      <span class="badge badge-pt">v0.1 debug</span>
+      <span class="badge badge-lim">9 test zones</span>
+      <button class="reset-btn" onclick="resetAll()">↺ Reset All Animations</button>
+    </div>
+  </div>
+
+  <!-- Anchor nav -->
+  <nav class="anchor-nav" id="anchor-nav">
+    <a class="anchor-pill" href="#zone-1">01 Reveal</a>
+    <a class="anchor-pill" href="#zone-2">02 Stagger</a>
+    <a class="anchor-pill" href="#zone-3">03 Count-Up</a>
+    <a class="anchor-pill" href="#zone-4">04 Slide H</a>
+    <a class="anchor-pill" href="#zone-5">05 Scale-In</a>
+    <a class="anchor-pill" href="#zone-6">06 Line Reveal</a>
+    <a class="anchor-pill" href="#zone-7">07 Border Draw</a>
+    <a class="anchor-pill" href="#zone-8">08 Parallax</a>
+    <a class="anchor-pill" href="#zone-9">09 Nav Active</a>
+  </nav>
+
+  <!-- ═══════════════════════════════════
+       ZONE 1 — REVEAL (fade + lift)
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-1" data-zone="01 Reveal">
+    <div class="zone-label" id="label-zone-1">
+      Zone 01 · Basic Reveal
+      <span class="zone-status" id="status-zone-1">pending</span>
+    </div>
+    <h2 class="zone-title">Fade + Lift<br><em>The foundation</em></h2>
+    <p class="zone-desc">Current live animation on goodassumptions.com. Opacity 0→1 + translateY(18px→0) at threshold 0.06. Tune threshold below.</p>
+
+    <!-- Threshold control -->
+    <div class="threshold-control">
+      <label>IO Threshold</label>
+      <input type="range" id="threshold-slider" min="0" max="0.9" step="0.01" value="0.06" oninput="updateThreshold(this.value)">
+      <span id="threshold-val">0.06</span>
+    </div>
+
+    <div class="card-grid" style="margin-top: var(--s8)">
+      <div class="card reveal" data-anim="reveal" data-label="reveal-1">
+        <div class="card-label">Reveal · Card A</div>
+        <div class="card-body">Fires when element crosses the viewport threshold. No delay.</div>
+      </div>
+      <div class="card reveal" data-anim="reveal" data-label="reveal-2" style="transition-delay:80ms">
+        <div class="card-label">Reveal · Card B</div>
+        <div class="card-body">80ms delay set inline. Simulates manual stagger without JS.</div>
+      </div>
+      <div class="card reveal" data-anim="reveal" data-label="reveal-3" style="transition-delay:160ms">
+        <div class="card-label">Reveal · Card C</div>
+        <div class="card-body">160ms delay. Check if fire order matches expectation in debug panel.</div>
+      </div>
+    </div>
+
+    <div class="reframe reveal" data-anim="reveal" data-label="reveal-reframe" style="transition-delay:240ms;margin-top:var(--s6)">
+      <div class="reframe-label">Debug Note</div>
+      <div class="reframe-body">If these cards animate in together (not staggered), the IO observer fired on all simultaneously. That's expected — they enter the viewport at the same time. True stagger needs JS (Zone 02).</div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 2 — STAGGER
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-2" data-zone="02 Stagger">
+    <div class="zone-label" id="label-zone-2">
+      Zone 02 · Stagger
+      <span class="zone-status" id="status-zone-2">pending</span>
+    </div>
+    <h2 class="zone-title">Sequential Reveal<br><em>Child delays via CSS nth-child</em></h2>
+    <p class="zone-desc">Parent gets <code>.on</code> from the observer. CSS nth-child selectors apply staggered transition-delay. No extra JS per child — one IO hit triggers the whole sequence.</p>
+
+    <div class="card-grid stagger-parent" data-anim="stagger" data-label="stagger-grid" style="margin-top: var(--s8)">
+      <div class="card stagger-child">
+        <div class="card-label" style="color:var(--lim)">01 · First</div>
+        <div class="card-body">Fires at 0ms. Should appear first.</div>
+      </div>
+      <div class="card stagger-child">
+        <div class="card-label" style="color:var(--cog)">02 · Second</div>
+        <div class="card-body">Fires at 90ms. Slight lag visible.</div>
+      </div>
+      <div class="card stagger-child">
+        <div class="card-label" style="color:var(--cv)">03 · Third</div>
+        <div class="card-body">Fires at 180ms. Cascade should feel smooth.</div>
+      </div>
+    </div>
+
+    <div class="card-grid stagger-parent" data-anim="stagger" data-label="stagger-grid-2" style="margin-top: var(--s4)">
+      <div class="card stagger-child">
+        <div class="card-label" style="color:var(--pt)">04 · Fourth</div>
+        <div class="card-body">270ms. Second row fires after first row completes.</div>
+      </div>
+      <div class="card stagger-child">
+        <div class="card-label" style="color:var(--coral)">05 · Fifth</div>
+        <div class="card-body">360ms. Check for jank at this delay.</div>
+      </div>
+      <div class="card stagger-child">
+        <div class="card-label" style="color:var(--t2)">06 · Sixth</div>
+        <div class="card-body">450ms. Last card. Total cascade = 450ms.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 3 — COUNT-UP
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-3" data-zone="03 Count-Up">
+    <div class="zone-label" id="label-zone-3">
+      Zone 03 · Count-Up
+      <span class="zone-status" id="status-zone-3">pending</span>
+    </div>
+    <h2 class="zone-title">Number Animation<br><em>JS-driven, IO-triggered</em></h2>
+    <p class="zone-desc">IntersectionObserver fires JS counter animation. Eased over 1.2s. Format: integer, percentage, prefix/suffix. Once fired, won't re-run until reset.</p>
+
+    <div class="stat-grid" style="margin-top: var(--s8)">
+      <div class="stat-cell count-up-wrap" data-anim="count" data-label="stat-1" data-target="160" data-suffix="" data-duration="1200">
+        <div class="stat-num"><span class="count-display">0</span></div>
+        <div class="stat-label">Liminal Transitions</div>
+      </div>
+      <div class="stat-cell count-up-wrap" data-anim="count" data-label="stat-2" data-target="94" data-suffix="%" data-duration="1400">
+        <div class="stat-num"><span class="count-display">0</span><span class="suffix">%</span></div>
+        <div class="stat-label">Enrichment Coverage</div>
+      </div>
+      <div class="stat-cell count-up-wrap" data-anim="count" data-label="stat-3" data-target="9" data-suffix="" data-prefix="" data-duration="800">
+        <div class="stat-num"><span class="count-display">0</span></div>
+        <div class="stat-label">Functional Categories</div>
+      </div>
+      <div class="stat-cell count-up-wrap" data-anim="count" data-label="stat-4" data-target="3072" data-suffix="d" data-duration="1600">
+        <div class="stat-num"><span class="count-display">0</span><span class="suffix">d</span></div>
+        <div class="stat-label">Embedding Dimensions</div>
+      </div>
+    </div>
+
+    <div class="reframe" style="margin-top: var(--s6)">
+      <div class="reframe-label">Debug Note</div>
+      <div class="reframe-body">If numbers jump to final value instantly → easing function failed. If they never animate → IO didn't fire. Check <code>dp-last</code> in overlay. Duration is set per-cell via <code>data-duration</code> attr.</div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 4 — HORIZONTAL SLIDE
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-4" data-zone="04 Slide H">
+    <div class="zone-label" id="label-zone-4">
+      Zone 04 · Horizontal Slide
+      <span class="zone-status" id="status-zone-4">pending</span>
+    </div>
+    <h2 class="zone-title">Slide Left / Right<br><em>Directional entry for split layouts</em></h2>
+    <p class="zone-desc">Left panel slides in from left, right panel from right. Good for two-column comparison layouts. Uses translateX.</p>
+
+    <div class="slide-row" style="margin-top: var(--s8)">
+      <div class="slide-card slide-left" data-anim="slide-left" data-label="slide-L">
+        <div class="card-label" style="color:var(--cv)">← Slides from Left</div>
+        <div class="card-body">This panel enters from the left side. translateX(-32px → 0). Check for horizontal scroll trigger at mobile widths.</div>
+      </div>
+      <div class="slide-card slide-right" data-anim="slide-right" data-label="slide-R">
+        <div class="card-label" style="color:var(--lim)">Slides from Right →</div>
+        <div class="card-body">This panel enters from the right. translateX(32px → 0). Both fire simultaneously — no stagger here.</div>
+      </div>
+    </div>
+
+    <div class="reframe reveal" data-anim="reveal" data-label="slide-note" style="margin-top: var(--s6)">
+      <div class="reframe-label">Watch For</div>
+      <div class="reframe-body">Horizontal slides can cause layout shift at narrow viewports if the element is near the page edge. Add <code>overflow-x: hidden</code> on a container if you see horizontal scrollbar flash.</div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 5 — SCALE-IN
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-5" data-zone="05 Scale-In">
+    <div class="zone-label" id="label-zone-5">
+      Zone 05 · Scale-In
+      <span class="zone-status" id="status-zone-5">pending</span>
+    </div>
+    <h2 class="zone-title">Scale Entry<br><em>Cards that grow into place</em></h2>
+    <p class="zone-desc">scale(0.93 → 1) + opacity. Subtle — not a zoom pop. Good for cards and feature blocks. Feels more tactile than a plain fade.</p>
+
+    <div class="card-grid" style="margin-top: var(--s8)">
+      <div class="card scale-in" data-anim="scale" data-label="scale-1">
+        <div class="card-label" style="color:var(--pt)">Scale-In A</div>
+        <div class="card-body">Starts at 93% size. Growth is subtle enough to feel physical.</div>
+      </div>
+      <div class="card scale-in" data-anim="scale" data-label="scale-2" style="transition-delay:60ms">
+        <div class="card-label" style="color:var(--cog)">Scale-In B</div>
+        <div class="card-body">60ms delay. Does the slight offset read as intentional?</div>
+      </div>
+      <div class="card scale-in" data-anim="scale" data-label="scale-3" style="transition-delay:120ms">
+        <div class="card-label" style="color:var(--lim)">Scale-In C</div>
+        <div class="card-body">120ms. If 0.93 feels too subtle, try 0.88 — update CSS var.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 6 — LINE REVEAL
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-6" data-zone="06 Line Reveal">
+    <div class="zone-label" id="label-zone-6">
+      Zone 06 · Line Reveal
+      <span class="zone-status" id="status-zone-6">pending</span>
+    </div>
+    <h2 class="zone-title">Text Line<br><em>Clip reveal, line by line</em></h2>
+    <p class="zone-desc">Each line of a headline clips upward into view. Uses overflow:hidden on the container with translateY(100%→0) per span. Editorial-grade.</p>
+
+    <div style="margin-top: var(--s10); max-width: 560px;">
+      <div class="line-reveal" data-anim="line-reveal" data-label="line-headline">
+        <span style="font-family: var(--disp); font-size: clamp(24px, 3.5vw, 38px); font-weight: 400; color: var(--t1); display: block; line-height: 1.3;">
+          Marketing isn't about
+        </span>
+        <span style="font-family: var(--disp); font-size: clamp(24px, 3.5vw, 38px); font-weight: 400; color: var(--t2); display: block; line-height: 1.3; font-style: italic; transition-delay: 80ms;">
+          moving people through stages.
+        </span>
+        <span style="font-family: var(--disp); font-size: clamp(24px, 3.5vw, 38px); font-weight: 400; color: var(--pt); display: block; line-height: 1.3; transition-delay: 160ms;">
+          It's about reading transitions.
+        </span>
+      </div>
+    </div>
+
+    <div class="reframe" style="margin-top: var(--s8)">
+      <div class="reframe-label">Implementation Note</div>
+      <div class="reframe-body">Each <code>&lt;span&gt;</code> must be a block element. Parent needs <code>overflow:hidden</code>. WP.com strips inline styles from page content — these spans need classes in style.css, not inline styles. Test this in the block editor.</div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 7 — BORDER DRAW
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-7" data-zone="07 Border Draw">
+    <div class="zone-label" id="label-zone-7">
+      Zone 07 · Border Draw
+      <span class="zone-status" id="status-zone-7">pending</span>
+    </div>
+    <h2 class="zone-title">Border Entry<br><em>Left rule draws in on scroll</em></h2>
+    <p class="zone-desc">Border-left grows from 0px to 2px while content fades in and padding-left expands. Good for pull quotes, reframe panels, insight callouts.</p>
+
+    <div style="margin-top: var(--s8); display: flex; flex-direction: column; gap: var(--s5)">
+      <div class="border-draw" data-anim="border-draw" data-label="bd-1">
+        <div style="font-size: 15px; color: var(--t2); font-weight: 300; line-height: 1.8; max-width: 560px;">
+          "The biggest mistake in behavioral marketing is treating consumer psychology like a checklist. Biases don't fire sequentially. They compound."
+        </div>
+        <div style="margin-top: var(--s3); font-size: 11px; color: var(--t3); font-family: var(--mono);">— SAEO Intelligence Framework</div>
+      </div>
+
+      <div class="border-draw" data-anim="border-draw" data-label="bd-2" style="transition-delay:150ms; border-left-color: var(--cog)">
+        <div style="font-size: 15px; color: var(--t2); font-weight: 300; line-height: 1.8; max-width: 560px;">
+          "Funnel stages describe a map. Liminal transitions describe the actual terrain."
+        </div>
+        <div style="margin-top: var(--s3); font-size: 11px; color: var(--t3); font-family: var(--mono);">— Good Assumptions</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 8 — PARALLAX
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-8" data-zone="08 Parallax">
+    <div class="zone-label" id="label-zone-8">
+      Zone 08 · Parallax Drift
+      <span class="zone-status" id="status-zone-8">pending</span>
+    </div>
+    <h2 class="zone-title">Background Parallax<br><em>Scroll-synced depth</em></h2>
+    <p class="zone-desc">Background layer moves at 0.4× scroll speed relative to container. Pure JS — no CSS scroll-snap. Check for jank on lower-end devices. Uses requestAnimationFrame.</p>
+
+    <div class="parallax-zone" id="parallax-zone" style="margin-top: var(--s8)">
+      <div class="parallax-bg" id="parallax-bg"></div>
+      <div class="parallax-text reveal" data-anim="reveal" data-label="parallax-text">
+        <h3>Depth in Motion</h3>
+        <p>background moves at 0.4× scroll velocity</p>
+      </div>
+    </div>
+
+    <div class="reframe" style="margin-top: var(--s6)">
+      <div class="reframe-label">Performance Note</div>
+      <div class="reframe-body">Parallax is driven by <code>requestAnimationFrame</code> + <code>transform: translateY()</code>. Will-change: transform is set on the bg element. Avoid parallax on mobile — the scroll behavior differences cause jank. Add a <code>@media (prefers-reduced-motion: reduce)</code> kill-switch.</div>
+    </div>
+  </section>
+
+  <div class="zone-spacer"><span class="zone-spacer-label">↓ keep scrolling · 40vh gap</span></div>
+
+  <!-- ═══════════════════════════════════
+       ZONE 9 — NAV ACTIVE / ANCHOR PILLS
+  ════════════════════════════════════ -->
+  <section class="test-zone" id="zone-9" data-zone="09 Nav Active">
+    <div class="zone-label" id="label-zone-9">
+      Zone 09 · Nav Active + Anchor Pills
+      <span class="zone-status" id="status-zone-9">pending</span>
+    </div>
+    <h2 class="zone-title">Scroll Tracking<br><em>Anchor pills + active state sync</em></h2>
+    <p class="zone-desc">The sticky nav above should reflect the current zone. Side panel dots should also track. Scroll up to verify the anchor pill deactivates correctly at zone boundaries.</p>
+
+    <div class="card-grid" style="margin-top: var(--s8)">
+      <div class="card reveal" data-anim="reveal" data-label="nav-1">
+        <div class="card-label">Pill Active State</div>
+        <div class="card-body">Check anchor-nav above — "09 Nav Active" pill should be active when this section is in view.</div>
+      </div>
+      <div class="card reveal" data-anim="reveal" data-label="nav-2" style="transition-delay:80ms">
+        <div class="card-label">Side Panel Dots</div>
+        <div class="card-body">The dot panel (right edge) should show dot 9 active. Hover the dots to see zone labels.</div>
+      </div>
+      <div class="card reveal" data-anim="reveal" data-label="nav-3" style="transition-delay:160ms">
+        <div class="card-label">Progress Bar</div>
+        <div class="card-body">Top progress bar should be near 100% when reading this. Gradient: green → blue.</div>
+      </div>
+    </div>
+
+    <div class="reframe reveal" data-anim="reveal" data-label="summary" style="margin-top: var(--s8)">
+      <div class="reframe-label">Summary</div>
+      <div class="reframe-body">
+        Every animation above uses a single shared IntersectionObserver (threshold tunable above). The stagger, count-up, line-reveal, parallax, and border-draw each add one small behavior on top of the same IO pattern. This is the architecture to carry into ga-animations.js — one observer, multiple callbacks keyed by data-anim attribute.
+      </div>
+    </div>
+
+    <!-- Bottom CTA area -->
+    <div style="margin-top: var(--s12); padding-top: var(--s10); border-top: 0.5px solid var(--border); text-align: center;">
+      <p style="font-family: var(--mono); font-size: 11px; color: var(--t3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: var(--s4)">End of test sequence</p>
+      <button class="reset-btn" onclick="resetAll()" style="font-size: 13px; padding: 8px 20px;">↺ Reset All Animations — Scroll Back Up to Re-Test</button>
+    </div>
+
+  </section>
+
+</div><!-- /page -->
+
+<script>
+// ═══════════════════════════════════════════════════════
+// GA ANIMATION DEBUG ENGINE
+// ═══════════════════════════════════════════════════════
+
+// ── Config ──────────────────────────────────────────────
+let currentThreshold = 0.06;
+let triggeredCount = 0;
+let observer;
+
+const zones = ['zone-1','zone-2','zone-3','zone-4','zone-5','zone-6','zone-7','zone-8','zone-9'];
+const zoneLabels = ['01 Reveal','02 Stagger','03 Count-Up','04 Slide H','05 Scale-In','06 Line Reveal','07 Border Draw','08 Parallax','09 Nav Active'];
+
+// ── Build side panel dots ────────────────────────────────
+(function buildDots() {
+  const container = document.getElementById('zone-dots');
+  zones.forEach((id, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'sp-dot';
+    dot.setAttribute('data-zone', id);
+    dot.setAttribute('data-label', zoneLabels[i]);
+    dot.addEventListener('click', () => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    container.appendChild(dot);
+  });
+})();
+
+// ── Progress bar + scroll tracking ──────────────────────
+function onScroll() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? Math.round((scrollTop / docHeight) * 100) : 0;
+
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('scroll-pct').textContent = pct + '%';
+  document.getElementById('dp-scroll').textContent = Math.round(scrollTop) + 'px';
+
+  // Active zone tracking
+  let activeZone = null;
+  zones.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.4) activeZone = id;
+    }
+  });
+
+  if (activeZone) {
+    document.getElementById('dp-zone').textContent = activeZone;
+
+    // Anchor pills
+    document.querySelectorAll('.anchor-pill').forEach(pill => {
+      const href = pill.getAttribute('href');
+      pill.classList.toggle('active', href === '#' + activeZone);
+    });
+
+    // Side dots
+    document.querySelectorAll('.sp-dot').forEach(dot => {
+      dot.classList.toggle('active', dot.getAttribute('data-zone') === activeZone);
+    });
+  }
+
+  // Parallax
+  updateParallax(scrollTop);
+}
+
+// ── Parallax ─────────────────────────────────────────────
+let rafId = null;
+function updateParallax(scrollTop) {
+  const zone = document.getElementById('parallax-zone');
+  const bg = document.getElementById('parallax-bg');
+  if (!zone || !bg) return;
+
+  const rect = zone.getBoundingClientRect();
+  const centerOffset = rect.top + rect.height / 2 - window.innerHeight / 2;
+  const shift = centerOffset * 0.3;
+  bg.style.transform = `translateY(${shift}px)`;
+}
+
+// ── IntersectionObserver factory ─────────────────────────
+function buildObserver(threshold) {
+  if (observer) observer.disconnect();
+
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      const el = entry.target;
+      const anim = el.dataset.anim;
+      const label = el.dataset.label || '?';
+
+      // Fire
+      el.classList.add('on');
+      triggeredCount++;
+      document.getElementById('dp-triggered').textContent = triggeredCount;
+      document.getElementById('dp-last').textContent = label;
+
+      // Update zone status
+      const zoneEl = el.closest('.test-zone');
+      if (zoneEl) {
+        const zoneId = zoneEl.id;
+        const statusEl = document.getElementById('status-' + zoneId);
+        const labelEl = document.getElementById('label-' + zoneId);
+        if (statusEl) { statusEl.textContent = 'fired'; statusEl.classList.add('fired'); }
+        if (labelEl) labelEl.classList.add('triggered');
+      }
+
+      // Count-up
+      if (anim === 'count') {
+        runCountUp(el);
+      }
+
+      observer.unobserve(el);
+    });
+  }, { threshold });
+
+  // Observe all animated elements
+  document.querySelectorAll('[data-anim]').forEach(el => {
+    // Only observe if not already .on
+    if (!el.classList.contains('on')) {
+      observer.observe(el);
+    }
+  });
+
+  // Update pending count
+  updatePending();
+}
+
+// ── Pending count ─────────────────────────────────────────
+function updatePending() {
+  const pending = document.querySelectorAll('[data-anim]:not(.on)').length;
+  document.getElementById('dp-pending').textContent = pending;
+}
+
+// ── Count-Up ─────────────────────────────────────────────
+function runCountUp(el) {
+  const target = parseInt(el.dataset.target || '0', 10);
+  const duration = parseInt(el.dataset.duration || '1200', 10);
+  const display = el.querySelector('.count-display');
+  if (!display) return;
+
+  const start = performance.now();
+
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const easedProgress = easeOut(progress);
+    const current = Math.round(easedProgress * target);
+    display.textContent = current.toLocaleString();
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// ── Threshold updater ─────────────────────────────────────
+function updateThreshold(val) {
+  currentThreshold = parseFloat(val);
+  document.getElementById('threshold-val').textContent = parseFloat(val).toFixed(2);
+  document.getElementById('dp-threshold').textContent = parseFloat(val).toFixed(2);
+  // Note: rebuilding observer doesn't re-fire already-fired elements
+  buildObserver(currentThreshold);
+}
+
+// ── Reset all animations ──────────────────────────────────
+function resetAll() {
+  // Remove .on from everything
+  document.querySelectorAll('.on').forEach(el => el.classList.remove('on'));
+
+  // Reset count-up displays
+  document.querySelectorAll('[data-anim="count"] .count-display').forEach(el => {
+    el.textContent = '0';
+  });
+
+  // Reset zone statuses
+  zones.forEach(id => {
+    const statusEl = document.getElementById('status-' + id);
+    const labelEl = document.getElementById('label-' + id);
+    if (statusEl) { statusEl.textContent = 'pending'; statusEl.classList.remove('fired'); }
+    if (labelEl) labelEl.classList.remove('triggered');
+  });
+
+  // Reset counters
+  triggeredCount = 0;
+  document.getElementById('dp-triggered').textContent = '0';
+  document.getElementById('dp-last').textContent = '—';
+
+  // Rebuild observer
+  buildObserver(currentThreshold);
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Init ──────────────────────────────────────────────────
+buildObserver(currentThreshold);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll(); // run once on load
+</script>
+
+</body>
+</html>
