@@ -4,7 +4,6 @@ title: Good Assumptions — Homepage
 url_path: /
 kind: page
 status: locked
-version: 1
 sections: 6
 palette: GA editorial primary, SAEO mark colors only in handoff section
 decisions:
@@ -12,7 +11,7 @@ decisions:
   mix: 70/20/10 authority-dominant
   reader: planner-primary · vp/founder halo
   positioning: wall-with-a-door
-source: cms.ga_content (Supabase, project vfnspmpwcmgrcditcwpr)
+source: cms.ga_content (Supabase, project vfnspmpwcmgrcditcwpr) — historical drafting record only; this file is canonical
 ---
 
 # Section 0 — Header
