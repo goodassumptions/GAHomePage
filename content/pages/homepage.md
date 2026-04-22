@@ -143,4 +143,6 @@ The framework is the map. SAEO walks it.
 
 **Column 3 — More:** Articles · About · Contact · RSS
 
-**Bottom row:** © 2026 Good Assumptions · SAEO.ai →
+**Bottom row:** © 2026 Good Assumptions · Terms · Privacy
+
+*Rationale: Section 5 is the SAEO conversion moment. Bottom-row pill was redundant. Legal links belong here — keeps the bottom line quiet.*
