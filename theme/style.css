@@ -1697,3 +1697,608 @@ tr:last-child td { border-bottom: none; }
     border-bottom: none !important;
   }
 }
+
+
+/* ============================================================
+   ────────────────────────────────────────────────────────────
+   CHROME — HEADER, NAV, DROPDOWNS, FOOTER
+   Added 2026-04-22 for FSE template-parts integration.
+   ────────────────────────────────────────────────────────────
+   ============================================================ */
+
+
+/* ============================================================
+   HEADER — Sticky top bar with brand mark, primary nav, CTA
+   ============================================================ */
+.ga-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(20, 20, 18, 0.85);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 0.5px solid var(--border);
+  margin: 0 !important;
+}
+
+.admin-bar .ga-header {
+  top: var(--wp-admin--admin-bar--height, 32px);
+}
+
+.ga-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--s6);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  gap: var(--s8);
+}
+
+.ga-header .ga-mark {
+  flex-shrink: 0;
+  color: var(--t1);
+}
+.ga-header .ga-mark-svg { color: var(--t1); }
+
+.ga-header .ga-mark-name {
+  font-family: var(--font-disp);
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--t1);
+  white-space: nowrap;
+}
+
+
+/* ── Primary nav (desktop) ─────────────────────────────── */
+.ga-primary-nav {
+  flex: 1;
+}
+
+.ga-nav-list {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ga-nav-item {
+  position: relative;
+  margin: 0;
+}
+
+.ga-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t2);
+  text-decoration: none;
+  border-radius: var(--r1);
+  transition: color var(--transition), background var(--transition);
+  white-space: nowrap;
+}
+
+.ga-nav-link:hover,
+.ga-nav-link.active,
+.ga-nav-item.ga-has-dropdown:hover .ga-nav-link {
+  color: var(--t1);
+  background: var(--bg-3);
+}
+
+.ga-nav-caret {
+  color: var(--t3);
+  transition: transform var(--transition), color var(--transition);
+}
+.ga-nav-item.ga-has-dropdown:hover .ga-nav-caret {
+  color: var(--t1);
+  transform: rotate(180deg);
+}
+
+
+/* ── Dropdown panel (hover-to-open on desktop) ─────────── */
+.ga-dropdown {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 0;
+  min-width: 240px;
+  background: var(--bg-2);
+  border: 0.5px solid var(--border-med);
+  border-radius: var(--r3);
+  padding: var(--s2);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+  pointer-events: none;
+}
+
+/* Hover-intent bridge — keeps dropdown open when moving cursor across the gap */
+.ga-has-dropdown::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ga-has-dropdown:hover .ga-dropdown,
+  .ga-has-dropdown:focus-within .ga-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+.ga-dropdown a {
+  display: block;
+  padding: 8px 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--t2);
+  text-decoration: none;
+  border-radius: var(--r1);
+  transition: color var(--transition), background var(--transition);
+}
+
+.ga-dropdown a:hover {
+  color: var(--t1);
+  background: var(--bg-4);
+}
+
+.ga-dropdown-cap {
+  margin-top: 4px;
+  padding-top: 12px !important;
+  border-top: 0.5px solid var(--border);
+  font-style: italic;
+  color: var(--t3) !important;
+  font-size: 12px !important;
+}
+.ga-dropdown-cap:hover {
+  color: var(--t1) !important;
+}
+
+
+/* ── Header CTA ────────────────────────────────────────── */
+.ga-header-cta {
+  flex-shrink: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--r1);
+  background: var(--saeo-teal);
+  color: #0f0f0e !important;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+.ga-header-cta:hover {
+  background: #15c9af;
+  color: #0f0f0e !important;
+}
+
+
+/* ── Mobile toggle (hidden on desktop) ─────────────────── */
+.ga-mobile-toggle {
+  display: none;
+  background: transparent;
+  border: 0;
+  padding: 8px;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: auto;
+}
+.ga-mobile-toggle span {
+  display: block;
+  width: 20px;
+  height: 1px;
+  background: var(--t1);
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+
+/* ── Header responsive ─────────────────────────────────── */
+@media (max-width: 860px) {
+  .ga-header-inner {
+    padding: 0 var(--s4);
+    gap: var(--s4);
+    height: 56px;
+  }
+  .ga-primary-nav {
+    display: none;
+  }
+  .ga-mobile-toggle {
+    display: flex;
+  }
+  .ga-header-cta {
+    display: none;
+  }
+}
+
+
+/* ============================================================
+   FOOTER — 4-col grid + bottom row
+   ============================================================ */
+.ga-footer {
+  background: var(--bg-2);
+  border-top: 0.5px solid var(--border-med);
+  margin: 0 !important;
+  padding: var(--s16) 0 var(--s8);
+}
+
+.ga-footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--s6);
+}
+
+.ga-footer-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) 1.5fr;
+  gap: var(--s10);
+  padding-bottom: var(--s10);
+  border-bottom: 0.5px solid var(--border);
+}
+
+.ga-footer-col-label {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--t3);
+  margin-bottom: var(--s4);
+}
+
+.ga-footer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.ga-footer-list li { margin: 0; }
+
+.ga-footer-list a {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--t2);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+.ga-footer-list a:hover { color: var(--t1); }
+
+.ga-footer-col-mark { padding-left: var(--s4); }
+
+.ga-footer-col-mark .ga-mark {
+  color: var(--t1);
+  margin-bottom: var(--s3);
+}
+.ga-footer-col-mark .ga-mark-svg { color: var(--t1); }
+
+.ga-footer-tagline {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--t3);
+  font-weight: 300;
+  line-height: 1.65;
+  max-width: 280px;
+  margin: 0;
+}
+
+
+/* ── Bottom row ───────────────────────────────────────── */
+.ga-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s4);
+  padding-top: var(--s5);
+  flex-wrap: wrap;
+}
+
+.ga-footer-copy {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--t4);
+  letter-spacing: 0.04em;
+}
+
+.ga-footer-saeo {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--saeo-teal);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 0.5px solid rgba(24, 176, 154, 0.3);
+  padding-bottom: 2px;
+  transition: border-color var(--transition);
+}
+.ga-footer-saeo:hover {
+  color: var(--saeo-teal);
+  border-bottom-color: var(--saeo-teal);
+}
+
+
+/* ── Footer responsive ────────────────────────────────── */
+@media (max-width: 860px) {
+  .ga-footer { padding: var(--s12) 0 var(--s6); }
+  .ga-footer-inner { padding: 0 var(--s4); }
+  .ga-footer-cols {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s8);
+    padding-bottom: var(--s8);
+  }
+  .ga-footer-col-mark {
+    grid-column: 1 / -1;
+    padding-left: 0;
+    padding-top: var(--s4);
+    border-top: 0.5px solid var(--border);
+  }
+}
+
+@media (max-width: 480px) {
+  .ga-footer-cols { grid-template-columns: 1fr; gap: var(--s6); }
+  .ga-footer-bottom { flex-direction: column; align-items: flex-start; gap: var(--s3); }
+}
+
+
+/* ============================================================
+   FRONT-PAGE — Additions to the .ga-home component family
+   Extending what already exists in style.css for new blocks
+   used in front-page.html (hero CTAs, section links, articles).
+   ============================================================ */
+
+/* ── Hero CTAs ───────────────────────────────────────── */
+.ga-hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  flex-wrap: wrap;
+  margin-top: var(--s4);
+}
+
+.ga-hero-secondary {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--t2);
+  text-decoration: none;
+  border-bottom: 0.5px solid var(--border-med);
+  padding-bottom: 2px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.ga-hero-secondary:hover {
+  color: var(--t1);
+  border-bottom-color: var(--border-hi);
+}
+
+
+/* ── Stack row body (extended layout for desc text) ──── */
+.ga-stack-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ga-stack-desc {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--t3);
+  line-height: 1.65;
+  font-weight: 300;
+  margin-top: 4px;
+}
+
+
+/* ── Section "see more" link ─────────────────────────── */
+.ga-section-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+  text-decoration: none;
+  margin-top: var(--s5);
+  border-bottom: 0.5px solid var(--border-med);
+  padding-bottom: 2px;
+  transition: color var(--transition), border-color var(--transition);
+}
+.ga-section-link:hover {
+  color: var(--t1);
+  border-bottom-color: var(--border-hi);
+}
+
+
+/* ── Article cards (full-width stack, one per row) ───── */
+.ga-articles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  margin-bottom: var(--s2);
+}
+
+.ga-article-card {
+  display: block;
+  background: var(--bg-3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--r3);
+  padding: var(--s5) var(--s6);
+  text-decoration: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.ga-article-card:hover {
+  border-color: var(--border-med);
+  background: var(--bg-4);
+}
+
+.ga-article-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-bottom: var(--s3);
+}
+
+.ga-article-tag {
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: var(--r1);
+  background: var(--lim-bg);
+  color: var(--lim);
+  border: 0.5px solid var(--lim-bd);
+}
+
+.ga-article-time {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.ga-article-title {
+  font-family: var(--font-disp);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--t1);
+  margin: 0 0 var(--s3);
+}
+
+.ga-article-deck {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--t2);
+  line-height: 1.7;
+  margin: 0;
+}
+
+
+/* ============================================================
+   SAEO HANDOFF — Section 5 of homepage
+   Visually distinct: SAEO mark colors mark the door in the wall.
+   ============================================================ */
+.ga-saeo-handoff {
+  position: relative;
+  margin: var(--s12) calc(-1 * var(--s6)) 0;
+  padding: var(--s16) var(--s6);
+  background: linear-gradient(
+    135deg,
+    rgba(203, 74, 43, 0.08) 0%,
+    rgba(24, 176, 154, 0.08) 100%
+  );
+  border-top: 0.5px solid var(--border-med);
+  border-bottom: 0.5px solid var(--border-med);
+  overflow: hidden;
+}
+
+.ga-saeo-handoff::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 90% 20%, rgba(24, 176, 154, 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 10% 80%, rgba(203, 74, 43, 0.08) 0%, transparent 70%);
+}
+
+.ga-saeo-handoff-inner {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.ga-saeo-eyebrow {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--saeo-teal);
+  margin-bottom: var(--s4);
+}
+
+.ga-saeo-headline {
+  font-family: var(--font-disp);
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--t1);
+  margin: 0 0 var(--s5);
+}
+
+.ga-saeo-body {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--t2);
+  line-height: 1.85;
+  max-width: 580px;
+  margin: 0 0 var(--s5);
+}
+
+.ga-saeo-tagline {
+  font-family: var(--font-disp);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--t1);
+  line-height: 1.5;
+  margin: 0 0 var(--s8);
+}
+
+.ga-saeo-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: var(--r1);
+  background: var(--saeo-teal);
+  color: #0f0f0e !important;
+  text-decoration: none;
+  transition: background var(--transition);
+}
+.ga-saeo-cta:hover {
+  background: #15c9af;
+  color: #0f0f0e !important;
+}
+
+
+/* ── SAEO handoff responsive ─────────────────────────── */
+@media (max-width: 640px) {
+  .ga-saeo-handoff {
+    margin: var(--s10) calc(-1 * var(--s4)) 0;
+    padding: var(--s12) var(--s4);
+  }
+}
