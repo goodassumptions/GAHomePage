@@ -14,15 +14,21 @@ Good Assumptions is the framework brand and educational/credibility engine for
 3. Canonical visual reference (`/design/`)
 4. Exploration mockups (`/ideas/`)
 
-The repo is the **build surface**. Authoring happens in Supabase. When a piece
-moves to `status='locked'` in `cms.ga_content`, it gets promoted here as a
-markdown file under `/content/`.
+---
+
+## The model in one paragraph
+
+Pre-lock, Supabase is canonical. Drafts and reviews live in `cms.ga_content`.
+When a piece is ready, it locks and promotes to GitHub `/content/`. After
+promotion, **GitHub is canonical for the body** — future revisions happen by
+editing the markdown file directly in git, not by re-editing the Supabase row.
+Git history is the version history; there is no manual version integer.
+Supabase remains canonical forever for cross-cutting decisions (`cms.ga_locks`)
+and for the historical drafting record of every piece.
 
 ---
 
 ## Session-start queries
-
-Run these at the top of any session to load workflow state.
 
 ### 1. Load all locked decisions
 
@@ -32,14 +38,14 @@ FROM cms.ga_locks
 ORDER BY category, key;
 ```
 
-These are the calls that drive every piece. Voice, mix, reader, vocab, IA,
-cadence, visual, process, positioning. Read these first; never re-litigate
-a lock unless explicitly asked.
+These are the calls that drive every piece — voice, mix, reader, vocab, IA,
+cadence, visual, process, positioning. Read first. Never re-litigate a lock
+unless explicitly asked to.
 
 ### 2. Current content state
 
 ```sql
-SELECT slug, kind, status, title, version, updated_at
+SELECT slug, kind, status, title, git_path, last_promoted_at, updated_at
 FROM cms.ga_content
 ORDER BY
   CASE status
@@ -51,38 +57,60 @@ ORDER BY
   updated_at DESC;
 ```
 
-Tells you what's in flight (review/draft) vs. what's done (locked/published).
+`git_path` and `last_promoted_at` tell you which pieces have been promoted to
+GitHub and where they live. `null` in these fields = Supabase-only (pre-lock).
 
-### 3. Pull a specific piece
+### 3. Detect drift between Supabase and GitHub
 
 ```sql
-SELECT slug, kind, status, title, url_path, copy_md, meta, decisions, notes, version
+SELECT slug, status, updated_at, last_promoted_at,
+       (updated_at > last_promoted_at) AS supabase_ahead
+FROM cms.ga_content
+WHERE last_promoted_at IS NOT NULL
+  AND updated_at > last_promoted_at;
+```
+
+A row showing up here means Supabase has changes that haven't made it to git.
+Either re-promote, or — if the changes are stale and git is now canonical —
+revert the Supabase row to match git, since git is the source of truth post-lock.
+
+### 4. Pull a specific piece
+
+```sql
+SELECT slug, kind, status, title, url_path, copy_md, meta, decisions, notes,
+       git_path, last_promoted_at, last_promoted_sha
 FROM cms.ga_content
 WHERE slug = '[slug]';
 ```
 
 ---
 
-## Workflow lifecycle for a single piece
+## Workflow lifecycle
 
 ```
-   ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌──────────────┐
-   │  draft  │───▶│ review  │───▶│ locked  │───▶│  published   │
-   └─────────┘    └─────────┘    └─────────┘    └──────────────┘
-        │              │              │                │
-   brief +        full draft     copy_md       /content/[kind]/
-   structure      in copy_md     frozen,       [slug].md
-   stored in     status moves    promoted      lives here in repo,
-   cms.ga_       to 'review'     to GitHub     WP build consumes
-   content
+   ┌─────────┐    ┌─────────┐    ┌──────────┐    ┌───────────────┐
+   │  draft  │───▶│ review  │───▶│  locked  │───▶│   published   │
+   └─────────┘    └─────────┘    └──────────┘    └───────────────┘
+        │              │              │                   │
+   brief +        full draft     promote to         site is live;
+   structure      in copy_md     GitHub at          git history is
+   stored in     status moves    content/[kind]/    the version
+   cms.ga_       to 'review'     [slug].md          history from
+   content                       record git_path,   here on
+                                 last_promoted_at,
+                                 last_promoted_sha
+                                 back to Supabase
 ```
 
-| Status | Lives where | Editable by |
+| Status | Body lives where (canonically) | Editable by |
 |---|---|---|
-| `draft` | Supabase only | Claude + Dwayne |
-| `review` | Supabase only | Claude (revisions on Dwayne feedback) |
-| `locked` | Supabase + GitHub `/content/` | No one (frozen — bump `version` to revise) |
-| `published` | Supabase + GitHub + live site | Same as locked |
+| `draft` | Supabase `copy_md` | Claude + Dwayne in chat |
+| `review` | Supabase `copy_md` | Claude (revisions on Dwayne feedback) |
+| `locked` | **GitHub** `/content/[kind]/[slug].md` | git only |
+| `published` | **GitHub** `/content/[kind]/[slug].md` | git only |
+
+The lock is a one-way door. Once a piece is locked and promoted, **the
+Supabase row becomes a historical record**. Edits go to git.
 
 ---
 
@@ -98,14 +126,18 @@ WHERE slug = '[slug]';
 | `status` | `draft` \| `review` \| `locked` \| `published` |
 | `title` | display title |
 | `url_path` | final URL — e.g. `/framework/four-layers/` |
-| `copy_md` | markdown source of truth |
+| `copy_md` | markdown source — canonical pre-lock, historical post-lock |
 | `copy_html` | optional rendered HTML |
 | `meta` | jsonb — eyebrow, ctas, byline, reading_time, related, tags |
 | `decisions` | jsonb — snapshot of which `ga_locks` drove this piece |
 | `notes` | working notes, redlines, todos (not for publication) |
-| `version` | int — increments on every meaningful revision |
+| `git_path` | path in GAHomePage repo where the piece was promoted |
+| `last_promoted_at` | when the row was last written to GitHub |
+| `last_promoted_sha` | commit SHA of the most recent promotion |
 
-### `cms.ga_locks` (global decisions)
+No `version` column — git tracks revisions.
+
+### `cms.ga_locks` (global decisions — always canonical in Supabase)
 
 | column | what it holds |
 |---|---|
@@ -119,41 +151,61 @@ Both tables have `created_at` / `updated_at` and an `updated_at` trigger.
 
 ---
 
-## Lock promotion (the only "ship" step)
+## Lock + promote (the one ship step)
 
 When a piece is ready to lock:
 
-1. Update `cms.ga_content` row: `status='locked'`, `version` bumped, `updated_at` auto.
-2. Write the file to GitHub at `/content/[kind]/[slug].md` using the
-   `github-gahomepage` MCP connector. The file body is the `copy_md` field,
-   optionally with frontmatter pulled from `meta`.
-3. WordPress build picks up the file from `/content/` and renders it into
-   the live site.
+```sql
+-- 1. Lock the row
+UPDATE cms.ga_content
+   SET status = 'locked',
+       updated_at = now()
+ WHERE slug = '[slug]';
+```
 
-**Connector convention.** Each repo has its own MCP connector named
-`github-[reponame]`. For this repo, use `github-gahomepage`. The generic
-`github-write` connector does NOT have access to this repo. The generic
-`github-read` connector does, but only for reads. Always prefer
-`github-gahomepage` for any operation on this repo.
+```
+2. Write file to GitHub via the github-gahomepage MCP connector:
+   path:    content/[kind]/[slug].md
+   body:    YAML frontmatter from meta + copy_md from the row
+   commit:  "content: promote [slug] from cms.ga_content (status=locked)"
+
+3. Capture the response — file SHA and commit SHA.
+```
+
+```sql
+-- 4. Record the bridge back to Supabase
+UPDATE cms.ga_content
+   SET git_path          = 'content/[kind]/[slug].md',
+       last_promoted_at  = now(),
+       last_promoted_sha = '[commit sha from step 3]'
+ WHERE slug = '[slug]';
+```
+
+After this, the piece is canonically in GitHub. Future revisions happen there.
+
+---
+
+## Connector convention
+
+Each repo has its own MCP connector named `github-[reponame]`.
+For this repo: **`github-gahomepage`**.
+
+The generic `github-write` connector does **not** have access to this repo.
+The generic `github-read` connector works for cross-repo reads only. Always
+prefer `github-gahomepage` for both reads and writes on this repo.
+
+| Repo | Connector |
+|---|---|
+| `goodassumptions/GAHomePage` | `github-gahomepage` |
+| SAEO edge functions | `github-saeo-edge` |
+| (cross-repo reads) | `github-read` |
+
+New repos in the constellation get their own `github-[reponame]` connector.
 
 ---
 
 ## Working group
 
 Backlog and decision-log items related to GA content workflow are tagged
-under working group **`WG_GA_Content`** in `zwhat_next` (the cross-platform
-backlog table in the SAEO project). When surfacing a TODO from this work,
-log it under that working group.
-
----
-
-## Sibling repos / connectors
-
-| Repo | Connector | Scope |
-|---|---|---|
-| `goodassumptions/GAHomePage` | `github-gahomepage` | This repo. GA site, theme, content. |
-| `[saeo edge functions repo]` | `github-saeo-edge` | SAEO platform edge functions. |
-| (general read across allowlisted repos) | `github-read` | Cross-repo reads. |
-
-If a new repo gets added to the constellation, expect a new
-`github-[reponame]` connector to be wired up alongside it.
+under working group **`WG_GA_Content`** in the cross-platform `zwhat_next`
+backlog table.
