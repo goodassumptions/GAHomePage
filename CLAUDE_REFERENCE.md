@@ -4,6 +4,44 @@
 
 ---
 
+## How to Start a New Claude Session on GA Work
+
+### Option A — Copy-paste this exact prompt to open any GA session:
+
+```
+You are working on the Good Assumptions project.
+
+Before we start, please do the following in order:
+
+1. Use the github-gahomepage MCP connector to read the file CLAUDE_REFERENCE.md from the repo goodassumptions/GAHomePage (branch: main). This is your stack and role reference.
+
+2. Use the github-gahomepage MCP connector to read SESSION_START.md from the same repo. This is your content workflow reference.
+
+3. Use the Supabase MCP connector to run these two queries against project vfnspmpwcmgrcditcwpr:
+
+   -- Locked decisions (read these first, never re-litigate):
+   SELECT category, key, value, rationale FROM cms.ga_locks ORDER BY category, key;
+
+   -- Current content state:
+   SELECT slug, kind, status, title, git_path, last_promoted_at, updated_at
+   FROM cms.ga_content
+   ORDER BY
+     CASE status WHEN 'review' THEN 1 WHEN 'draft' THEN 2 WHEN 'locked' THEN 3 WHEN 'published' THEN 4 END,
+     updated_at DESC;
+
+4. Confirm what you loaded and then ask what we're working on today.
+```
+
+### Option B — Minimal prompt for theme/design-only sessions:
+
+```
+You are working on the Good Assumptions WordPress theme.
+
+Read CLAUDE_REFERENCE.md from github repo goodassumptions/GAHomePage using the github-gahomepage MCP connector, then ask what we're working on.
+```
+
+---
+
 ## The Two Products
 
 **Good Assumptions** (`goodassumptions.com`) — Behavioral marketing education and content brand. Credibility engine and publishing arm for SAEO. GEO-first content strategy.
@@ -26,13 +64,13 @@ Good Assumptions is the public-facing brand. SAEO is the product it supports.
 
 ---
 
-## Abandoned Explorations (do not reference)
+## Abandoned Explorations — Do Not Reference
 
 - **Payload CMS** (`payload-website-starter` repo) — explored, abandoned
 - **Wix** — explored, abandoned
 - **Directus** — explored, abandoned
 
-WordPress.com is the canonical publishing endpoint going forward. Do not suggest switching.
+WordPress.com is the canonical publishing endpoint. Do not suggest switching.
 
 ---
 
@@ -42,7 +80,7 @@ WordPress.com is the canonical publishing endpoint going forward. Do not suggest
 |---|---|---|
 | `goodassumptions/GAHomePage` | Theme files + promoted content | `github-gahomepage` |
 | `goodassumptions/saeo-edge` | SAEO edge functions | `github-saeo-edge` |
-| Cross-repo reads | Read-only access | `github-read` |
+| Cross-repo reads only | Read-only | `github-read` |
 
 **Always use `github-gahomepage` for GAHomePage reads and writes.** The generic `github-write` connector does not have access to this repo.
 
@@ -54,23 +92,29 @@ All theme files live in `GAHomePage/theme/`. These are the canonical source — 
 
 | File | Purpose |
 |---|---|
-| `style.css` | All custom CSS — design tokens, component styles, animations |
-| `theme.json` | Block editor settings — typography, colors, spacing scale |
-| `functions.php` | PHP — enqueues, custom blocks, GA-specific hooks |
-| `ga-animations.js` | Scroll and interaction animations |
-| `patterns/` | Block patterns registered for the editor |
-| `parts/` | Template parts (header, footer) |
-| `templates/` | Full page templates |
+| `theme/style.css` | All custom CSS — design tokens, component styles, animations |
+| `theme/theme.json` | Block editor settings — typography, colors, spacing scale |
+| `theme/functions.php` | PHP — enqueues, custom blocks, GA-specific hooks |
+| `theme/ga-animations.js` | Scroll and interaction animations |
+| `theme/patterns/` | Block patterns registered for the editor |
+| `theme/parts/` | Template parts (header, footer) |
+| `theme/templates/` | Full page templates |
+
+### How theme changes work
+
+1. Claude edits the file in `GAHomePage/theme/` via `github-gahomepage`
+2. Dwayne copies the changed file content into WordPress.com admin (Appearance → Theme File Editor, or via the child theme upload)
+3. Live site updates immediately — no build step
 
 ---
 
-## Design System Basics
+## Design System
 
-- **Primary color:** Lime/chartreuse green `#7FE042` (GA monogram color)
-- **Background:** Dark navy/near-black
+- **Primary green:** `#7FE042` (GA monogram lime/chartreuse)
+- **Background:** Dark navy near-black (`#0a0f1e` approx)
 - **Typography:** Bold sans-serif, high contrast
 - **Parent theme:** Twenty Twenty-Four
-- Design tokens live in `theme.json` and as CSS custom properties in `style.css`
+- Design tokens defined in `theme/theme.json` as CSS custom properties, extended in `theme/style.css`
 
 ---
 
@@ -80,9 +124,14 @@ All theme files live in `GAHomePage/theme/`. These are the canonical source — 
 draft → review → locked → published
 ```
 
-- **Pre-lock:** Supabase `cms.ga_content` is canonical. Body in `copy_md`.
-- **On lock:** Promote markdown to `GAHomePage/content/[kind]/[slug].md` via `github-gahomepage`. Record `git_path`, `last_promoted_at`, `last_promoted_sha` back to Supabase.
-- **Post-lock:** GitHub is canonical for the body. Supabase row becomes historical record.
+| Status | Body canonical where | Edit how |
+|---|---|---|
+| `draft` | Supabase `cms.ga_content.copy_md` | Claude + Dwayne in chat |
+| `review` | Supabase `cms.ga_content.copy_md` | Claude revisions on feedback |
+| `locked` | GitHub `GAHomePage/content/[kind]/[slug].md` | Git only |
+| `published` | GitHub `GAHomePage/content/[kind]/[slug].md` | Git only |
+
+Lock is a one-way door. Once promoted to GitHub, Supabase row is historical record only.
 
 Key tables: `cms.ga_content`, `cms.ga_locks`
 
@@ -91,20 +140,11 @@ Key tables: `cms.ga_content`, `cms.ga_locks`
 ## Claude's Role
 
 - Design and content editor for the WordPress site
-- Build assistant for the GA theme (style.css, theme.json, functions.php, patterns)
+- Build assistant for the GA theme (`style.css`, `theme.json`, `functions.php`, patterns)
 - Content pipeline operator (Supabase → GitHub promotion workflow)
 - GEO-first content strategy partner
 
-Not a Wix editor. Not a Payload CMS assistant. Not an infrastructure engineer (Supabase is already set up and stable).
-
----
-
-## Session Start Checklist
-
-1. Read `SESSION_START.md` (this repo root) for content workflow state
-2. Run session-start queries to load `cms.ga_locks` and `cms.ga_content` state
-3. Check `cms.ga_content` for any `supabase_ahead` drift
-4. Proceed with the task
+Not a Wix editor. Not a Payload CMS assistant. Not an infrastructure engineer.
 
 ---
 
@@ -112,5 +152,6 @@ Not a Wix editor. Not a Payload CMS assistant. Not an infrastructure engineer (S
 
 - **Project ref:** `vfnspmpwcmgrcditcwpr`
 - **Schema:** `cms`
-- **Key tables:** `ga_content`, `ga_locks`
-- MCP connector: Supabase MCP (connected)
+- **Key tables:** `cms.ga_content`, `cms.ga_locks`
+- **MCP connector:** Supabase (connected in Claude.ai)
+- **DB connection (if needed directly):** Transaction pooler `aws-0-us-east-1.pooler.supabase.com:6543`
